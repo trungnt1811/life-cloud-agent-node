@@ -1,0 +1,67 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: go.mod
+
+    - name: Cache Go modules
+      uses: actions/cache@v4
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-go-
+
+    - name: Download dependencies
+      run: go mod download
+
+    - name: Verify template identity
+      run: make template-identity-check
+
+    - name: Verify generated mocks
+      run: |
+        make mockgen
+        git diff --exit-code
+
+    - name: Verify OpenAPI docs
+      run: make swagger-check
+
+    - name: Run repository tests on PostgreSQL
+      run: make test-postgres-repositories
+
+    - name: Run tests
+      run: make test
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Go
+      uses: actions/setup-go@v5
+      with:
+        go-version-file: go.mod
+
+    - name: Run golangci-lint
+      run: make lint
+
+    - name: Verify lint fixes are committed
+      run: git diff --exit-code
