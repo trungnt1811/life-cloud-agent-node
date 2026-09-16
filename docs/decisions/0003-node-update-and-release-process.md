@@ -86,4 +86,5 @@ Tradeoffs:
 - Decide how a high-severity advisory is escalated beyond a passive status
   flag (e.g. paging the site operator) — not designed yet.
 - `UpdateAdvisory` / `Register` / `Heartbeat` on the shared stream: wire
-  fields addressed by decision 0004 (`.proto` implementation still pending).
+  fields addressed by decision 0004 (`.proto` + stubs checked in; runtime
+  stream handling still follow-up).

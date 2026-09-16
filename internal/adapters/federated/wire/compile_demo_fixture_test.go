@@ -38,14 +38,62 @@ func TestCompileDemoQueryTask_RoundTrip(t *testing.T) {
 	require.True(t, proto.Equal(task, &decoded))
 }
 
-func TestQueryTaskV1_RejectsNonEmptyGroupBy(t *testing.T) {
-	task, err := federatedwire.CompileDemoQueryTaskFromFixture()
-	require.NoError(t, err)
+func TestCompileDemoQueryTask_ExportedAPI(t *testing.T) {
+	task := federatedwire.CompileDemoQueryTask(federatedwire.DemoQueryDefinition{
+		DateStart:    "2024-01-01",
+		DateEnd:      "2024-12-31",
+		CBCRequired:  []string{"HB"},
+		HPLCRequired: []string{"HBF"},
+	})
+	require.Equal(t, "2024-01-01", task.GetTimeRange().GetFrom())
+	require.Equal(t, []string{"HB"}, task.GetRequiredPanels()[0].GetFieldCodes())
+}
 
-	task.GroupBy = []string{"HB"}
-	err = federatedwire.ValidateQueryTaskStructureV1(task)
-	require.Error(t, err)
-	require.Contains(t, err.Error(), "group_by")
+func TestQueryTaskV1_RejectsStructuralViolations(t *testing.T) {
+	t.Run("non_empty_group_by", func(t *testing.T) {
+		task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+		require.NoError(t, err)
+		task.GroupBy = []string{"HB"}
+		err = federatedwire.ValidateQueryTaskStructureV1(task)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "group_by")
+	})
+
+	t.Run("unsupported_schema_version", func(t *testing.T) {
+		task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+		require.NoError(t, err)
+		task.QuerySchemaVersion = 2
+		err = federatedwire.ValidateQueryTaskStructureV1(task)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "query_schema_version")
+	})
+
+	t.Run("unspecified_specimen_policy", func(t *testing.T) {
+		task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+		require.NoError(t, err)
+		task.SpecimenPolicy = nodev1.SpecimenPolicy_SPECIMEN_POLICY_UNSPECIFIED
+		err = federatedwire.ValidateQueryTaskStructureV1(task)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "specimen_policy")
+	})
+
+	t.Run("unspecified_operator", func(t *testing.T) {
+		task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+		require.NoError(t, err)
+		task.Conditions[0].Op = nodev1.ComparisonOperator_COMPARISON_OPERATOR_UNSPECIFIED
+		err = federatedwire.ValidateQueryTaskStructureV1(task)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "op")
+	})
+
+	t.Run("unspecified_value_constraint", func(t *testing.T) {
+		task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+		require.NoError(t, err)
+		task.RequiredPanels[0].ValueConstraint = nodev1.ValueConstraint_VALUE_CONSTRAINT_UNSPECIFIED
+		err = federatedwire.ValidateQueryTaskStructureV1(task)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "value_constraint")
+	})
 }
 
 func TestNodeControlConnect_ServiceRegistered(t *testing.T) {

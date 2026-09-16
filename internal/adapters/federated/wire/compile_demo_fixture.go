@@ -1,11 +1,9 @@
 package wire
 
 import (
+	_ "embed"
 	"encoding/json"
 	"fmt"
-	"os"
-	"path/filepath"
-	"runtime"
 	"strconv"
 
 	nodev1 "github.com/lifenetwork-ai/life-cloud-agent-node/gen/lifecloud/node/v1"
@@ -13,7 +11,12 @@ import (
 
 const demoQuerySchemaVersion uint32 = 1
 
-type demoQueryDefinition struct {
+//go:embed testdata/query_definition.json
+var demoQueryDefinitionJSON []byte
+
+// DemoQueryDefinition is the engineering cohort fixture shape from
+// life-cloud federated_mvp/benchmark/query_definition.json.
+type DemoQueryDefinition struct {
 	DateStart    string   `json:"date_start"`
 	DateEnd      string   `json:"date_end"`
 	CBCRequired  []string `json:"cbc_required"`
@@ -24,33 +27,18 @@ type demoQueryDefinition struct {
 	} `json:"rule"`
 }
 
-// CompileDemoQueryTaskFromFixture reads the embedded demo fixture and returns
-// the schema-v1 QueryTask equivalent (decision 0004 mapping table).
+// CompileDemoQueryTaskFromFixture decodes the embedded demo fixture and
+// returns the schema-v1 QueryTask equivalent (decision 0004 mapping table).
 func CompileDemoQueryTaskFromFixture() (*nodev1.QueryTask, error) {
-	fixturePath, err := demoFixturePath()
-	if err != nil {
-		return nil, err
-	}
-
-	content, err := os.ReadFile(fixturePath)
-	if err != nil {
-		return nil, fmt.Errorf("read demo fixture: %w", err)
-	}
-
-	var fixture demoQueryDefinition
-	if err := json.Unmarshal(content, &fixture); err != nil {
+	var fixture DemoQueryDefinition
+	if err := json.Unmarshal(demoQueryDefinitionJSON, &fixture); err != nil {
 		return nil, fmt.Errorf("decode demo fixture: %w", err)
 	}
-
-	return compileDemoQueryTask(fixture), nil
+	return CompileDemoQueryTask(fixture), nil
 }
 
 // CompileDemoQueryTask builds the schema-v1 task from decoded fixture fields.
-func CompileDemoQueryTask(fixture demoQueryDefinition) *nodev1.QueryTask {
-	return compileDemoQueryTask(fixture)
-}
-
-func compileDemoQueryTask(fixture demoQueryDefinition) *nodev1.QueryTask {
+func CompileDemoQueryTask(fixture DemoQueryDefinition) *nodev1.QueryTask {
 	return &nodev1.QueryTask{
 		JobId:              "demo-cohort",
 		QuerySchemaVersion: demoQuerySchemaVersion,
@@ -92,22 +80,47 @@ func compileDemoQueryTask(fixture demoQueryDefinition) *nodev1.QueryTask {
 	}
 }
 
-// ValidateQueryTaskStructureV1 applies schema-v1 structural rules that protobuf
-// decode alone does not enforce (decision 0004).
+// ValidateQueryTaskStructureV1 applies schema-v1 wire rules that protobuf
+// decode alone does not enforce (decision 0004): required enums, schema
+// version, and reserved group_by. Whitelist and semantic checks remain later
+// validation layers.
 func ValidateQueryTaskStructureV1(task *nodev1.QueryTask) error {
 	if task == nil {
 		return fmt.Errorf("query task is nil")
 	}
+	if task.GetQuerySchemaVersion() != demoQuerySchemaVersion {
+		return fmt.Errorf("unsupported query_schema_version %d; schema v1 requires %d", task.GetQuerySchemaVersion(), demoQuerySchemaVersion)
+	}
+	if task.GetSpecimenPolicy() != nodev1.SpecimenPolicy_SPECIMEN_POLICY_LATEST_IN_RANGE {
+		return fmt.Errorf("specimen_policy must be LATEST_IN_RANGE for schema v1")
+	}
 	if len(task.GetGroupBy()) > 0 {
 		return fmt.Errorf("group_by is reserved in schema v1 and must be empty")
 	}
-	return nil
-}
-
-func demoFixturePath() (string, error) {
-	_, currentFile, _, ok := runtime.Caller(0)
-	if !ok {
-		return "", fmt.Errorf("resolve fixture path")
+	for i, condition := range task.GetConditions() {
+		if condition == nil {
+			return fmt.Errorf("conditions[%d] is nil", i)
+		}
+		if condition.GetFieldCode() == "" {
+			return fmt.Errorf("conditions[%d].field_code is required", i)
+		}
+		if condition.GetOp() == nodev1.ComparisonOperator_COMPARISON_OPERATOR_UNSPECIFIED {
+			return fmt.Errorf("conditions[%d].op must be set", i)
+		}
+		if condition.GetValue() == nil || condition.GetValue().GetKind() == nil {
+			return fmt.Errorf("conditions[%d].value is required", i)
+		}
 	}
-	return filepath.Join(filepath.Dir(currentFile), "testdata", "query_definition.json"), nil
+	for i, panel := range task.GetRequiredPanels() {
+		if panel == nil {
+			return fmt.Errorf("required_panels[%d] is nil", i)
+		}
+		if len(panel.GetFieldCodes()) == 0 {
+			return fmt.Errorf("required_panels[%d].field_codes must not be empty", i)
+		}
+		if panel.GetValueConstraint() == nodev1.ValueConstraint_VALUE_CONSTRAINT_UNSPECIFIED {
+			return fmt.Errorf("required_panels[%d].value_constraint must be set", i)
+		}
+	}
+	return nil
 }

@@ -21,12 +21,16 @@ jobs:
       with:
         go-version-file: go.mod
 
-    - name: Cache Go modules
+    - name: Cache Go modules and pinned proto tools
       uses: actions/cache@v4
       with:
-        path: ~/go/pkg/mod
-        key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+        path: |
+          ~/go/pkg/mod
+          tools/bin
+          tools/include
+        key: ${{ runner.os }}-go-proto-${{ hashFiles('**/go.sum', 'Makefile') }}
         restore-keys: |
+          ${{ runner.os }}-go-proto-
           ${{ runner.os }}-go-
 
     - name: Download dependencies
@@ -42,9 +46,6 @@ jobs:
 
     - name: Verify OpenAPI docs
       run: make swagger-check
-
-    - name: Install protoc
-      run: sudo apt-get update && sudo apt-get install -y protobuf-compiler
 
     - name: Verify generated protobuf stubs
       run: make proto-check

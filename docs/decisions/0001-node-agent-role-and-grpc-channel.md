@@ -58,10 +58,11 @@ Tradeoffs:
   existing HTTP server, with its own DI wiring, and its own test/lint
   coverage.
 - The concrete wire contract is recorded in decision 0004; `.proto`
-  implementation remains follow-up work.
+  source and generated stubs are checked in (`api/proto/`, `gen/`).
 
 ## Follow-Up
 
 - Concrete gRPC service contract (proto definitions, RPC methods, query
-  shape): addressed by decision 0004; `.proto` implementation still pending.
+  shape): addressed by decision 0004; `.proto` + codegen landed — gRPC
+  server/client runtime remains follow-up.
 - Track bootstrap and gRPC scaffolding work in plans under `docs/plans/`.

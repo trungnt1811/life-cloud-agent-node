@@ -38,6 +38,10 @@ life-wallet-backend
 build/
 generated/
 
+# Pinned local codegen tools (protoc + plugins + well-known includes)
+tools/bin/
+tools/include/
+
 # Dependency directories
 node_modules/
 jspm_packages/

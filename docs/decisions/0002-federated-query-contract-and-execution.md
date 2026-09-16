@@ -28,9 +28,11 @@ callback) for the result. No client ever talks to a node agent directly, and
 no single slow or unreachable hospital blocks the request.
 
 **Queries are structured filters, never raw SQL.** A query is a versioned,
-schema-defined structure (field, operator, value, time range, group-by) —
-the same shape as `life-cloud`'s `query_definition.json` fixtures — carried
-in the `.proto` contract shared by node and control center. The control
+schema-defined structure carried in the shared `.proto` contract: field /
+operator / value conditions, time range, specimen selection policy,
+required panels (with exact-vs-censored value constraints), and optional
+group-by. Schema v1 details are in decision 0004; the demo
+`query_definition.json` fixture compiles into that shape. The control
 center never has authority to run an arbitrary statement against a node's
 database.
 
@@ -143,8 +145,8 @@ Tradeoffs:
   patient data flows through this system; today's "dispatch to all online
   nodes" is a named MVP assumption, not a security decision.
 - Concrete `.proto` / schema v1 wire contract: addressed by decision 0004
-  and `docs/product/query-field-dictionary.md` (implementation of `.proto`
-  files still pending).
+  and `docs/product/query-field-dictionary.md` (`.proto` source + generated
+  stubs checked in; gRPC runtime still follow-up).
 - Design the local `enabled_query_fields` admin surface (REST endpoint(s),
   audit fields) as node-local REST scope per decision 0001.
 - Revisit the human-in-the-loop / hybrid policy-engine alternative if a

@@ -148,18 +148,12 @@ make dev-down       # Stop local dependencies
    make mockgen
    ```
 
-3. **Install protoc for gRPC codegen**
+3. **Protobuf codegen uses a pinned toolchain**
    ```bash
-   # macOS
-   brew install protobuf
-   # Debian/Ubuntu
-   sudo apt-get install -y protobuf-compiler
+   make proto          # downloads pinned protoc + plugins into tools/bin/
+   make proto-check    # regenerates and fails if gen/ drifts
    ```
-
-4. **Generate protobuf stubs**
-   ```bash
-   make proto
-   ```
+   Do not rely on system `protoc` (Homebrew/apt versions differ and break CI).
 
 ### Testing
 

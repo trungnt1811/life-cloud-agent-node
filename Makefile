@@ -10,11 +10,16 @@ DB_PASSWORD ?= postgres
 DB_PORT ?= 5432
 POSTGRES_REPOSITORY_TEST_IMAGE ?= postgres:15-alpine
 
+PROTOC_VERSION ?= 29.3
 PROTOC_GEN_GO_VERSION ?= v1.36.5
 PROTOC_GEN_GO_GRPC_VERSION ?= v1.5.1
 PROTO_FILES := api/proto/lifecloud/node/v1/node_control.proto
+TOOLS_DIR := $(CURDIR)/tools
+TOOLS_BIN := $(TOOLS_DIR)/bin
+PROTOC := $(TOOLS_BIN)/protoc
+PROTOC_INCLUDE := $(TOOLS_DIR)/include
 
-.PHONY: build clean run test test-coverage lint swagger swagger-check proto proto-check template-identity-check migrate mockgen mocks dev-up dev-down docker-db-up docker-db-down test-postgres-repositories test-postgres-repositories-fast
+.PHONY: build clean run test test-coverage lint swagger swagger-check proto proto-tools proto-check template-identity-check migrate mockgen mocks dev-up dev-down docker-db-up docker-db-down test-postgres-repositories test-postgres-repositories-fast
 
 build:
 	go build -o ./bin/$(APP_BIN) ./cmd/main.go
@@ -50,13 +55,36 @@ swagger:
 swagger-check: swagger
 	git diff --exit-code -- docs/docs.go docs/swagger.json docs/swagger.yaml
 
-proto:
-	@command -v protoc >/dev/null 2>&1 || { echo "protoc is required; install protobuf-compiler"; exit 1; }
-	@go install google.golang.org/protobuf/cmd/protoc-gen-go@$(PROTOC_GEN_GO_VERSION)
-	@go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@$(PROTOC_GEN_GO_GRPC_VERSION)
+proto-tools:
+	@mkdir -p "$(TOOLS_BIN)" "$(PROTOC_INCLUDE)"
+	@if ! "$(PROTOC)" --version 2>/dev/null | grep -Fq "$(PROTOC_VERSION)"; then \
+		os=$$(uname -s); arch=$$(uname -m); \
+		case "$$os-$$arch" in \
+			Linux-x86_64)   platform=linux-x86_64 ;; \
+			Linux-aarch64)  platform=linux-aarch_64 ;; \
+			Darwin-x86_64)  platform=osx-x86_64 ;; \
+			Darwin-arm64)   platform=osx-aarch_64 ;; \
+			*) echo "unsupported platform for pinned protoc: $$os $$arch"; exit 1 ;; \
+		esac; \
+		tmp=$$(mktemp -d); \
+		url="https://github.com/protocolbuffers/protobuf/releases/download/v$(PROTOC_VERSION)/protoc-$(PROTOC_VERSION)-$${platform}.zip"; \
+		echo "downloading pinned protoc $(PROTOC_VERSION) ($${platform})"; \
+		curl -fsSL "$$url" -o "$$tmp/protoc.zip"; \
+		unzip -qo "$$tmp/protoc.zip" -d "$$tmp/protoc"; \
+		install -m 755 "$$tmp/protoc/bin/protoc" "$(PROTOC)"; \
+		rm -rf "$(PROTOC_INCLUDE)"; \
+		mkdir -p "$(PROTOC_INCLUDE)"; \
+		cp -R "$$tmp/protoc/include/." "$(PROTOC_INCLUDE)/"; \
+		rm -rf "$$tmp"; \
+	fi
+	@GOBIN="$(TOOLS_BIN)" go install google.golang.org/protobuf/cmd/protoc-gen-go@$(PROTOC_GEN_GO_VERSION)
+	@GOBIN="$(TOOLS_BIN)" go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@$(PROTOC_GEN_GO_GRPC_VERSION)
+
+proto: proto-tools
 	@mkdir -p gen
-	protoc \
+	PATH="$(TOOLS_BIN):$$PATH" "$(PROTOC)" \
 	  --proto_path=api/proto \
+	  --proto_path="$(PROTOC_INCLUDE)" \
 	  --go_out=gen --go_opt=paths=source_relative \
 	  --go-grpc_out=gen --go-grpc_opt=paths=source_relative \
 	  $(PROTO_FILES)
