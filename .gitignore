@@ -75,3 +75,6 @@ cmd/__*
 # AI-assissted
 .claude/
 .serena/
+# Harness core maintenance binary
+scripts/bin/harness
+scripts/bin/harness.exe
