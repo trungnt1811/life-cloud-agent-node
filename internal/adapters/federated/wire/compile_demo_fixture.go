@@ -82,8 +82,8 @@ func CompileDemoQueryTask(fixture DemoQueryDefinition) *nodev1.QueryTask {
 
 // ValidateQueryTaskStructureV1 applies schema-v1 wire rules that protobuf
 // decode alone does not enforce (decision 0004): required enums, schema
-// version, and reserved group_by. Whitelist and semantic checks remain later
-// validation layers.
+// version, a required time_range, and reserved group_by. Whitelist and
+// semantic checks remain later validation layers.
 func ValidateQueryTaskStructureV1(task *nodev1.QueryTask) error {
 	if task == nil {
 		return fmt.Errorf("query task is nil")
@@ -93,6 +93,15 @@ func ValidateQueryTaskStructureV1(task *nodev1.QueryTask) error {
 	}
 	if task.GetSpecimenPolicy() != nodev1.SpecimenPolicy_SPECIMEN_POLICY_LATEST_IN_RANGE {
 		return fmt.Errorf("specimen_policy must be LATEST_IN_RANGE for schema v1")
+	}
+	if task.GetTimeRange() == nil {
+		return fmt.Errorf("time_range is required")
+	}
+	if task.GetTimeRange().GetFrom() == "" {
+		return fmt.Errorf("time_range.from is required")
+	}
+	if task.GetTimeRange().GetTo() == "" {
+		return fmt.Errorf("time_range.to is required")
 	}
 	if len(task.GetGroupBy()) > 0 {
 		return fmt.Errorf("group_by is reserved in schema v1 and must be empty")

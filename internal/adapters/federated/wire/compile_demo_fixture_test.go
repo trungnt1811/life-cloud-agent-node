@@ -94,6 +94,24 @@ func TestQueryTaskV1_RejectsStructuralViolations(t *testing.T) {
 		require.Error(t, err)
 		require.Contains(t, err.Error(), "value_constraint")
 	})
+
+	t.Run("missing_time_range", func(t *testing.T) {
+		task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+		require.NoError(t, err)
+		task.TimeRange = nil
+		err = federatedwire.ValidateQueryTaskStructureV1(task)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "time_range")
+	})
+
+	t.Run("missing_time_range_bound", func(t *testing.T) {
+		task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+		require.NoError(t, err)
+		task.TimeRange.To = ""
+		err = federatedwire.ValidateQueryTaskStructureV1(task)
+		require.Error(t, err)
+		require.Contains(t, err.Error(), "time_range.to")
+	})
 }
 
 func TestNodeControlConnect_ServiceRegistered(t *testing.T) {
