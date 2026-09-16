@@ -1,18 +1,42 @@
-# Go Backend Template
+# Life Cloud Node Agent
 
-A production-ready Go API template using Clean Architecture principles with Gin, PostgreSQL, Redis/in-memory cache, structured logging, explicit dependency composition, and architecture guards.
+The node-side data agent that runs at a single hospital site in the Life
+Cloud federated thalassemia registry. Each hospital runs its own instance
+against its own local data; no raw patient data leaves the node. See
+[docs/product/overview.md](docs/product/overview.md) for the product intent
+and [docs/decisions/0001-node-agent-role-and-grpc-channel.md](docs/decisions/0001-node-agent-role-and-grpc-channel.md)
+for the accepted architecture. Agents working in this repository should start
+from [AGENTS.md](AGENTS.md).
+
+Built on a Clean Architecture Go API foundation with Gin, PostgreSQL,
+Redis/in-memory cache, structured logging, explicit dependency composition,
+and architecture guards.
+
+## Current Status
+
+Template bootstrap is complete (module, app, and database identity match this
+repository). No federated query domain or gRPC service exists yet — the
+`internal/domain/.../example*` CRUD code is still the template's placeholder
+domain, not the thalassemia data model. See `docs/plans/` for active and
+completed work.
 
 ## Features
 
-- **Clean Architecture**: Well-structured codebase following Clean Architecture principles
-- **RESTful API**: Built with Gin web framework
+- **Clean Architecture**: layered codebase separating delivery, domain, and
+  adapters
+- **REST (Gin)**: node-local HTTP surface for health checks, admin, and
+  Swagger/OpenAPI docs
+- **gRPC (planned)**: the federated query channel between the central
+  coordinator and this node agent; not yet implemented (decision 0001)
 - **Database**: PostgreSQL with GORM ORM and migrations
 - **Caching**: Redis integration with configurable TTL
-- **Configuration**: Environment-based configuration with Viper and module-scoped runtime config
-- **Logging**: Structured logging with Zap
+- **Configuration**: environment-based configuration with Viper and
+  module-scoped runtime config
+- **Logging**: structured logging with Zap
 - **Documentation**: Swagger/OpenAPI integration
-- **Testing**: Unit testing setup with testify, gomock, architecture guards, and integration test helpers
-- **Docker**: Multi-stage Dockerfile and docker-compose setup
+- **Testing**: unit testing with testify, gomock, architecture guards, and
+  integration test helpers
+- **Docker**: multi-stage Dockerfile and docker-compose setup
 - **Linting**: golangci-lint configuration
 
 ## Project Structure
@@ -47,28 +71,12 @@ A production-ready Go API template using Clean Architecture principles with Gin,
 
 ## Quick Start
 
-### Template Bootstrap
-
-Before writing product code in a repository created from this template, replace the template identity with the real repository identity:
-
-- `go.mod` module path
-- `.golangci.yml` `gci` local import prefix
-- `APP_BIN` in `Makefile`
-- `APP_NAME` and `DB_NAME` in `.env.example`
-- database names in `docker-compose.yml`
-
-Then run:
-
-```bash
-make template-identity-check
-```
-
 ### Using Docker Compose (Recommended)
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd go-backend-template
+   git clone git@github.com:lifenetwork-ai/life-cloud-agent-node.git
+   cd life-cloud-agent-node
    ```
 
 2. **Start all services**
@@ -115,7 +123,7 @@ make test-coverage  # Run tests with coverage
 make lint           # Run linter
 make swagger        # Generate Swagger documentation
 make swagger-check  # Verify generated Swagger/OpenAPI docs are current
-make template-identity-check # Verify derived repos no longer use template identity
+make template-identity-check # Verify the repository no longer uses the upstream template identity
 make migrate        # Run database migrations
 make clean          # Clean build artifacts
 make mockgen        # Regenerate gomock mocks through go generate
@@ -160,7 +168,7 @@ The application uses environment variables for configuration. Key variables:
 
 ```env
 # Application
-APP_NAME=go-backend-template
+APP_NAME=life-cloud-agent-node
 APP_PORT=8080
 APP_REQUEST_TIMEOUT_MS=30000
 ENV=development
@@ -171,7 +179,7 @@ DB_HOST=localhost
 DB_PORT=5432
 DB_USER=postgres
 DB_PASSWORD=postgres
-DB_NAME=go_backend_template
+DB_NAME=life_cloud_agent_node
 DB_MAX_OPEN_CONNS=25
 DB_MAX_IDLE_CONNS=5
 DB_CONN_MAX_LIFETIME_IN_MINUTE=60
@@ -187,10 +195,15 @@ CACHE_TYPE=redis
 
 ## Architecture
 
-This boilerplate follows Clean Architecture principles:
+This repository follows Clean Architecture principles:
 
-- **Delivery**: HTTP-only concerns. Handlers map request DTOs to domain contracts and map usecase output back to response DTOs.
-- **Domain**: Contracts, entities, usecases, repository ports, and external service ports. Domain does not import Gin, GORM, HTTP response packages, client SDKs, or adapter models.
+- **Delivery**: HTTP-only concerns today. Handlers map request DTOs to domain
+  contracts and map usecase output back to response DTOs. A gRPC delivery
+  path is planned for the federated query channel (decision 0001) and will
+  live alongside this layer, not replace it.
+- **Domain**: Contracts, entities, usecases, repository ports, and external
+  service ports. Domain does not import Gin, GORM, HTTP response packages,
+  client SDKs, gRPC-generated code, or adapter models.
 - **Adapters**: Persistence and external service implementations. Repositories map GORM models to domain records/entities; service adapters call HTTP/RPC/KMS/third-party clients behind domain ports.
 - **Infrastructure**: Reusable clients/drivers such as cache and rate limiter implementations.
 - **DI/Runtime Config**: Startup composes dependencies and projects environment config into module-scoped config structs.
@@ -223,7 +236,8 @@ git diff --check
 
 ## API Endpoints
 
-The boilerplate includes example CRUD endpoints:
+The codebase still ships the template's placeholder CRUD endpoints, not yet
+replaced by the federated thalassemia domain:
 
 ```
 GET    /api/v1/examples     # List examples
@@ -239,10 +253,10 @@ DELETE /api/v1/examples/:id # Delete example
 
 ```bash
 # Build image
-docker build -t go-backend-template .
+docker build -t life-cloud-agent-node .
 
 # Run container
-docker run -p 8080:8080 go-backend-template
+docker run -p 8080:8080 life-cloud-agent-node
 ```
 
 ### Using docker-compose
@@ -258,21 +272,10 @@ docker-compose logs -f
 docker-compose down
 ```
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - Clean Architecture by Robert C. Martin
 - Gin Web Framework
 - GORM ORM
-- And all the amazing Go community packages used in this project
+- Bootstrapped from the internal `go-backend-template` and
+  [repository-harness](https://github.com/hoangnb24/repository-harness)
