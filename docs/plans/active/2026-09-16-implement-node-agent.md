@@ -94,50 +94,281 @@ Out of scope (explicitly not this plan):
 
 Ordered by dependency; each phase is implemented, tested, and committed
 before the next begins. Update this section and Decisions below as
-evidence changes the approach.
+evidence changes the approach. File paths are proposals, not authority —
+follow the repo's existing Clean Architecture layering
+(`internal/domain` never imports `gen/`, `internal/adapters` implements
+domain ports, `internal/delivery` stays HTTP-only) and its
+`internal/testsupport/archtest` guards over anything written here.
 
-1. **D3 — Local Patient Registry domain.** Entities/contracts for patient,
-   specimen, and the 9 schema-v1 lab observations; repository port +
-   GORM/Postgres adapter + migration, following the existing
-   `internal/domain` / `internal/adapters/repositories` layering and
-   architecture-boundary tests.
-2. **Ingestion (4.0).** One adapter per life-cloud hospital profile
-   (VN_A/B/C shapes), each implementing a shared `HospitalExportAdapter`
-   port, writing normalized records into D3 via the repository from (1).
-   Each profile's exact mapping rules get their own short decision note if
-   materially ambiguous choices arise (e.g. an unmapped source code).
-3. **D5 — Enabled Query Fields + admin REST.** Store + migration; REST
-   endpoints under the existing Gin router (list/enable/disable a field,
-   `updated_by`/`updated_at` audit), reusing the repo's existing
-   admin-auth pattern (`SWAGGER_BASIC_AUTH_*`) rather than inventing a new
-   one.
-4. **Validation layers 2 & 3.** Whitelist against D5; semantic checks
-   (operator eligible for field kind, value parses per
-   `query-field-dictionary.md`, `time_range` bounds are valid dates) on
-   top of the existing layer 1/4 in `internal/adapters/federated/wire`.
-5. **Execution (3.5) + output policy (3.6).** Compile a validated
-   `QueryTask` into a query against D3 (required panels + conditions +
-   time range + specimen policy), compute `matching_count`, apply
-   small-cell suppression before returning `QueryResult`.
-6. **D4 — Job Progress Checkpoint + resume.** Store + migration; execution
-   from (5) persists progress so a dropped stream resumes instead of
-   rerunning. Checkpoint granularity is decided when this phase starts
-   (needs its own small decision — see Risks).
-7. **gRPC client.** Dial-out, `Register` on (re)connect with
-   `agent_version`/`query_schema_version`, periodic `Heartbeat`, receive
-   `CenterToNode` (`QueryTask` → pipeline from 4-6; `UpdateAdvisory` → log
-   + expose via `GET /admin/status`), send `NodeToCenter`
-   (`Register`/`Heartbeat`/`QueryResult`), reconnect with backoff on
-   stream loss. Wired into `cmd/app` via `internal/di`.
-8. **Stub control center (test support only).** A minimal `NodeControl`
-   server — accept `Connect`, record `Register`/`Heartbeat`, send a
-   `QueryTask` on command, receive `QueryResult` — living under test
-   support (not shipped in the production binary), to drive end-to-end
-   tests of (7) without the real control center.
-9. **End-to-end integration test.** Stub control center + real node agent
-   + seeded D3 (from 1-2): one query round trip, one rejected query
-   (invalid field), one dropped-stream-and-resume scenario, one
-   `UpdateAdvisory` delivery — proving the whole chain, not just units.
+### Phase 1 — D3: Local Patient Registry domain model + migration
+
+Files: `internal/domain/entities/{patient,specimen,lab_observation}.go`,
+`internal/domain/repositories/interfaces.go` (add `PatientRegistryRepository`),
+`internal/adapters/repositories/models/{patient,specimen,lab_observation}.go`,
+`internal/adapters/repositories/patient_registry_repository.go` (+ mapper
++ test), `internal/adapters/postgres/scripts/02_create_patient_registry_tables.sql`,
+`internal/mocks/mock_patient_registry_repository.go`.
+
+Key types (storage-only this phase; query methods land in Phase 5):
+
+```go
+type Patient struct {
+    ID                 uuid.UUID
+    ExternalPatientID  string // source-system identifier, kept as-is
+}
+
+type Specimen struct {
+    ID              uuid.UUID
+    PatientID       uuid.UUID
+    CollectedAt     time.Time // calendar date only
+    SourceDataset   string
+    SourceFile      string
+    SourceRowNumber int
+    SourceRecordID  string
+}
+
+type LabObservation struct {
+    ID         uuid.UUID
+    SpecimenID uuid.UUID
+    FieldCode  string // one of the 9 codes in query-field-dictionary.md
+    Value      string // decimal string, exact precision preserved
+    Censored   bool   // true when source used a '<' operator
+    RawValue   string
+    RawUnit    string
+}
+```
+
+- [ ] Entities carry no GORM tags (architecture boundary).
+- [ ] Migration creates `patients`, `specimens`, `lab_observations` with a
+      FK chain and indexes on `(patient_id, collected_at)` and
+      `(specimen_id, field_code)`.
+- [ ] GORM models + mapper, following `example_mapper.go`'s pattern.
+- [ ] Repository implementation + Postgres Testcontainers test (reuse
+      `internal/adapters/repositories/testsupport`).
+- [ ] `make mockgen`; `go build ./...`; `go test ./...`; `make lint`;
+      `make template-identity-check`.
+
+### Phase 2 — Ingestion (4.0): VN_A/B/C adapters into D3
+
+Files: `internal/adapters/ingestion/{adapter.go,vn_a.go,vn_b.go,vn_c.go}`
+(+ one `_test.go` each), `internal/domain/usecases/ingest_hospital_export_ucase.go`,
+a `cmd/` entrypoint or `make ingest` target, small fixtures under
+`internal/adapters/ingestion/testdata/` copied from
+`life-cloud/data/federated_mvp/nodes/{VN_A,VN_B,VN_C}/raw/` (a handful of
+rows each, not the full dataset).
+
+Key types:
+
+```go
+type Adapter interface {
+    ParseFile(path string) ([]NormalizedSpecimen, []Anomaly, error)
+}
+
+type NormalizedSpecimen struct {
+    ExternalPatientID string
+    CollectedAt       time.Time
+    Observations      []NormalizedObservation
+    Provenance        Provenance // source file/row/record id
+}
+
+type NormalizedObservation struct {
+    FieldCode string
+    Value     string // decimal, unrounded
+    Censored  bool
+    RawValue  string
+    RawUnit   string
+}
+
+// Anomaly is a row that couldn't be normalized; recorded, not silently
+// dropped or corrected (matches life-cloud's own stated policy).
+type Anomaly struct {
+    SourceFile      string
+    SourceRowNumber int
+    Reason          string
+}
+```
+
+- [ ] VN_A adapter: wide CSV, one row per panel, ISO dates, Hb in `g/dL`
+      directly. Unit test against a small fixture.
+- [ ] VN_B adapter: long CSV, one row per test, site codes `0301`/`H02`,
+      Hb `g/L` → `g/dL` conversion, HbA2 fraction → percent, `YYYYMMDD`
+      dates. Unit test.
+- [ ] VN_C adapter: semicolon-delimited UTF-8-BOM CSV, unaccented
+      Vietnamese headers, comma decimal separator, `DD/MM/YYYY` dates.
+      Unit test.
+- [ ] Anomalies (unknown codes, missing units, ambiguous dates, negative
+      values) are recorded via the `Anomaly` return, never silently
+      corrected or dropped. If a genuinely ambiguous mapping choice comes
+      up implementing any of the three, stop and record it as a short
+      decision before choosing (per Risks).
+- [ ] Ingestion usecase: pick adapter by profile flag, call
+      `PatientRegistryRepository` from Phase 1 to persist normalized
+      output; log anomaly count/reasons.
+- [ ] Integration test: ingest the copied fixtures end-to-end, assert
+      expected patient/specimen/observation counts land in D3.
+
+### Phase 3 — D5: Enabled Query Fields store + admin REST
+
+Files: `internal/domain/entities/enabled_query_field.go`,
+`internal/domain/repositories/interfaces.go` (add
+`EnabledQueryFieldRepository`), matching adapter/model/mapper/test,
+`internal/adapters/postgres/scripts/03_create_enabled_query_fields_table.sql`,
+`internal/domain/usecases/enabled_query_field_ucase.go`,
+`internal/delivery/dto/enabled_query_field.go`,
+`internal/delivery/http/handlers/enabled_query_field_handler.go`,
+`internal/delivery/http/route/enabled_query_field_route.go`.
+
+```go
+type EnabledQueryField struct {
+    FieldCode string
+    Enabled   bool
+    UpdatedAt time.Time
+    UpdatedBy string
+}
+```
+
+Endpoints (admin-auth protected, same middleware family as Swagger's):
+`GET /admin/query-fields` (list all 9 global codes + this node's state),
+`PUT /admin/query-fields/:field_code` (`{enabled, updated_by}`).
+
+- [ ] Migration seeds all 9 global field codes with `enabled=false` —
+      explicit per-hospital opt-in, not a default-open list.
+- [ ] Repository + usecase + handler + route, following the `example_*`
+      layering exactly.
+- [ ] Reuse `SWAGGER_BASIC_AUTH_USER`/`_PASS`-style middleware for these
+      admin routes; if that coupling turns out wrong once written, flag it
+      rather than silently introducing a second auth scheme.
+- [ ] `make swagger` updated; handler + repository tests; `go build/test/lint`.
+
+### Phase 4 — Validation layers 2 (whitelist) & 3 (semantic)
+
+Files: new files alongside `internal/adapters/federated/wire/compile_demo_fixture.go`,
+e.g. `validate_whitelist.go`, `validate_semantic.go`, `field_dictionary.go`
+(the 9-code → kind map, comment-linked to
+`docs/product/query-field-dictionary.md`), plus a combined
+`ValidateQueryTaskV1` that runs all four layers in Fig. 3's order.
+
+```go
+// ValidateQueryTaskWhitelistV1 — layer 2: every field_code referenced must
+// exist and be enabled in this node's own EnabledQueryFieldRepository.
+func ValidateQueryTaskWhitelistV1(ctx context.Context, task *nodev1.QueryTask, repo EnabledQueryFieldRepository) error
+
+// ValidateQueryTaskSemanticV1 — layer 3: operator eligible for field kind,
+// value parses as an exact decimal, time_range bounds are valid and ordered.
+func ValidateQueryTaskSemanticV1(task *nodev1.QueryTask) error
+```
+
+- [ ] Whitelist: unknown or disabled `field_code` in any condition or
+      required panel → `REJECTED_INVALID_QUERY`, reason names the field.
+- [ ] Semantic: value parses as an unrounded decimal (reuse the pattern
+      `life-cloud`'s own generator uses — no binary float on the wire, per
+      the `.proto` comment on `ConditionValue`); `time_range.from <=
+      time_range.to`; both are valid `YYYY-MM-DD`.
+- [ ] Combine all four layers into one `ValidateQueryTaskV1` matching
+      Fig. 3's exact order (structural → whitelist → semantic → version),
+      used by the gRPC handler in Phase 7 instead of calling each layer
+      separately.
+- [ ] One test per rejection reason, following the existing
+      `TestQueryTaskV1_RejectsStructuralViolations` pattern.
+
+### Phase 5 — Execution (3.5) + output policy (3.6)
+
+Files: extend `PatientRegistryRepository` with `CountMatchingCohort`;
+implement the SQL in the Phase 1 repository; add
+`internal/adapters/federated/wire/execute_query.go`; add
+`SUPPRESSION_THRESHOLD` to `conf`/`.env.example` (default e.g. `5`).
+
+```go
+// CohortCriteria is domain-owned, decoupled from the wire QueryTask.
+type CohortCriteria struct {
+    From, To        time.Time
+    Conditions      []Condition
+    RequiredPanels  []RequiredPanel
+}
+
+func (r *patientRegistryRepository) CountMatchingCohort(ctx context.Context, c CohortCriteria) (uint64, error)
+```
+
+- [ ] SQL selects the latest specimen per patient within `[from, to]`
+      (per `SPECIMEN_POLICY_LATEST_IN_RANGE`), requires every
+      `RequiredPanel`'s fields present (EXACT = non-censored value
+      required; ALLOW_CENSORED = presence is enough even if censored),
+      then applies each `Condition` as a decimal comparison.
+- [ ] Suppression: `0 < count < SUPPRESSION_THRESHOLD` → `matching_count=0,
+      suppressed=true`; otherwise the real count, `suppressed=false`.
+- [ ] Postgres Testcontainers test seeding known fixture rows with a
+      hand-computed expected count (mirrors life-cloud's own benchmark
+      verification style, not just a smoke test).
+
+### Phase 6 — D4: Job Progress Checkpoint + resume
+
+- [ ] **Before writing code:** record
+      `docs/decisions/0005-job-checkpoint-granularity.md` — what a
+      resumable batch is (e.g. patient-ID range chunks) and how often a
+      checkpoint is written. Do not guess this in code first.
+- [ ] Entity + migration for `job_progress` (`job_id`, `last_checkpoint`,
+      `updated_at`).
+- [ ] Repository + resume logic wired into Phase 5's execution so it runs
+      in checkpointable chunks.
+- [ ] Test: interrupt execution mid-chunk, resume, assert the final count
+      matches running the same query uninterrupted (no missed or
+      double-counted chunk).
+
+### Phase 7 — gRPC client: dial-out, Register/Heartbeat, task handling
+
+Files: `internal/adapters/federated/client/node_client.go`,
+`internal/workers/federated_client_worker.go`, `internal/runtimeconfig`
+additions (`CONTROL_CENTER_ADDRESS`, `NODE_ID`, `AGENT_VERSION`), DI wiring
+in `internal/di/wire.go` and `cmd/app/app.go`.
+
+- [ ] Dial-out and open `NodeControl.Connect`'s bidi stream.
+- [ ] Send `Register` on connect and every reconnect
+      (`node_id`, `agent_version`, `query_schema_version=1`).
+- [ ] Heartbeat every 30s with in-flight job IDs (Fig. 4).
+- [ ] Receive loop: `QueryTask` → `ValidateQueryTaskV1` (Phase 4) →
+      execute (Phase 5, checkpointed per Phase 6) → send `QueryResult`;
+      `UpdateAdvisory` → persist/expose for `GET /admin/status` (decision
+      0003 — log only, never auto-apply).
+- [ ] Reconnect with exponential backoff on stream error/EOF; in-flight
+      job resumes from its Phase 6 checkpoint after reconnect.
+- [ ] Graceful shutdown via the existing `internal/server/shutdown.go`
+      lifecycle hook.
+- [ ] Unit tests for the client's message handling using an in-process
+      `bufconn` server (doesn't need Phase 8's stub — a minimal inline
+      test double is enough here).
+
+### Phase 8 — Stub control center (test support only)
+
+Files: `internal/testsupport/controlcenterstub/server.go` implementing
+`nodev1.NodeControlServer`.
+
+- [ ] Accept `Connect`, record `Register`/`Heartbeat`, expose
+      `SendQueryTask(task)` / `SendUpdateAdvisory(...)` plus channels to
+      observe received `QueryResult`s — enough surface to drive Phase 9,
+      nothing more.
+- [ ] Serves over `bufconn` or `127.0.0.1:0`, test-only.
+- [ ] Package doc comment states plainly this is test support and must
+      never be imported from `cmd/`; extend
+      `internal/testsupport/archtest` so that import is a caught
+      violation, not just a convention.
+
+### Phase 9 — End-to-end integration test
+
+Files: `tests/integration/federated_query_test.go`, added to CI.
+
+- [ ] Boot the Phase 7 client against the Phase 8 stub; seed D3 (Phase
+      1-2 fixtures); enable the needed fields in D5 (Phase 3); send a
+      valid `QueryTask`; assert `QueryResult{status: OK, matching_count:
+      <expected>}`.
+- [ ] Rejected case: reference a disabled/unknown field → assert
+      `REJECTED_INVALID_QUERY`.
+- [ ] Dropped-stream case: sever the stub connection mid-task, let the
+      client reconnect, assert the result still arrives via Phase 6's
+      checkpoint resume.
+- [ ] `UpdateAdvisory` case: stub sends an advisory, assert
+      `GET /admin/status` reflects it.
+- [ ] Wire into `.github/workflows/ci.yml` (new `make test-integration`
+      target or folded into the existing Postgres-repository test job).
 
 ## Risks And Recovery
 
