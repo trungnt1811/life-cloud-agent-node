@@ -31,10 +31,14 @@ expected to follow.
   node-local concerns: health checks, admin, and Swagger/OpenAPI docs. It is
   not the federated interface.
 
-See `docs/decisions/0001-node-agent-role-and-grpc-channel.md` for the accepted
-decision and rationale.
+See `docs/decisions/` for the accepted decisions and rationale:
+`0001` (node role and gRPC channel), `0002` (query contract, four-layer
+validation, execution model), `0003` (update and release process).
 
 ## Current Status
 
-Template bootstrap in progress. No federated query domain model or gRPC
-service is implemented yet; see `docs/plans/active/` for the current plan.
+Template bootstrap is complete (see `docs/plans/completed/`). The
+architecture and query/update contracts are decided (`docs/decisions/`), but
+no gRPC service, `.proto` contract, or federated query domain model is
+implemented yet. The example CRUD code is still the template's placeholder
+domain.
