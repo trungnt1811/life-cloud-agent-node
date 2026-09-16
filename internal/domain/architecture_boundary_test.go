@@ -82,6 +82,7 @@ func TestCodebaseGoFilesStayReviewable(t *testing.T) {
 		MaxTestLines:       1000,
 		ExcludeDirs: []string{
 			"docs",
+			"gen",
 			"mocks",
 		},
 	})

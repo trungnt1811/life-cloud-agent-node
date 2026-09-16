@@ -154,10 +154,11 @@ Tradeoffs:
 
 ## Follow-Up
 
-- Implement the `.proto` files and codegen against this decision (no further
-  wire-policy invention in that change).
-- Add executable proof that the demo fixture compiles to a schema-v1
-  `QueryTask` and that non-empty `group_by` is rejected.
+- ~~Implement the `.proto` files and codegen against this decision~~ — done
+  (`api/proto/lifecloud/node/v1/node_control.proto`, `make proto`, `gen/`).
+- ~~Add executable proof that the demo fixture compiles to a schema-v1
+  `QueryTask` and that non-empty `group_by` is rejected~~ — done
+  (`internal/adapters/federated/wire/`).
 - Design schema v2 (or a compatible extension) when grouped aggregates are
   required.
 - Per-researcher / per-node dispatch authorization remains open from

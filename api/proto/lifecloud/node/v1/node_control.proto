@@ -1,0 +1,139 @@
+syntax = "proto3";
+
+package lifecloud.node.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/lifenetwork-ai/life-cloud-agent-node/gen/lifecloud/node/v1;nodev1";
+
+// NodeControl is the long-lived, node-initiated bidirectional stream between
+// a hospital node agent and the control center (decision 0004).
+service NodeControl {
+  rpc Connect(stream NodeToCenter) returns (stream CenterToNode);
+}
+
+// NodeToCenter carries messages sent from the node to the control center.
+message NodeToCenter {
+  oneof payload {
+    Register register = 1;
+    Heartbeat heartbeat = 2;
+    QueryResult query_result = 3;
+  }
+}
+
+// CenterToNode carries messages sent from the control center to the node.
+message CenterToNode {
+  oneof payload {
+    QueryTask query_task = 1;
+    UpdateAdvisory update_advisory = 2;
+  }
+}
+
+// Register is sent on every (re)connect.
+message Register {
+  string node_id = 1;
+  string agent_version = 2;
+  uint32 query_schema_version = 3;
+}
+
+// Heartbeat is sent periodically while the stream is open.
+message Heartbeat {
+  google.protobuf.Timestamp sent_at = 1;
+  repeated string inflight_job_ids = 2;
+}
+
+// UpdateAdvisory notifies the node of an available agent version.
+// The node logs and exposes locally; it never auto-updates (decision 0003).
+message UpdateAdvisory {
+  string version = 1;
+  string changelog_url = 2;
+  AdvisorySeverity severity = 3;
+}
+
+enum AdvisorySeverity {
+  ADVISORY_SEVERITY_UNSPECIFIED = 0;
+  ADVISORY_SEVERITY_INFO = 1;
+  ADVISORY_SEVERITY_RECOMMENDED = 2;
+  ADVISORY_SEVERITY_CRITICAL = 3;
+}
+
+// QueryTask is a structured cohort query dispatched to a node (schema v1).
+message QueryTask {
+  string job_id = 1;
+  uint32 query_schema_version = 2;
+  DateRange time_range = 3;
+  SpecimenPolicy specimen_policy = 4;
+  repeated QueryCondition conditions = 5;
+  repeated RequiredPanel required_panels = 6;
+  // Reserved for future grouped aggregates. Schema v1 nodes must reject
+  // non-empty group_by with REJECTED_INVALID_QUERY (decision 0004).
+  repeated string group_by = 7;
+}
+
+// DateRange bounds specimen selection using inclusive calendar dates (YYYY-MM-DD).
+message DateRange {
+  string from = 1;
+  string to = 2;
+}
+
+enum SpecimenPolicy {
+  SPECIMEN_POLICY_UNSPECIFIED = 0;
+  SPECIMEN_POLICY_LATEST_IN_RANGE = 1;
+}
+
+message QueryCondition {
+  string field_code = 1;
+  ComparisonOperator op = 2;
+  ConditionValue value = 3;
+}
+
+enum ComparisonOperator {
+  COMPARISON_OPERATOR_UNSPECIFIED = 0;
+  COMPARISON_OPERATOR_EQ = 1;
+  COMPARISON_OPERATOR_NE = 2;
+  COMPARISON_OPERATOR_LT = 3;
+  COMPARISON_OPERATOR_LTE = 4;
+  COMPARISON_OPERATOR_GT = 5;
+  COMPARISON_OPERATOR_GTE = 6;
+}
+
+message ConditionValue {
+  oneof kind {
+    // Decimal numeric value as a string; never use binary float on the wire.
+    string number_value = 1;
+    string string_value = 2;
+  }
+}
+
+message RequiredPanel {
+  repeated string field_codes = 1;
+  ValueConstraint value_constraint = 2;
+}
+
+enum ValueConstraint {
+  VALUE_CONSTRAINT_UNSPECIFIED = 0;
+  // Every field must be present with a non-censored exact numeric value.
+  VALUE_CONSTRAINT_EXACT = 1;
+  // Presence counts even when the stored result is censored.
+  VALUE_CONSTRAINT_ALLOW_CENSORED = 2;
+}
+
+// QueryResult is aggregate-only output from a node for one job.
+message QueryResult {
+  string job_id = 1;
+  QueryResultStatus status = 2;
+  // Required when status is not OK.
+  string reason = 3;
+  // Set only when status is OK; count after small-cell suppression.
+  uint64 matching_count = 4;
+  // True when the raw match count was hidden due to suppression threshold.
+  bool suppressed = 5;
+}
+
+enum QueryResultStatus {
+  QUERY_RESULT_STATUS_UNSPECIFIED = 0;
+  QUERY_RESULT_STATUS_OK = 1;
+  QUERY_RESULT_STATUS_REJECTED_INVALID_QUERY = 2;
+  QUERY_RESULT_STATUS_UNSUPPORTED_VERSION = 3;
+  QUERY_RESULT_STATUS_ERROR = 4;
+}

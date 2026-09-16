@@ -10,7 +10,11 @@ DB_PASSWORD ?= postgres
 DB_PORT ?= 5432
 POSTGRES_REPOSITORY_TEST_IMAGE ?= postgres:15-alpine
 
-.PHONY: build clean run test test-coverage lint swagger swagger-check template-identity-check migrate mockgen mocks dev-up dev-down docker-db-up docker-db-down test-postgres-repositories test-postgres-repositories-fast
+PROTOC_GEN_GO_VERSION ?= v1.36.5
+PROTOC_GEN_GO_GRPC_VERSION ?= v1.5.1
+PROTO_FILES := api/proto/lifecloud/node/v1/node_control.proto
+
+.PHONY: build clean run test test-coverage lint swagger swagger-check proto proto-check template-identity-check migrate mockgen mocks dev-up dev-down docker-db-up docker-db-down test-postgres-repositories test-postgres-repositories-fast
 
 build:
 	go build -o ./bin/$(APP_BIN) ./cmd/main.go
@@ -45,6 +49,20 @@ swagger:
 
 swagger-check: swagger
 	git diff --exit-code -- docs/docs.go docs/swagger.json docs/swagger.yaml
+
+proto:
+	@command -v protoc >/dev/null 2>&1 || { echo "protoc is required; install protobuf-compiler"; exit 1; }
+	@go install google.golang.org/protobuf/cmd/protoc-gen-go@$(PROTOC_GEN_GO_VERSION)
+	@go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@$(PROTOC_GEN_GO_GRPC_VERSION)
+	@mkdir -p gen
+	protoc \
+	  --proto_path=api/proto \
+	  --go_out=gen --go_opt=paths=source_relative \
+	  --go-grpc_out=gen --go-grpc_opt=paths=source_relative \
+	  $(PROTO_FILES)
+
+proto-check: proto
+	git diff --exit-code -- gen/
 
 template-identity-check:
 	@repo_name=$$(basename "$$(git rev-parse --show-toplevel 2>/dev/null || pwd)"); \

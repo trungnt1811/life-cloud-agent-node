@@ -1,0 +1,26 @@
+{
+  "version": "federated-data-v2",
+  "date_start": "2024-01-01",
+  "date_end": "2024-12-31",
+  "cbc_required": [
+    "HB",
+    "MCV",
+    "MCH",
+    "RBC"
+  ],
+  "hplc_required": [
+    "HBA0",
+    "HBA2",
+    "HBF"
+  ],
+  "rule": {
+    "MCV_lt_fL": 80,
+    "MCH_lt_pg": 27
+  },
+  "purpose": "Engineering cohort test parameters only; not a validated screening or diagnostic rule.",
+  "person_count": "Registry entities per site. Source rows do not establish unique real people.",
+  "latest_specimen": "Latest date then lexical specimen ID among accepted observations in the interval, before testing CBC completeness.",
+  "hplc": "All three HPLC tests present on the selected specimen, including valid censored results.",
+  "missing": "Incomplete CBC is excluded from the complete denominator; missing HPLC means no complete HPLC panel recorded in this export.",
+  "dedup": "Collapse identical reexports. Highest final revision per specimen and test wins."
+}

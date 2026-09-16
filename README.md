@@ -16,10 +16,12 @@ and architecture guards.
 
 Template bootstrap is complete (module, app, and database identity match this
 repository). Architecture and the gRPC wire contract / query schema v1 are
-decided (`docs/decisions/0001`–`0004`), but no gRPC service or `.proto` files
-exist yet — the `internal/domain/.../example*` CRUD code is still the
-template's placeholder domain, not the thalassemia data model. See
-`docs/plans/` for active and completed work.
+decided (`docs/decisions/0001`–`0004`). The `.proto` source and generated Go
+stubs live under `api/proto/` and `gen/`; regenerate with `make proto`. No
+gRPC server or federated query runtime exists yet — the
+`internal/domain/.../example*` CRUD code is still the template's placeholder
+domain, not the thalassemia data model. See `docs/plans/` for active and
+completed work.
 
 ## Features
 
@@ -124,6 +126,8 @@ make test-coverage  # Run tests with coverage
 make lint           # Run linter
 make swagger        # Generate Swagger documentation
 make swagger-check  # Verify generated Swagger/OpenAPI docs are current
+make proto          # Generate gRPC/protobuf Go stubs
+make proto-check    # Verify generated protobuf stubs are current
 make template-identity-check # Verify the repository no longer uses the upstream template identity
 make migrate        # Run database migrations
 make clean          # Clean build artifacts
@@ -142,6 +146,19 @@ make dev-down       # Stop local dependencies
 2. **Generate mocks**
    ```bash
    make mockgen
+   ```
+
+3. **Install protoc for gRPC codegen**
+   ```bash
+   # macOS
+   brew install protobuf
+   # Debian/Ubuntu
+   sudo apt-get install -y protobuf-compiler
+   ```
+
+4. **Generate protobuf stubs**
+   ```bash
+   make proto
    ```
 
 ### Testing

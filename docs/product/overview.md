@@ -43,6 +43,7 @@ diagrams, and data flow dictionary, and
 
 Template bootstrap is complete (see `docs/plans/completed/`). Architecture,
 query/update behavior, and the gRPC wire contract / schema v1 are decided
-(`docs/decisions/0001`–`0004`), but no gRPC service, `.proto` files, or
-federated query domain model is implemented yet. The example CRUD code is
-still the template's placeholder domain.
+(`docs/decisions/0001`–`0004`). The `.proto` contract and generated Go stubs
+are checked in (`api/proto/`, `gen/`); no gRPC server or federated query
+domain model is implemented yet. The example CRUD code is still the
+template's placeholder domain.
