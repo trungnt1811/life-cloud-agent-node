@@ -3,8 +3,8 @@
 Data flow diagrams (level 0, 1 & 2), the async query sequence, the node
 update/release flow, and the data flow dictionary for the Life Cloud node
 agent and its (not-yet-built) control center. This is the reviewed shape
-`docs/decisions/0001`–`0003` describe in prose; the `.proto` contract gets
-written against this.
+`docs/decisions/0001`–`0003` describe in prose; the normative wire contract
+is decision 0004 (`.proto` implementation follows that decision).
 
 Each hospital runs one node agent against its own local data; no
 patient-level record ever leaves the node. A central control center (not
@@ -298,15 +298,31 @@ implied by Fig. 3.
 | 3.5 → 3.6 | Raw aggregate, pre-suppression. |
 | 3.6 → 1.0 | `QueryResult`: `status = ok`, suppressed aggregate. |
 
-Message shape this pipeline implies for the `.proto`:
+Normative message shape is decision 0004 (`lifecloud.node.v1`). Summary:
 
 ```
-QueryTask{ job_id, query_schema_version, filter{ conditions[{field,op,value}], time_range{from,to}, group_by[] } }
-QueryResult{ job_id, status, reason?, aggregate? }
+NodeControl.Connect: stream NodeToCenter ↔ stream CenterToNode
+NodeToCenter  = Register | Heartbeat | QueryResult
+CenterToNode  = QueryTask | UpdateAdvisory
+
+QueryTask{
+  job_id, query_schema_version,
+  time_range{from,to},
+  specimen_policy,                 // v1: LATEST_IN_RANGE only
+  conditions[{field_code,op,value}],
+  required_panels[{field_codes[], value_constraint}],
+  group_by[]                       // v1: must be empty or rejected
+}
+QueryResult{ job_id, status, reason?, matching_count?, suppressed }
 ```
+
+Field codes and the demo-fixture compile mapping:
+`docs/product/query-field-dictionary.md`.
 
 ## Related
 
 - `docs/decisions/0001-node-agent-role-and-grpc-channel.md`
 - `docs/decisions/0002-federated-query-contract-and-execution.md`
 - `docs/decisions/0003-node-update-and-release-process.md`
+- `docs/decisions/0004-grpc-wire-contract-schema-v1.md`
+- `docs/product/query-field-dictionary.md`

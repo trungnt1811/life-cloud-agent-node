@@ -10,10 +10,11 @@ files after actual product domains, such as `overview.md`, `billing.md`,
 
 ## Current Product Contract
 
-No consumer-specific product contract is shipped in this generic directory.
-The upstream `repository-harness` contract lives in the root README, current
-workflow and architecture documents, lasting decisions, implementation, and
-executable tests.
+- `overview.md` — node-agent role in the federated thalassemia registry.
+- `federated-query-flow.md` — DFD / sequence / data-flow dictionary for the
+  gRPC channel and local stores.
+- `query-field-dictionary.md` — schema v1 global `field_code` set and demo
+  compile hint (pairs with decision 0004).
 
 ## Update Rule
 

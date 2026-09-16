@@ -33,14 +33,16 @@ expected to follow.
 
 See `docs/decisions/` for the accepted decisions and rationale:
 `0001` (node role and gRPC channel), `0002` (query contract, four-layer
-validation, execution model), `0003` (update and release process). See
+validation, execution model), `0003` (update and release process),
+`0004` (concrete gRPC wire contract and query schema v1). See
 `docs/product/federated-query-flow.md` for the DFD 0/1/2, sequence
-diagrams, and data flow dictionary those decisions were reviewed against.
+diagrams, and data flow dictionary, and
+`docs/product/query-field-dictionary.md` for schema v1 field codes.
 
 ## Current Status
 
-Template bootstrap is complete (see `docs/plans/completed/`). The
-architecture and query/update contracts are decided (`docs/decisions/`), but
-no gRPC service, `.proto` contract, or federated query domain model is
-implemented yet. The example CRUD code is still the template's placeholder
-domain.
+Template bootstrap is complete (see `docs/plans/completed/`). Architecture,
+query/update behavior, and the gRPC wire contract / schema v1 are decided
+(`docs/decisions/0001`–`0004`), but no gRPC service, `.proto` files, or
+federated query domain model is implemented yet. The example CRUD code is
+still the template's placeholder domain.

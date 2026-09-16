@@ -57,13 +57,11 @@ Tradeoffs:
 - The repository now needs a second server (gRPC) running alongside the
   existing HTTP server, with its own DI wiring, and its own test/lint
   coverage.
-- The gRPC service contract (proto messages, RPC methods, query semantics)
-  is not yet designed and is out of scope for this decision.
+- The concrete wire contract is recorded in decision 0004; `.proto`
+  implementation remains follow-up work.
 
 ## Follow-Up
 
-- Design the gRPC service contract (proto definitions, RPC methods, request
-  or query shape, error model) as its own decision once the coordinator's
-  query needs are concrete.
-- Track bootstrap and gRPC scaffolding work in
-  `docs/plans/active/2026-09-16-bootstrap-life-cloud-node-agent.md`.
+- Concrete gRPC service contract (proto definitions, RPC methods, query
+  shape): addressed by decision 0004; `.proto` implementation still pending.
+- Track bootstrap and gRPC scaffolding work in plans under `docs/plans/`.

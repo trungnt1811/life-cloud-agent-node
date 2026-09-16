@@ -85,5 +85,5 @@ Tradeoffs:
 
 - Decide how a high-severity advisory is escalated beyond a passive status
   flag (e.g. paging the site operator) — not designed yet.
-- Design `UpdateAdvisory` as part of the same `.proto` contract that will
-  carry `Register`, `Heartbeat`, `QueryTask`, and `QueryResult`.
+- `UpdateAdvisory` / `Register` / `Heartbeat` on the shared stream: wire
+  fields addressed by decision 0004 (`.proto` implementation still pending).

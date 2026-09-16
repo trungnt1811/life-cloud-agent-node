@@ -142,9 +142,9 @@ Tradeoffs:
 - Design per-researcher / per-node dispatch authorization before any real
   patient data flows through this system; today's "dispatch to all online
   nodes" is a named MVP assumption, not a security decision.
-- Design the concrete `.proto` contract (`QueryTask`, `QueryFilter`,
-  `QueryResult`, the status enum, `query_schema_version`) as its own
-  artifact.
+- Concrete `.proto` / schema v1 wire contract: addressed by decision 0004
+  and `docs/product/query-field-dictionary.md` (implementation of `.proto`
+  files still pending).
 - Design the local `enabled_query_fields` admin surface (REST endpoint(s),
   audit fields) as node-local REST scope per decision 0001.
 - Revisit the human-in-the-loop / hybrid policy-engine alternative if a

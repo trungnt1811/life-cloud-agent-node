@@ -15,10 +15,11 @@ and architecture guards.
 ## Current Status
 
 Template bootstrap is complete (module, app, and database identity match this
-repository). No federated query domain or gRPC service exists yet — the
-`internal/domain/.../example*` CRUD code is still the template's placeholder
-domain, not the thalassemia data model. See `docs/plans/` for active and
-completed work.
+repository). Architecture and the gRPC wire contract / query schema v1 are
+decided (`docs/decisions/0001`–`0004`), but no gRPC service or `.proto` files
+exist yet — the `internal/domain/.../example*` CRUD code is still the
+template's placeholder domain, not the thalassemia data model. See
+`docs/plans/` for active and completed work.
 
 ## Features
 
