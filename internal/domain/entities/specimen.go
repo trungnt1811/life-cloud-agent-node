@@ -31,28 +31,38 @@ type SpecimenRecord struct {
 	CreatedAt       time.Time
 }
 
-// NewSpecimen creates a specimen. CollectedAt is stored as a UTC calendar date.
-func NewSpecimen(
-	id, patientID uuid.UUID,
-	collectedAt time.Time,
-	sourceDataset, sourceFile, sourceRecordID string,
-	sourceRowNumber int,
-	now time.Time,
-) *Specimen {
+// NewSpecimenParams are the inputs to NewSpecimen, grouped in a struct so
+// same-typed fields (the three source-provenance strings) can't be silently
+// transposed at a call site the way positional string arguments can.
+type NewSpecimenParams struct {
+	ID              uuid.UUID
+	PatientID       uuid.UUID
+	CollectedAt     time.Time
+	SourceDataset   string
+	SourceFile      string
+	SourceRowNumber int
+	SourceRecordID  string
+	Now             time.Time
+}
+
+// NewSpecimen creates a specimen. CollectedAt is stored as a calendar date.
+func NewSpecimen(params NewSpecimenParams) *Specimen {
+	id := params.ID
 	if id == uuid.Nil {
 		id = uuid.New()
 	}
+	now := params.Now
 	if now.IsZero() {
 		now = time.Now().UTC()
 	}
 	return &Specimen{
 		id:              id,
-		patientID:       patientID,
-		collectedAt:     calendarDateUTC(collectedAt),
-		sourceDataset:   strings.TrimSpace(sourceDataset),
-		sourceFile:      strings.TrimSpace(sourceFile),
-		sourceRowNumber: sourceRowNumber,
-		sourceRecordID:  strings.TrimSpace(sourceRecordID),
+		patientID:       params.PatientID,
+		collectedAt:     calendarDate(params.CollectedAt),
+		sourceDataset:   strings.TrimSpace(params.SourceDataset),
+		sourceFile:      strings.TrimSpace(params.SourceFile),
+		sourceRowNumber: params.SourceRowNumber,
+		sourceRecordID:  strings.TrimSpace(params.SourceRecordID),
 		createdAt:       now.UTC(),
 	}
 }
@@ -65,7 +75,7 @@ func NewSpecimenFromRecord(record SpecimenRecord) *Specimen {
 	return &Specimen{
 		id:              record.ID,
 		patientID:       record.PatientID,
-		collectedAt:     calendarDateUTC(record.CollectedAt),
+		collectedAt:     calendarDate(record.CollectedAt),
 		sourceDataset:   record.SourceDataset,
 		sourceFile:      record.SourceFile,
 		sourceRowNumber: record.SourceRowNumber,
@@ -147,10 +157,13 @@ func (s *Specimen) CreatedAt() time.Time {
 	return s.createdAt
 }
 
-func calendarDateUTC(value time.Time) time.Time {
+// calendarDate keeps the calendar date (year/month/day) as given, without
+// first converting across timezones. Converting to UTC before truncating
+// would shift the date backward a day for any positive-offset local
+// timestamp (e.g. an early-morning collection in Vietnam, UTC+7).
+func calendarDate(value time.Time) time.Time {
 	if value.IsZero() {
 		return time.Time{}
 	}
-	utc := value.UTC()
-	return time.Date(utc.Year(), utc.Month(), utc.Day(), 0, 0, 0, 0, time.UTC)
+	return time.Date(value.Year(), value.Month(), value.Day(), 0, 0, 0, 0, time.UTC)
 }

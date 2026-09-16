@@ -16,7 +16,8 @@ CREATE TABLE IF NOT EXISTS specimens (
     source_file VARCHAR(512) NOT NULL DEFAULT '',
     source_row_number INTEGER NOT NULL DEFAULT 0,
     source_record_id VARCHAR(255) NOT NULL DEFAULT '',
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT specimens_source_provenance_key UNIQUE (source_dataset, source_file, source_record_id)
 );
 
 CREATE INDEX IF NOT EXISTS specimens_patient_id_collected_at_idx
@@ -31,8 +32,7 @@ CREATE TABLE IF NOT EXISTS lab_observations (
     raw_value TEXT NOT NULL DEFAULT '',
     raw_unit VARCHAR(64) NOT NULL DEFAULT '',
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    -- The UNIQUE constraint already backs (specimen_id, field_code) with a
+    -- btree index; no separate CREATE INDEX is needed on the same columns.
     CONSTRAINT lab_observations_specimen_id_field_code_key UNIQUE (specimen_id, field_code)
 );
-
-CREATE INDEX IF NOT EXISTS lab_observations_specimen_id_field_code_idx
-    ON lab_observations (specimen_id, field_code);

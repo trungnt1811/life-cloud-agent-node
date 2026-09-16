@@ -29,16 +29,16 @@ func TestPatientRegistryMapperRoundTripsEveryField(t *testing.T) {
 	require.Nil(t, patientModelFromEntity(nil))
 	require.Nil(t, patientEntityFromModel(nil))
 
-	specimen := entities.NewSpecimen(
-		uuid.New(),
-		patient.ID(),
-		collectedAt,
-		"VN_A",
-		"raw/cbc.csv",
-		"row-12",
-		12,
-		now,
-	)
+	specimen := entities.NewSpecimen(entities.NewSpecimenParams{
+		ID:              uuid.New(),
+		PatientID:       patient.ID(),
+		CollectedAt:     collectedAt,
+		SourceDataset:   "VN_A",
+		SourceFile:      "raw/cbc.csv",
+		SourceRecordID:  "row-12",
+		SourceRowNumber: 12,
+		Now:             now,
+	})
 	require.Equal(t, time.Date(2024, 6, 15, 0, 0, 0, 0, time.UTC), specimen.CollectedAt())
 	specimenModel := specimenModelFromEntity(specimen)
 	gotSpecimen := specimenEntityFromModel(specimenModel)
@@ -46,16 +46,16 @@ func TestPatientRegistryMapperRoundTripsEveryField(t *testing.T) {
 	require.Nil(t, specimenModelFromEntity(nil))
 	require.Nil(t, specimenEntityFromModel(nil))
 
-	observation := entities.NewLabObservation(
-		uuid.New(),
-		specimen.ID(),
-		"MCV",
-		"79.5",
-		"<0.1",
-		"fL",
-		true,
-		now,
-	)
+	observation := entities.NewLabObservation(entities.NewLabObservationParams{
+		ID:         uuid.New(),
+		SpecimenID: specimen.ID(),
+		FieldCode:  "MCV",
+		Value:      "79.5",
+		RawValue:   "<0.1",
+		RawUnit:    "fL",
+		Censored:   true,
+		Now:        now,
+	})
 	observationModel := labObservationModelFromEntity(observation)
 	gotObservation := labObservationEntityFromModel(observationModel)
 	require.Equal(t, observation.Record(), gotObservation.Record())

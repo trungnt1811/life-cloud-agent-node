@@ -419,6 +419,27 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
   `GetOrCreatePatient` + transactional `SaveSpecimen` (with observations);
   cohort query methods remain Phase 5. Unique `(specimen_id, field_code)`
   enforces one observation per field per specimen.
+- 2026-09-16 (Phase 1, post-review fixes): `/code-review` on the Phase 1
+  commit found and this session fixed: a date-shift bug in
+  `calendarDateUTC` for positive-offset timezones (Vietnam, UTC+7 — fixed
+  by not converting to UTC before extracting the calendar date);
+  `NewSpecimen`/`NewLabObservation` took several same-typed positional
+  string args, now grouped into `NewSpecimenParams`/
+  `NewLabObservationParams`; `SaveSpecimen` had no idempotency guard,
+  now uses `ON CONFLICT DO NOTHING` on a new `specimens` unique key
+  (`source_dataset, source_file, source_record_id`) plus a canonical
+  re-read, and batches observation inserts instead of looping; added
+  `specimens_source_provenance_key`; removed a redundant plain index that
+  duplicated the `lab_observations` unique constraint's backing index;
+  added `patientRegistryRepository.WithTx` for transaction composability;
+  reverted `ExampleRepository`'s mockgen directive to `-source` mode and
+  moved `PatientRegistryRepository` into its own file with its own
+  `-source` directive (a `reflect`-mode directive had made mock
+  regeneration for either interface depend on the whole package
+  compiling); factored duplicated `dbWithContext` into
+  `repohelpers.DBWithContext`; `GetOrCreatePatient` now upserts with
+  `DoUpdates` (a no-op self-assignment) so Postgres always `RETURNING`s
+  the canonical row in one round trip instead of up to three.
 - Promote any phase-specific decision (e.g. checkpoint granularity,
   suppression threshold default, a specific mapping ambiguity) into
   `docs/decisions/` as that phase starts, per the pattern already used by

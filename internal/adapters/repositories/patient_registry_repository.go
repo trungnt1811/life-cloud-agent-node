@@ -11,6 +11,7 @@ import (
 	"gorm.io/gorm/clause"
 
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/repositories/models"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/repositories/repohelpers"
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/entities"
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/repositories"
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/platform/logger"
@@ -30,10 +31,18 @@ func NewPatientRegistryRepository(db *gorm.DB, logger logger.Logger) repositorie
 }
 
 func (r *patientRegistryRepository) dbWithContext(ctx context.Context) *gorm.DB {
-	if ctx == nil {
-		return r.db
+	return repohelpers.DBWithContext(ctx, r.db)
+}
+
+// WithTx returns a repository instance bound to the provided transaction.
+func (r *patientRegistryRepository) WithTx(tx *gorm.DB) repositories.PatientRegistryRepository {
+	if tx == nil {
+		return r
 	}
-	return r.db.WithContext(ctx)
+	return &patientRegistryRepository{
+		db:     tx,
+		logger: r.logger,
+	}
 }
 
 func (r *patientRegistryRepository) GetPatientByID(ctx context.Context, id uuid.UUID) (*entities.Patient, error) {
@@ -73,27 +82,23 @@ func (r *patientRegistryRepository) GetOrCreatePatient(ctx context.Context, exte
 		return nil, errors.New("external patient id is required")
 	}
 
-	existing, err := r.GetPatientByExternalID(ctx, externalPatientID)
-	if err != nil {
-		return nil, err
-	}
-	if existing != nil {
-		return existing, nil
-	}
-
 	patient := entities.NewPatient(uuid.New(), externalPatientID, time.Now().UTC())
 	model := patientModelFromEntity(patient)
+	// DoUpdates with a no-op self-assignment (instead of DoNothing) makes
+	// Postgres RETURNING the canonical row in every case - the pre-existing
+	// one on conflict, the newly inserted one otherwise - in one round trip,
+	// instead of a SELECT-then-maybe-INSERT-then-SELECT sequence.
 	if err := r.dbWithContext(ctx).
 		Clauses(clause.OnConflict{
 			Columns:   []clause.Column{{Name: "external_patient_id"}},
-			DoNothing: true,
+			DoUpdates: clause.AssignmentColumns([]string{"external_patient_id"}),
 		}).
 		Create(model).Error; err != nil {
-		r.logger.Error("Failed to create patient", logger.String("external_patient_id", externalPatientID), logger.Err(err))
+		r.logger.Error("Failed to upsert patient", logger.String("external_patient_id", externalPatientID), logger.Err(err))
 		return nil, err
 	}
 
-	return r.GetPatientByExternalID(ctx, externalPatientID)
+	return patientEntityFromModel(model), nil
 }
 
 func (r *patientRegistryRepository) GetSpecimenByID(ctx context.Context, id uuid.UUID) (*entities.Specimen, error) {
@@ -125,11 +130,37 @@ func (r *patientRegistryRepository) SaveSpecimen(
 
 	return r.dbWithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		specimenModel := specimenModelFromEntity(specimen)
-		if err := tx.Create(specimenModel).Error; err != nil {
+		// DoNothing on the source-provenance key makes a retried ingestion
+		// batch a safe no-op for the specimen row instead of a duplicate
+		// insert or a hard transaction failure.
+		if err := tx.
+			Clauses(clause.OnConflict{
+				Columns: []clause.Column{
+					{Name: "source_dataset"}, {Name: "source_file"}, {Name: "source_record_id"},
+				},
+				DoNothing: true,
+			}).
+			Create(specimenModel).Error; err != nil {
 			r.logger.Error("Failed to create specimen", logger.String("id", specimen.ID().String()), logger.Err(err))
 			return err
 		}
 
+		// The conflict clause may have skipped the insert if this specimen
+		// was already ingested under a different, earlier-assigned ID; read
+		// back the canonical row by provenance so observations attach to
+		// the row that actually exists rather than the one just attempted.
+		var canonical models.Specimen
+		if err := tx.
+			Where(
+				"source_dataset = ? AND source_file = ? AND source_record_id = ?",
+				specimenModel.SourceDataset, specimenModel.SourceFile, specimenModel.SourceRecordID,
+			).
+			First(&canonical).Error; err != nil {
+			r.logger.Error("Failed to read back specimen", logger.String("id", specimen.ID().String()), logger.Err(err))
+			return err
+		}
+
+		observationModels := make([]*models.LabObservation, 0, len(observations))
 		for _, observation := range observations {
 			if observation == nil {
 				continue
@@ -138,15 +169,28 @@ func (r *patientRegistryRepository) SaveSpecimen(
 				return errors.New("lab observation specimen id mismatch")
 			}
 			observationModel := labObservationModelFromEntity(observation)
-			if err := tx.Create(observationModel).Error; err != nil {
-				r.logger.Error(
-					"Failed to create lab observation",
-					logger.String("specimen_id", specimen.ID().String()),
-					logger.String("field_code", observation.FieldCode()),
-					logger.Err(err),
-				)
-				return err
-			}
+			observationModel.SpecimenID = canonical.ID
+			observationModels = append(observationModels, observationModel)
+		}
+		if len(observationModels) == 0 {
+			return nil
+		}
+
+		// One batched insert instead of one round trip per observation;
+		// DoNothing on (specimen_id, field_code) makes a retried batch a
+		// safe no-op here too.
+		if err := tx.
+			Clauses(clause.OnConflict{
+				Columns:   []clause.Column{{Name: "specimen_id"}, {Name: "field_code"}},
+				DoNothing: true,
+			}).
+			Create(&observationModels).Error; err != nil {
+			r.logger.Error(
+				"Failed to create lab observations",
+				logger.String("specimen_id", canonical.ID.String()),
+				logger.Err(err),
+			)
+			return err
 		}
 		return nil
 	})

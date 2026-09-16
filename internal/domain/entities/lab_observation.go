@@ -31,27 +31,39 @@ type LabObservationRecord struct {
 	CreatedAt  time.Time
 }
 
+// NewLabObservationParams are the inputs to NewLabObservation, grouped in a
+// struct so same-typed fields (fieldCode/value/rawValue/rawUnit are all
+// strings) can't be silently transposed at a call site the way positional
+// string arguments can.
+type NewLabObservationParams struct {
+	ID         uuid.UUID
+	SpecimenID uuid.UUID
+	FieldCode  string
+	Value      string
+	Censored   bool
+	RawValue   string
+	RawUnit    string
+	Now        time.Time
+}
+
 // NewLabObservation creates a lab observation with normalized string fields.
-func NewLabObservation(
-	id, specimenID uuid.UUID,
-	fieldCode, value, rawValue, rawUnit string,
-	censored bool,
-	now time.Time,
-) *LabObservation {
+func NewLabObservation(params NewLabObservationParams) *LabObservation {
+	id := params.ID
 	if id == uuid.Nil {
 		id = uuid.New()
 	}
+	now := params.Now
 	if now.IsZero() {
 		now = time.Now().UTC()
 	}
 	return &LabObservation{
 		id:         id,
-		specimenID: specimenID,
-		fieldCode:  strings.TrimSpace(fieldCode),
-		value:      strings.TrimSpace(value),
-		censored:   censored,
-		rawValue:   strings.TrimSpace(rawValue),
-		rawUnit:    strings.TrimSpace(rawUnit),
+		specimenID: params.SpecimenID,
+		fieldCode:  strings.TrimSpace(params.FieldCode),
+		value:      strings.TrimSpace(params.Value),
+		censored:   params.Censored,
+		rawValue:   strings.TrimSpace(params.RawValue),
+		rawUnit:    strings.TrimSpace(params.RawUnit),
 		createdAt:  now.UTC(),
 	}
 }

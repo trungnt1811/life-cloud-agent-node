@@ -7,6 +7,7 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/repositories/models"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/repositories/repohelpers"
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/entities"
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/repositories"
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/platform/logger"
@@ -27,10 +28,7 @@ func NewExampleRepository(db *gorm.DB, logger logger.Logger) repositories.Exampl
 }
 
 func (r *exampleRepository) dbWithContext(ctx context.Context) *gorm.DB {
-	if ctx == nil {
-		return r.db
-	}
-	return r.db.WithContext(ctx)
+	return repohelpers.DBWithContext(ctx, r.db)
 }
 
 // Create creates a new example entity.

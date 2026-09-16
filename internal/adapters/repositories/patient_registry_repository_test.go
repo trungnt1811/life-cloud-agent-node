@@ -47,20 +47,26 @@ func TestPatientRegistryRepository_PersistAndReadGraph(t *testing.T) {
 	require.Equal(t, "EXT-100", byID.ExternalPatientID())
 
 	specimenID := uuid.New()
-	specimen := entities.NewSpecimen(
-		specimenID,
-		patient.ID(),
-		time.Date(2024, 3, 10, 15, 0, 0, 0, time.UTC),
-		"VN_A",
-		"cbc.csv",
-		"rec-1",
-		1,
-		now,
-	)
+	specimen := entities.NewSpecimen(entities.NewSpecimenParams{
+		ID:              specimenID,
+		PatientID:       patient.ID(),
+		CollectedAt:     time.Date(2024, 3, 10, 15, 0, 0, 0, time.UTC),
+		SourceDataset:   "VN_A",
+		SourceFile:      "cbc.csv",
+		SourceRecordID:  "rec-1",
+		SourceRowNumber: 1,
+		Now:             now,
+	})
 	observations := []*entities.LabObservation{
-		entities.NewLabObservation(uuid.New(), specimenID, "HB", "12.4", "12.4", "g/dL", false, now),
-		entities.NewLabObservation(uuid.New(), specimenID, "MCV", "79", "79", "fL", false, now),
-		entities.NewLabObservation(uuid.New(), specimenID, "HBF", "0.1", "<0.1", "%", true, now),
+		entities.NewLabObservation(entities.NewLabObservationParams{
+			ID: uuid.New(), SpecimenID: specimenID, FieldCode: "HB", Value: "12.4", RawValue: "12.4", RawUnit: "g/dL", Now: now,
+		}),
+		entities.NewLabObservation(entities.NewLabObservationParams{
+			ID: uuid.New(), SpecimenID: specimenID, FieldCode: "MCV", Value: "79", RawValue: "79", RawUnit: "fL", Now: now,
+		}),
+		entities.NewLabObservation(entities.NewLabObservationParams{
+			ID: uuid.New(), SpecimenID: specimenID, FieldCode: "HBF", Value: "0.1", RawValue: "<0.1", RawUnit: "%", Censored: true, Now: now,
+		}),
 	}
 	require.NoError(t, repo.SaveSpecimen(ctx, specimen, observations))
 
@@ -104,6 +110,61 @@ func TestPatientRegistryRepository_PersistAndReadGraph(t *testing.T) {
 	require.Nil(t, missingSpecimen)
 }
 
+func TestPatientRegistryRepository_SaveSpecimenIsIdempotentOnRetry(t *testing.T) {
+	db := openPatientRegistryRepositoryTestDB(t)
+	ctx := context.Background()
+	repo := NewPatientRegistryRepository(db, logger.GetLogger())
+	now := time.Now().UTC()
+
+	patient, err := repo.GetOrCreatePatient(ctx, "EXT-300")
+	require.NoError(t, err)
+
+	buildBatch := func() (*entities.Specimen, []*entities.LabObservation) {
+		specimen := entities.NewSpecimen(entities.NewSpecimenParams{
+			ID:              uuid.New(),
+			PatientID:       patient.ID(),
+			CollectedAt:     time.Date(2024, 5, 1, 0, 0, 0, 0, time.UTC),
+			SourceDataset:   "VN_A",
+			SourceFile:      "cbc.csv",
+			SourceRecordID:  "rec-retry-1",
+			SourceRowNumber: 7,
+			Now:             now,
+		})
+		observations := []*entities.LabObservation{
+			entities.NewLabObservation(entities.NewLabObservationParams{
+				ID: uuid.New(), SpecimenID: specimen.ID(), FieldCode: "HB", Value: "12.0", RawValue: "12.0", RawUnit: "g/dL", Now: now,
+			}),
+		}
+		return specimen, observations
+	}
+
+	// First attempt: a fresh, client-generated specimen ID, as a real
+	// ingestion run would produce.
+	firstSpecimen, firstObservations := buildBatch()
+	require.NoError(t, repo.SaveSpecimen(ctx, firstSpecimen, firstObservations))
+
+	// Retry after a simulated crash/timeout: same source row, but a NEW
+	// client-generated specimen ID (nothing on the client remembers the
+	// first attempt succeeded). This must not create a duplicate specimen,
+	// must not fail the transaction, and must not orphan observations
+	// against an ID that was never actually written.
+	retrySpecimen, retryObservations := buildBatch()
+	require.NotEqual(t, firstSpecimen.ID(), retrySpecimen.ID())
+	require.NoError(t, repo.SaveSpecimen(ctx, retrySpecimen, retryObservations))
+
+	specimens, err := repo.CountSpecimens(ctx)
+	require.NoError(t, err)
+	require.Equal(t, 1, specimens, "retry must not create a second specimen row")
+
+	labs, err := repo.CountLabObservations(ctx)
+	require.NoError(t, err)
+	require.Equal(t, 1, labs, "retry must not duplicate lab observations")
+
+	canonical, err := repo.GetSpecimenByID(ctx, firstSpecimen.ID())
+	require.NoError(t, err)
+	require.NotNil(t, canonical, "observations must attach to the specimen actually persisted")
+}
+
 func TestPatientRegistryRepository_RejectsObservationSpecimenMismatch(t *testing.T) {
 	db := openPatientRegistryRepositoryTestDB(t)
 	ctx := context.Background()
@@ -114,8 +175,19 @@ func TestPatientRegistryRepository_RejectsObservationSpecimenMismatch(t *testing
 	require.NoError(t, err)
 
 	specimenID := uuid.New()
-	specimen := entities.NewSpecimen(specimenID, patient.ID(), now, "VN_B", "lab.csv", "r1", 1, now)
-	badObservation := entities.NewLabObservation(uuid.New(), uuid.New(), "HB", "13", "13", "g/dL", false, now)
+	specimen := entities.NewSpecimen(entities.NewSpecimenParams{
+		ID:              specimenID,
+		PatientID:       patient.ID(),
+		CollectedAt:     now,
+		SourceDataset:   "VN_B",
+		SourceFile:      "lab.csv",
+		SourceRecordID:  "r1",
+		SourceRowNumber: 1,
+		Now:             now,
+	})
+	badObservation := entities.NewLabObservation(entities.NewLabObservationParams{
+		ID: uuid.New(), SpecimenID: uuid.New(), FieldCode: "HB", Value: "13", RawValue: "13", RawUnit: "g/dL", Now: now,
+	})
 
 	err = repo.SaveSpecimen(ctx, specimen, []*entities.LabObservation{badObservation})
 	require.Error(t, err)
