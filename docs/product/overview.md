@@ -33,7 +33,9 @@ expected to follow.
 
 See `docs/decisions/` for the accepted decisions and rationale:
 `0001` (node role and gRPC channel), `0002` (query contract, four-layer
-validation, execution model), `0003` (update and release process).
+validation, execution model), `0003` (update and release process). See
+`docs/product/federated-query-flow.md` for the DFD 0/1/2, sequence
+diagrams, and data flow dictionary those decisions were reviewed against.
 
 ## Current Status
 
