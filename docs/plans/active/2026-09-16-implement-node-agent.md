@@ -138,14 +138,14 @@ type LabObservation struct {
 }
 ```
 
-- [ ] Entities carry no GORM tags (architecture boundary).
-- [ ] Migration creates `patients`, `specimens`, `lab_observations` with a
+- [x] Entities carry no GORM tags (architecture boundary).
+- [x] Migration creates `patients`, `specimens`, `lab_observations` with a
       FK chain and indexes on `(patient_id, collected_at)` and
       `(specimen_id, field_code)`.
-- [ ] GORM models + mapper, following `example_mapper.go`'s pattern.
-- [ ] Repository implementation + Postgres Testcontainers test (reuse
+- [x] GORM models + mapper, following `example_mapper.go`'s pattern.
+- [x] Repository implementation + Postgres Testcontainers test (reuse
       `internal/adapters/repositories/testsupport`).
-- [ ] `make mockgen`; `go build ./...`; `go test ./...`; `make lint`;
+- [x] `make mockgen`; `go build ./...`; `go test ./...`; `make lint`;
       `make template-identity-check`.
 
 ### Phase 2 — Ingestion (4.0): VN_A/B/C adapters into D3
@@ -393,7 +393,7 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
 
 ## Progress
 
-- [ ] Phase 1 — D3 Local Patient Registry domain model + migration.
+- [x] Phase 1 — D3 Local Patient Registry domain model + migration.
 - [ ] Phase 2 — Ingestion adapters for VN_A/B/C profiles into D3.
 - [ ] Phase 3 — D5 Enabled Query Fields store + admin REST.
 - [ ] Phase 4 — Validation layers 2 (whitelist) & 3 (semantic).
@@ -413,6 +413,12 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
 - 2026-09-16: **Real HIS/LIS ingestion is in scope**, targeting the three
   life-cloud demo hospital profiles (VN_A/B/C) as the concrete reference —
   the only available spec.
+- 2026-09-16 (Phase 1): Domain entities follow the existing encapsulated
+  `ExampleEntity` pattern (private fields + `Record()`), not exported
+  structs from the plan sketch. Storage API is
+  `GetOrCreatePatient` + transactional `SaveSpecimen` (with observations);
+  cohort query methods remain Phase 5. Unique `(specimen_id, field_code)`
+  enforces one observation per field per specimen.
 - Promote any phase-specific decision (e.g. checkpoint granularity,
   suppression threshold default, a specific mapping ambiguity) into
   `docs/decisions/` as that phase starts, per the pattern already used by
@@ -431,4 +437,6 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
 
 ## Result
 
-Pending — phase 1 not yet started.
+Phase 1 complete — D3 local patient registry domain, migration, GORM
+repository, mocks, and Postgres Testcontainers proof are in place. Phase 2
+(ingestion) is next.

@@ -10,7 +10,8 @@ import (
 
 // ExampleRepository defines the interface for a generic example repository.
 //
-//go:generate mockgen -source=interfaces.go -destination=../../mocks/mock_example_repository.go -package=mocks
+//go:generate mockgen -destination=../../mocks/mock_example_repository.go -package=mocks . ExampleRepository
+//go:generate mockgen -destination=../../mocks/mock_patient_registry_repository.go -package=mocks . PatientRegistryRepository
 type ExampleRepository interface {
 	GetByID(ctx context.Context, id uuid.UUID) (*entities.ExampleEntity, error)
 	Create(ctx context.Context, entity *entities.ExampleEntity) error
@@ -19,4 +20,18 @@ type ExampleRepository interface {
 	List(ctx context.Context, limit, offset int) ([]*entities.ExampleEntity, error)
 	ListByIDs(ctx context.Context, ids []uuid.UUID) ([]*entities.ExampleEntity, error)
 	Count(ctx context.Context) (int, error)
+}
+
+// PatientRegistryRepository is the D3 local patient registry store.
+// Phase 1 is storage-only; cohort query methods land in Phase 5.
+type PatientRegistryRepository interface {
+	GetPatientByID(ctx context.Context, id uuid.UUID) (*entities.Patient, error)
+	GetPatientByExternalID(ctx context.Context, externalPatientID string) (*entities.Patient, error)
+	GetOrCreatePatient(ctx context.Context, externalPatientID string) (*entities.Patient, error)
+	GetSpecimenByID(ctx context.Context, id uuid.UUID) (*entities.Specimen, error)
+	SaveSpecimen(ctx context.Context, specimen *entities.Specimen, observations []*entities.LabObservation) error
+	ListObservationsBySpecimenID(ctx context.Context, specimenID uuid.UUID) ([]*entities.LabObservation, error)
+	CountPatients(ctx context.Context) (int, error)
+	CountSpecimens(ctx context.Context) (int, error)
+	CountLabObservations(ctx context.Context) (int, error)
 }
