@@ -8,14 +8,14 @@ import (
 	swaggerfiles "github.com/swaggo/files"
 	ginswagger "github.com/swaggo/gin-swagger"
 
-	"github.com/lifenetwork-ai/go-backend-template/conf"
-	"github.com/lifenetwork-ai/go-backend-template/constants"
-	_ "github.com/lifenetwork-ai/go-backend-template/docs"
-	"github.com/lifenetwork-ai/go-backend-template/internal/delivery/http/handlers"
-	middleware "github.com/lifenetwork-ai/go-backend-template/internal/delivery/http/middleware"
-	routev1 "github.com/lifenetwork-ai/go-backend-template/internal/delivery/http/route"
-	"github.com/lifenetwork-ai/go-backend-template/internal/di"
-	"github.com/lifenetwork-ai/go-backend-template/internal/platform/logger"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/conf"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/constants"
+	_ "github.com/lifenetwork-ai/life-cloud-agent-node/docs"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/delivery/http/handlers"
+	middleware "github.com/lifenetwork-ai/life-cloud-agent-node/internal/delivery/http/middleware"
+	routev1 "github.com/lifenetwork-ai/life-cloud-agent-node/internal/delivery/http/route"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/di"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/platform/logger"
 )
 
 const defaultCORSAllowedHeaders = "Content-Type,Content-Length,Accept-Encoding,X-CSRF-Token,Authorization,accept,origin,Cache-Control,X-Requested-With,X-Request-ID,X-Correlation-ID"

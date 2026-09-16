@@ -3,7 +3,7 @@ package integration
 import (
 	"testing"
 
-	"github.com/lifenetwork-ai/go-backend-template/tests/integration/testutil"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/tests/integration/testutil"
 )
 
 func TestHealthEndpoints(t *testing.T) {

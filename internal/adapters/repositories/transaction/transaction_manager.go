@@ -5,9 +5,9 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/lifenetwork-ai/go-backend-template/internal/adapters/repositories/repohelpers"
-	"github.com/lifenetwork-ai/go-backend-template/internal/adapters/repositories/txhooks"
-	domainrepos "github.com/lifenetwork-ai/go-backend-template/internal/domain/repositories"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/repositories/repohelpers"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/repositories/txhooks"
+	domainrepos "github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/repositories"
 )
 
 // TransactionManagerDeps contains repositories that can be rebound to a transaction.

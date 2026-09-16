@@ -8,13 +8,13 @@ import (
 	"github.com/patrickmn/go-cache"
 	"github.com/stretchr/testify/require"
 
-	"github.com/lifenetwork-ai/go-backend-template/infrastructures/caching"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/infrastructures/caching"
 )
 
 func TestFixedWindowRateLimiter_AllowCountsAndReset(t *testing.T) {
 	underlying := cache.New(cache.NoExpiration, 10*time.Minute)
 	cacheClient := caching.NewGoCacheClient(underlying)
-	cacheRepo := caching.NewCachingRepository(context.Background(), "go-backend-template-test", cacheClient)
+	cacheRepo := caching.NewCachingRepository(context.Background(), "life-cloud-agent-node-test", cacheClient)
 
 	limiter := NewFixedWindowRateLimiter(cacheRepo)
 	key := "user:1"
@@ -46,7 +46,7 @@ func TestFixedWindowRateLimiter_AllowCountsAndReset(t *testing.T) {
 func TestFixedWindowRateLimiter_LimitZeroFirstCallDenied(t *testing.T) {
 	underlying := cache.New(cache.NoExpiration, 10*time.Minute)
 	cacheClient := caching.NewGoCacheClient(underlying)
-	cacheRepo := caching.NewCachingRepository(context.Background(), "go-backend-template-test", cacheClient)
+	cacheRepo := caching.NewCachingRepository(context.Background(), "life-cloud-agent-node-test", cacheClient)
 
 	limiter := NewFixedWindowRateLimiter(cacheRepo)
 	key := "user:zero"
@@ -63,7 +63,7 @@ func TestFixedWindowRateLimiter_LimitZeroFirstCallDenied(t *testing.T) {
 func TestFixedWindowRateLimiter_MultipleRequestsWithinLimit(t *testing.T) {
 	underlying := cache.New(cache.NoExpiration, 10*time.Minute)
 	cacheClient := caching.NewGoCacheClient(underlying)
-	cacheRepo := caching.NewCachingRepository(context.Background(), "go-backend-template-test", cacheClient)
+	cacheRepo := caching.NewCachingRepository(context.Background(), "life-cloud-agent-node-test", cacheClient)
 
 	limiter := NewFixedWindowRateLimiter(cacheRepo)
 	key := "user:multi"
@@ -88,7 +88,7 @@ func TestFixedWindowRateLimiter_MultipleRequestsWithinLimit(t *testing.T) {
 func TestFixedWindowRateLimiter_DifferentKeysIndependent(t *testing.T) {
 	underlying := cache.New(cache.NoExpiration, 10*time.Minute)
 	cacheClient := caching.NewGoCacheClient(underlying)
-	cacheRepo := caching.NewCachingRepository(context.Background(), "go-backend-template-test", cacheClient)
+	cacheRepo := caching.NewCachingRepository(context.Background(), "life-cloud-agent-node-test", cacheClient)
 
 	limiter := NewFixedWindowRateLimiter(cacheRepo)
 	window := 30 * time.Second
@@ -112,7 +112,7 @@ func TestFixedWindowRateLimiter_WindowExpiration(t *testing.T) {
 	// Use short expiration for test
 	underlying := cache.New(1*time.Millisecond, 1*time.Millisecond)
 	cacheClient := caching.NewGoCacheClient(underlying)
-	cacheRepo := caching.NewCachingRepository(context.Background(), "go-backend-template-test", cacheClient)
+	cacheRepo := caching.NewCachingRepository(context.Background(), "life-cloud-agent-node-test", cacheClient)
 
 	limiter := NewFixedWindowRateLimiter(cacheRepo)
 	key := "user:expiring"
@@ -142,7 +142,7 @@ func TestFixedWindowRateLimiter_WindowExpiration(t *testing.T) {
 func TestFixedWindowRateLimiter_ResetNonExistentKey(t *testing.T) {
 	underlying := cache.New(cache.NoExpiration, 10*time.Minute)
 	cacheClient := caching.NewGoCacheClient(underlying)
-	cacheRepo := caching.NewCachingRepository(context.Background(), "go-backend-template-test", cacheClient)
+	cacheRepo := caching.NewCachingRepository(context.Background(), "life-cloud-agent-node-test", cacheClient)
 
 	limiter := NewFixedWindowRateLimiter(cacheRepo)
 
@@ -154,7 +154,7 @@ func TestFixedWindowRateLimiter_ResetNonExistentKey(t *testing.T) {
 func TestFixedWindowRateLimiter_HighLimit(t *testing.T) {
 	underlying := cache.New(cache.NoExpiration, 10*time.Minute)
 	cacheClient := caching.NewGoCacheClient(underlying)
-	cacheRepo := caching.NewCachingRepository(context.Background(), "go-backend-template-test", cacheClient)
+	cacheRepo := caching.NewCachingRepository(context.Background(), "life-cloud-agent-node-test", cacheClient)
 
 	limiter := NewFixedWindowRateLimiter(cacheRepo)
 	key := "user:highlimit"

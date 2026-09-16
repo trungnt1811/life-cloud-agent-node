@@ -3,7 +3,7 @@ package runtimeconfig
 import (
 	"strings"
 
-	"github.com/lifenetwork-ai/go-backend-template/conf"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/conf"
 )
 
 type ModuleConfigs struct {

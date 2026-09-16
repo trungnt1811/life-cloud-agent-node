@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/lifenetwork-ai/go-backend-template/infrastructures/caching/types"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/infrastructures/caching/types"
 )
 
 const testValConstant = "test_val"

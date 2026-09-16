@@ -8,10 +8,10 @@ import (
 	"github.com/patrickmn/go-cache"
 	"github.com/stretchr/testify/require"
 
-	"github.com/lifenetwork-ai/go-backend-template/infrastructures/caching/types"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/infrastructures/caching/types"
 )
 
-const testAppName = "go-backend-template-test"
+const testAppName = "life-cloud-agent-node-test"
 
 func TestCachingRepository_Prefixing_SaveRetrieveRemove(t *testing.T) {
 	underlying := cache.New(5*time.Minute, 10*time.Minute)

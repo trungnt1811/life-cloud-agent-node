@@ -7,9 +7,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 
-	"github.com/lifenetwork-ai/go-backend-template/internal/adapters/repositories/models"
-	"github.com/lifenetwork-ai/go-backend-template/internal/domain/entities"
-	"github.com/lifenetwork-ai/go-backend-template/internal/testsupport/mappingtest"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/repositories/models"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/entities"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/testsupport/mappingtest"
 )
 
 func TestExampleMapperCoversRecordAndModelFields(t *testing.T) {

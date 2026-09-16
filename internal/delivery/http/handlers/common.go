@@ -5,9 +5,9 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	httpresponse "github.com/lifenetwork-ai/go-backend-template/internal/delivery/http/response"
-	domainerrors "github.com/lifenetwork-ai/go-backend-template/internal/domain/usecases/errors"
-	"github.com/lifenetwork-ai/go-backend-template/internal/platform/logger"
+	httpresponse "github.com/lifenetwork-ai/life-cloud-agent-node/internal/delivery/http/response"
+	domainerrors "github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/usecases/errors"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/platform/logger"
 )
 
 // HandleDomainError is a centralized error handler for domain errors

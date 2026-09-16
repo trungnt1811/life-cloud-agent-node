@@ -10,12 +10,12 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 
-	"github.com/lifenetwork-ai/go-backend-template/constants"
-	"github.com/lifenetwork-ai/go-backend-template/internal/domain/contracts"
-	"github.com/lifenetwork-ai/go-backend-template/internal/domain/entities"
-	domainrepos "github.com/lifenetwork-ai/go-backend-template/internal/domain/repositories"
-	domainerrors "github.com/lifenetwork-ai/go-backend-template/internal/domain/usecases/errors"
-	"github.com/lifenetwork-ai/go-backend-template/internal/mocks"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/constants"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/contracts"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/entities"
+	domainrepos "github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/repositories"
+	domainerrors "github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/usecases/errors"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/mocks"
 )
 
 func requireExampleDomainError(

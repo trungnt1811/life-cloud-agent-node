@@ -5,8 +5,8 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/lifenetwork-ai/go-backend-template/internal/domain/contracts"
-	"github.com/lifenetwork-ai/go-backend-template/internal/domain/types"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/contracts"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/types"
 )
 
 // ExampleUseCase defines the interface for example use case operations.

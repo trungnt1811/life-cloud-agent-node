@@ -13,7 +13,7 @@ import (
 	context "context"
 	reflect "reflect"
 
-	repositories "github.com/lifenetwork-ai/go-backend-template/internal/domain/repositories"
+	repositories "github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/repositories"
 	gomock "go.uber.org/mock/gomock"
 )
 

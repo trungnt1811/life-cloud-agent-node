@@ -3,8 +3,8 @@ package rate_limiter
 import (
 	"time"
 
-	cachetypes "github.com/lifenetwork-ai/go-backend-template/infrastructures/caching/types"
-	"github.com/lifenetwork-ai/go-backend-template/infrastructures/rate_limiter/types"
+	cachetypes "github.com/lifenetwork-ai/life-cloud-agent-node/infrastructures/caching/types"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/infrastructures/rate_limiter/types"
 )
 
 type fixedWindowRateLimiter struct {

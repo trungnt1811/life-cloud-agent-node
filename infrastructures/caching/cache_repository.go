@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/lifenetwork-ai/go-backend-template/infrastructures/caching/types"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/infrastructures/caching/types"
 )
 
 type cachingRepository struct {
@@ -19,7 +19,7 @@ type cachingRepository struct {
 func NewCachingRepository(ctx context.Context, appName string, client types.CacheClient) types.CacheRepository {
 	appName = strings.TrimSpace(appName)
 	if appName == "" {
-		appName = "go-backend-template"
+		appName = "life-cloud-agent-node"
 	}
 	return &cachingRepository{
 		ctx:     ctx,

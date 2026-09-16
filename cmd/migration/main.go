@@ -4,10 +4,10 @@ import (
 	"log"
 	"os"
 
-	"github.com/lifenetwork-ai/go-backend-template/conf"
-	"github.com/lifenetwork-ai/go-backend-template/internal/adapters/postgres"
-	"github.com/lifenetwork-ai/go-backend-template/internal/di/instances"
-	"github.com/lifenetwork-ai/go-backend-template/internal/runtimeconfig"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/conf"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/postgres"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/di/instances"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/runtimeconfig"
 )
 
 func main() {

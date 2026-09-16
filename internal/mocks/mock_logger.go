@@ -12,7 +12,7 @@ package mocks
 import (
 	reflect "reflect"
 
-	logger "github.com/lifenetwork-ai/go-backend-template/internal/platform/logger"
+	logger "github.com/lifenetwork-ai/life-cloud-agent-node/internal/platform/logger"
 	gomock "go.uber.org/mock/gomock"
 )
 

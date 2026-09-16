@@ -10,12 +10,12 @@ import (
 	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
 
-	"github.com/lifenetwork-ai/go-backend-template/infrastructures/caching"
-	"github.com/lifenetwork-ai/go-backend-template/internal/adapters/repositories/models"
-	repositorytest "github.com/lifenetwork-ai/go-backend-template/internal/adapters/repositories/testsupport"
-	"github.com/lifenetwork-ai/go-backend-template/internal/domain/entities"
-	domainrepos "github.com/lifenetwork-ai/go-backend-template/internal/domain/repositories"
-	"github.com/lifenetwork-ai/go-backend-template/internal/platform/logger"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/infrastructures/caching"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/repositories/models"
+	repositorytest "github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/repositories/testsupport"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/entities"
+	domainrepos "github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/repositories"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/platform/logger"
 )
 
 func openExampleRepositoryTestDB(t *testing.T) *gorm.DB {
@@ -80,7 +80,7 @@ func TestExampleRepositoryCache_ReadThroughAndTxBypass(t *testing.T) {
 
 	baseRepo := NewExampleRepository(db, logger.GetLogger())
 	cacheClient := caching.NewGoCacheClient(gocache.New(time.Minute, time.Minute))
-	cacheRepo := caching.NewCachingRepository(ctx, "go-backend-template-test", cacheClient)
+	cacheRepo := caching.NewCachingRepository(ctx, "life-cloud-agent-node-test", cacheClient)
 	repo := NewExampleRepositoryCache(baseRepo, cacheRepo, logger.GetLogger())
 
 	entity := entities.NewExampleEntity(uuid.New(), "cached", "initial", time.Now().UTC())

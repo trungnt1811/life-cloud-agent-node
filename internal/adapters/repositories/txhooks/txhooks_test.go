@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
 
-	repositorytest "github.com/lifenetwork-ai/go-backend-template/internal/adapters/repositories/testsupport"
+	repositorytest "github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/repositories/testsupport"
 )
 
 func openTestDB(t *testing.T) *gorm.DB {

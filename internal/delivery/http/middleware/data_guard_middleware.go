@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/lifenetwork-ai/go-backend-template/internal/delivery/http/response"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/delivery/http/response"
 )
 
 // RequestDataGuardMiddleware provides basic security headers and request validation

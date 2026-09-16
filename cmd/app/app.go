@@ -7,14 +7,14 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
-	"github.com/lifenetwork-ai/go-backend-template/conf"
-	"github.com/lifenetwork-ai/go-backend-template/internal/adapters/postgres"
-	httprouter "github.com/lifenetwork-ai/go-backend-template/internal/delivery/http/router"
-	"github.com/lifenetwork-ai/go-backend-template/internal/di"
-	"github.com/lifenetwork-ai/go-backend-template/internal/di/instances"
-	"github.com/lifenetwork-ai/go-backend-template/internal/platform/logger"
-	"github.com/lifenetwork-ai/go-backend-template/internal/runtimeconfig"
-	"github.com/lifenetwork-ai/go-backend-template/internal/server"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/conf"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/postgres"
+	httprouter "github.com/lifenetwork-ai/life-cloud-agent-node/internal/delivery/http/router"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/di"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/di/instances"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/platform/logger"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/runtimeconfig"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/server"
 )
 
 func RunApp(config *conf.Configuration) error {

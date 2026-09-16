@@ -5,7 +5,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/lifenetwork-ai/go-backend-template/internal/domain/entities"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/entities"
 )
 
 // ExampleRepository defines the interface for a generic example repository.

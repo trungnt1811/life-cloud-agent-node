@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/lifenetwork-ai/go-backend-template/constants"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/constants"
 )
 
 func TestNormalizeConfigurationUsesRuntimeDefaults(t *testing.T) {

@@ -3,7 +3,7 @@ package route
 import (
 	"github.com/gin-gonic/gin"
 
-	"github.com/lifenetwork-ai/go-backend-template/internal/delivery/http/handlers"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/delivery/http/handlers"
 )
 
 // SetupExampleRoutes sets up routes for example operations.

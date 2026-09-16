@@ -8,9 +8,9 @@ import (
 	"github.com/patrickmn/go-cache"
 	"github.com/redis/go-redis/v9"
 
-	"github.com/lifenetwork-ai/go-backend-template/constants"
-	"github.com/lifenetwork-ai/go-backend-template/internal/platform/logger"
-	"github.com/lifenetwork-ai/go-backend-template/internal/runtimeconfig"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/constants"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/platform/logger"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/runtimeconfig"
 )
 
 var (

@@ -1,8 +1,8 @@
 package repositories
 
 import (
-	"github.com/lifenetwork-ai/go-backend-template/internal/adapters/repositories/models"
-	"github.com/lifenetwork-ai/go-backend-template/internal/domain/entities"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/repositories/models"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/entities"
 )
 
 func exampleModelFromEntity(entity *entities.ExampleEntity) *models.Example {

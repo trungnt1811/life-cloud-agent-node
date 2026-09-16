@@ -15,7 +15,7 @@ import (
 	reflect "reflect"
 	time "time"
 
-	types "github.com/lifenetwork-ai/go-backend-template/infrastructures/caching/types"
+	types "github.com/lifenetwork-ai/life-cloud-agent-node/infrastructures/caching/types"
 	gomock "go.uber.org/mock/gomock"
 )
 

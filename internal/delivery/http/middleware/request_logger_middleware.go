@@ -6,7 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/lifenetwork-ai/go-backend-template/internal/platform/logger"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/platform/logger"
 )
 
 // RequestLoggerMiddleware returns a gin middleware for HTTP request logging

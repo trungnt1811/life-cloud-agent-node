@@ -9,8 +9,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/lifenetwork-ai/go-backend-template/constants"
-	"github.com/lifenetwork-ai/go-backend-template/internal/platform/logger"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/constants"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/platform/logger"
 )
 
 func GracefulTimeout(timeout time.Duration) time.Duration {

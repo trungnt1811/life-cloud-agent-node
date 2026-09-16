@@ -13,7 +13,7 @@ import (
 	gormpostgres "gorm.io/driver/postgres"
 	"gorm.io/gorm"
 
-	apppostgres "github.com/lifenetwork-ai/go-backend-template/internal/adapters/postgres"
+	apppostgres "github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/postgres"
 )
 
 const (
@@ -27,10 +27,10 @@ const (
 	postgresRepositoryTestNameEnv   = "POSTGRES_REPOSITORY_TEST_CONTAINER_NAME"
 
 	defaultPostgresRepositoryTestImage      = "postgres:15-alpine"
-	defaultPostgresRepositoryTestDB         = "go_backend_template_repository_tests"
+	defaultPostgresRepositoryTestDB         = "life_cloud_agent_node_repository_tests"
 	defaultPostgresRepositoryTestUser       = "postgres"
 	defaultPostgresRepositoryTestPass       = "postgres"
-	defaultPostgresRepositoryTestNamePrefix = "go-backend-template-repository-tests-postgres"
+	defaultPostgresRepositoryTestNamePrefix = "life-cloud-agent-node-repository-tests-postgres"
 
 	postgresRepositoryTemplateLockKey1 = 724101
 	postgresRepositoryTemplateLockKey2 = 1

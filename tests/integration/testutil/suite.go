@@ -8,8 +8,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
-	"github.com/lifenetwork-ai/go-backend-template/conf"
-	"github.com/lifenetwork-ai/go-backend-template/internal/platform/logger"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/conf"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/platform/logger"
 )
 
 // RouterSetupFunc defines the app router bootstrap function used by integration tests.

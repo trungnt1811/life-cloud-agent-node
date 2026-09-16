@@ -14,10 +14,10 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 
-	"github.com/lifenetwork-ai/go-backend-template/internal/domain/contracts"
-	domaintypes "github.com/lifenetwork-ai/go-backend-template/internal/domain/types"
-	domainerrors "github.com/lifenetwork-ai/go-backend-template/internal/domain/usecases/errors"
-	"github.com/lifenetwork-ai/go-backend-template/internal/mocks"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/contracts"
+	domaintypes "github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/types"
+	domainerrors "github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/usecases/errors"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/mocks"
 )
 
 func TestExampleHandlerListExamplesSuccess(t *testing.T) {

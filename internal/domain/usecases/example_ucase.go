@@ -8,14 +8,14 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/lifenetwork-ai/go-backend-template/constants"
-	"github.com/lifenetwork-ai/go-backend-template/internal/domain/contracts"
-	"github.com/lifenetwork-ai/go-backend-template/internal/domain/entities"
-	"github.com/lifenetwork-ai/go-backend-template/internal/domain/repositories"
-	domaintypes "github.com/lifenetwork-ai/go-backend-template/internal/domain/types"
-	domainerrors "github.com/lifenetwork-ai/go-backend-template/internal/domain/usecases/errors"
-	"github.com/lifenetwork-ai/go-backend-template/internal/domain/usecases/interfaces"
-	loggerpkg "github.com/lifenetwork-ai/go-backend-template/internal/platform/logger"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/constants"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/contracts"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/entities"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/repositories"
+	domaintypes "github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/types"
+	domainerrors "github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/usecases/errors"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/usecases/interfaces"
+	loggerpkg "github.com/lifenetwork-ai/life-cloud-agent-node/internal/platform/logger"
 )
 
 const (

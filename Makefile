@@ -1,10 +1,10 @@
-APP_BIN ?= go-backend-template
+APP_BIN ?= life-cloud-agent-node
 GOLANGCI_LINT_VERSION ?= v1.64.8
 TEMPLATE_MODULE := github.com/lifenetwork-ai/go-backend-template
 TEMPLATE_REPO_NAME := go-backend-template
 TEMPLATE_DB_NAME := go_backend_template
 
-DB_NAME ?= go_backend_template
+DB_NAME ?= life_cloud_agent_node
 DB_USER ?= postgres
 DB_PASSWORD ?= postgres
 DB_PORT ?= 5432

@@ -3,8 +3,8 @@ package main
 import (
 	"log"
 
-	app "github.com/lifenetwork-ai/go-backend-template/cmd/app"
-	"github.com/lifenetwork-ai/go-backend-template/conf"
+	app "github.com/lifenetwork-ai/life-cloud-agent-node/cmd/app"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/conf"
 )
 
 func main() {

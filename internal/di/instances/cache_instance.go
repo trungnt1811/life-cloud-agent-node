@@ -5,11 +5,11 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/lifenetwork-ai/go-backend-template/constants"
-	"github.com/lifenetwork-ai/go-backend-template/infrastructures/caching"
-	"github.com/lifenetwork-ai/go-backend-template/infrastructures/caching/types"
-	"github.com/lifenetwork-ai/go-backend-template/internal/platform/logger"
-	"github.com/lifenetwork-ai/go-backend-template/internal/runtimeconfig"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/constants"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/infrastructures/caching"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/infrastructures/caching/types"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/platform/logger"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/runtimeconfig"
 )
 
 var (

@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/lifenetwork-ai/go-backend-template/internal/testsupport/archtest"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/testsupport/archtest"
 )
 
 func TestDomainProductionCodeDoesNotImportOuterLayers(t *testing.T) {

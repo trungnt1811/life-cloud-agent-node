@@ -7,7 +7,7 @@ import (
 
 	"github.com/spf13/viper"
 
-	"github.com/lifenetwork-ai/go-backend-template/constants"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/constants"
 )
 
 type DatabaseConfiguration struct {
@@ -56,7 +56,7 @@ type Configuration struct {
 var configuration = NormalizeConfiguration(Configuration{})
 
 const (
-	defaultAppName                     = "go-backend-template"
+	defaultAppName                     = "life-cloud-agent-node"
 	defaultAppPort              uint32 = 8080
 	defaultEnv                         = "development"
 	defaultLogLevel                    = "info"
@@ -70,7 +70,7 @@ const (
 	defaultDBPassword                  = "postgres"
 	defaultDBHost                      = "localhost"
 	defaultDBPort                      = "5432"
-	defaultDBName                      = "go_backend_template"
+	defaultDBName                      = "life_cloud_agent_node"
 	defaultDBMaxIdleConns              = 5
 	defaultDBMaxOpenConns              = 25
 	defaultDBConnMaxLifetimeMin        = 60

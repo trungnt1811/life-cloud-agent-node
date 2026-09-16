@@ -8,7 +8,7 @@ import (
 	"github.com/patrickmn/go-cache"
 	"github.com/stretchr/testify/require"
 
-	"github.com/lifenetwork-ai/go-backend-template/infrastructures/caching/types"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/infrastructures/caching/types"
 )
 
 type testStruct struct {

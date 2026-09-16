@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/lifenetwork-ai/go-backend-template/conf"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/conf"
 )
 
 func TestModuleConfigsFromConfigurationUsesConfDefaults(t *testing.T) {

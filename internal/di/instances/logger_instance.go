@@ -1,7 +1,7 @@
 package instances
 
 import (
-	"github.com/lifenetwork-ai/go-backend-template/internal/platform/logger"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/platform/logger"
 )
 
 var loggerInstance logger.Logger

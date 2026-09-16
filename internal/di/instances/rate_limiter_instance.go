@@ -4,11 +4,11 @@ import (
 	"context"
 	"sync"
 
-	cachetypes "github.com/lifenetwork-ai/go-backend-template/infrastructures/caching/types"
-	ratelimiter "github.com/lifenetwork-ai/go-backend-template/infrastructures/rate_limiter"
-	"github.com/lifenetwork-ai/go-backend-template/infrastructures/rate_limiter/types"
-	"github.com/lifenetwork-ai/go-backend-template/internal/platform/logger"
-	"github.com/lifenetwork-ai/go-backend-template/internal/runtimeconfig"
+	cachetypes "github.com/lifenetwork-ai/life-cloud-agent-node/infrastructures/caching/types"
+	ratelimiter "github.com/lifenetwork-ai/life-cloud-agent-node/infrastructures/rate_limiter"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/infrastructures/rate_limiter/types"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/platform/logger"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/runtimeconfig"
 )
 
 var (

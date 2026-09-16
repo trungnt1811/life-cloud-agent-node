@@ -14,7 +14,7 @@ import (
 	reflect "reflect"
 
 	uuid "github.com/google/uuid"
-	entities "github.com/lifenetwork-ai/go-backend-template/internal/domain/entities"
+	entities "github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/entities"
 	gomock "go.uber.org/mock/gomock"
 )
 

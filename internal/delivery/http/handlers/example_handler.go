@@ -7,13 +7,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 
-	"github.com/lifenetwork-ai/go-backend-template/constants"
-	"github.com/lifenetwork-ai/go-backend-template/internal/delivery/dto"
-	httpresponse "github.com/lifenetwork-ai/go-backend-template/internal/delivery/http/response"
-	"github.com/lifenetwork-ai/go-backend-template/internal/domain/contracts"
-	domainerrors "github.com/lifenetwork-ai/go-backend-template/internal/domain/usecases/errors"
-	"github.com/lifenetwork-ai/go-backend-template/internal/domain/usecases/interfaces"
-	"github.com/lifenetwork-ai/go-backend-template/internal/platform/logger"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/constants"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/delivery/dto"
+	httpresponse "github.com/lifenetwork-ai/life-cloud-agent-node/internal/delivery/http/response"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/contracts"
+	domainerrors "github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/usecases/errors"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/usecases/interfaces"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/platform/logger"
 )
 
 // ExampleHandler handles requests related to example operations.

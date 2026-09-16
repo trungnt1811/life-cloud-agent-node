@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"github.com/lifenetwork-ai/go-backend-template/internal/domain/entities"
-	"github.com/lifenetwork-ai/go-backend-template/internal/domain/usecases/services"
-	"github.com/lifenetwork-ai/go-backend-template/internal/platform/logger"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/entities"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/usecases/services"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/platform/logger"
 )
 
 // ExampleService is a sample external service adapter.

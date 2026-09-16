@@ -10,12 +10,12 @@ import (
 	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
 
-	adapterrepos "github.com/lifenetwork-ai/go-backend-template/internal/adapters/repositories"
-	repositorytest "github.com/lifenetwork-ai/go-backend-template/internal/adapters/repositories/testsupport"
-	"github.com/lifenetwork-ai/go-backend-template/internal/adapters/repositories/txhooks"
-	"github.com/lifenetwork-ai/go-backend-template/internal/domain/entities"
-	domainrepos "github.com/lifenetwork-ai/go-backend-template/internal/domain/repositories"
-	"github.com/lifenetwork-ai/go-backend-template/internal/platform/logger"
+	adapterrepos "github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/repositories"
+	repositorytest "github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/repositories/testsupport"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/repositories/txhooks"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/entities"
+	domainrepos "github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/repositories"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/platform/logger"
 )
 
 func openTransactionManagerTestDB(t *testing.T) *gorm.DB {

@@ -3,7 +3,7 @@ package services
 import (
 	"context"
 
-	"github.com/lifenetwork-ai/go-backend-template/internal/domain/entities"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/entities"
 )
 
 // ExampleService is the domain port for an external example service.

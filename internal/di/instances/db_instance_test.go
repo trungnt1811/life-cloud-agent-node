@@ -6,7 +6,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/lifenetwork-ai/go-backend-template/internal/runtimeconfig"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/runtimeconfig"
 )
 
 func TestDatabasePoolSettingsFromConfig(t *testing.T) {

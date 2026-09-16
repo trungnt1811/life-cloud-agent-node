@@ -12,7 +12,7 @@ services:
       DB_PASSWORD: password
       DB_HOST: db
       DB_PORT: 5432
-      DB_NAME: go_backend_template
+      DB_NAME: life_cloud_agent_node
       REDIS_ADDRESS: redis:6379
     depends_on:
       db:
@@ -27,7 +27,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: go_backend_template
+      POSTGRES_DB: life_cloud_agent_node
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:

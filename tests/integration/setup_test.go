@@ -4,16 +4,16 @@ import (
 	"os"
 	"testing"
 
-	"github.com/lifenetwork-ai/go-backend-template/cmd/app"
-	"github.com/lifenetwork-ai/go-backend-template/conf"
-	"github.com/lifenetwork-ai/go-backend-template/constants"
-	"github.com/lifenetwork-ai/go-backend-template/tests/integration/testutil"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/cmd/app"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/conf"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/constants"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/tests/integration/testutil"
 )
 
 func TestMain(m *testing.M) {
 	suite := testutil.NewTestSuite(testutil.SuiteConfig{
 		Config: &conf.Configuration{
-			AppName:   "go-backend-template-test",
+			AppName:   "life-cloud-agent-node-test",
 			AppPort:   8080,
 			Env:       "TEST",
 			LogLevel:  "info",

@@ -5,14 +5,14 @@ import (
 
 	"gorm.io/gorm"
 
-	"github.com/lifenetwork-ai/go-backend-template/internal/adapters/repositories"
-	transactionrepo "github.com/lifenetwork-ai/go-backend-template/internal/adapters/repositories/transaction"
-	"github.com/lifenetwork-ai/go-backend-template/internal/di/instances"
-	repoInterfaces "github.com/lifenetwork-ai/go-backend-template/internal/domain/repositories"
-	"github.com/lifenetwork-ai/go-backend-template/internal/domain/usecases"
-	"github.com/lifenetwork-ai/go-backend-template/internal/domain/usecases/interfaces"
-	"github.com/lifenetwork-ai/go-backend-template/internal/platform/logger"
-	"github.com/lifenetwork-ai/go-backend-template/internal/runtimeconfig"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/repositories"
+	transactionrepo "github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/repositories/transaction"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/di/instances"
+	repoInterfaces "github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/repositories"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/usecases"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/usecases/interfaces"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/platform/logger"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/runtimeconfig"
 )
 
 // Repos holds all initialized repositories.

@@ -60,7 +60,7 @@ linters-settings:
     sections:
       - standard # Standard section: captures all standard packages.
       - default # Default section: contains all imports that could not be matched to another section type.
-      - prefix(github.com/lifenetwork-ai/go-backend-template)
+      - prefix(github.com/lifenetwork-ai/life-cloud-agent-node)
   revive:
     rules:
       - name: redefines-builtin-id

@@ -1,4 +1,4 @@
-module github.com/lifenetwork-ai/go-backend-template
+module github.com/lifenetwork-ai/life-cloud-agent-node
 
 go 1.24.0
 

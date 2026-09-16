@@ -1,6 +1,6 @@
 package testutil
 
-import "github.com/lifenetwork-ai/go-backend-template/internal/platform/logger"
+import "github.com/lifenetwork-ai/life-cloud-agent-node/internal/platform/logger"
 
 // TestLogger is a silent logger used in tests.
 type TestLogger struct{}

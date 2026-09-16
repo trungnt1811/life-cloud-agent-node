@@ -5,8 +5,8 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/lifenetwork-ai/go-backend-template/internal/domain/contracts"
-	domaintypes "github.com/lifenetwork-ai/go-backend-template/internal/domain/types"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/contracts"
+	domaintypes "github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/types"
 )
 
 // CreateExampleRequest is the HTTP request body for creating an example.

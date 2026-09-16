@@ -6,10 +6,10 @@ import (
 	"github.com/google/uuid"
 	"gorm.io/gorm"
 
-	"github.com/lifenetwork-ai/go-backend-template/internal/adapters/repositories/models"
-	"github.com/lifenetwork-ai/go-backend-template/internal/domain/entities"
-	"github.com/lifenetwork-ai/go-backend-template/internal/domain/repositories"
-	"github.com/lifenetwork-ai/go-backend-template/internal/platform/logger"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/repositories/models"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/entities"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/repositories"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/platform/logger"
 )
 
 // exampleRepository implements repositories.ExampleRepository with GORM.

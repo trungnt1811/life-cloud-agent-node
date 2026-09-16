@@ -7,9 +7,9 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 
-	"github.com/lifenetwork-ai/go-backend-template/internal/domain/contracts"
-	domaintypes "github.com/lifenetwork-ai/go-backend-template/internal/domain/types"
-	"github.com/lifenetwork-ai/go-backend-template/internal/testsupport/mappingtest"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/contracts"
+	domaintypes "github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/types"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/testsupport/mappingtest"
 )
 
 func TestCreateExampleRequestCoversCreateExampleInputFields(t *testing.T) {

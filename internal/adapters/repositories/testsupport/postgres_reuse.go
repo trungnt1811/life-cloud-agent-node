@@ -10,7 +10,7 @@ import (
 	tcpostgres "github.com/testcontainers/testcontainers-go/modules/postgres"
 	"gorm.io/gorm"
 
-	apppostgres "github.com/lifenetwork-ai/go-backend-template/internal/adapters/postgres"
+	apppostgres "github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/postgres"
 )
 
 var (
