@@ -489,10 +489,36 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
   `TestPatientRegistryRepository_SaveSpecimenHigherRevisionWinsRegardlessOfCallOrder`
   (both directions of call order), `TestVNAAdapter_FlagsMissingSpecimenID`,
   `TestVNBAdapter_FlagsDateMismatchWithinGroup`, and
-  `TestVNBAdapter_FlagsConflictingValueAtSameRevision`. Not fixed in this
-  pass (simplification/efficiency findings, not correctness): the
-  hardcoded `"final"` status literal, the dual date-format representation,
-  and the N+1 patient-upsert/read-back round trips.
+  `TestVNBAdapter_FlagsConflictingValueAtSameRevision`.
+- 2026-09-17 (completeness pass — remaining simplification/efficiency
+  findings from the same review): fixed the ones with real, contained
+  value; left the ones whose fix cost or risk outweighed it.
+  - **Fixed**: N+1 patient upsert (`ingestHospitalExportUseCase` now caches
+    `*entities.Patient` by external ID for one `IngestFiles` run instead of
+    re-upserting per specimen); `SaveSpecimen`'s unconditional read-back
+    SELECT after the specimen insert (now only reads back when
+    `RowsAffected == 0`, i.e. an actual conflict — the common first-time
+    path is one round trip, matching the pattern already used in
+    `GetOrCreatePatient`); the redundant `IngestResult.Anomalies` counter
+    (removed; `AnomalyCount()` derives it from `len(AnomalyReasons)`, so
+    the two can't drift); dead code — unused `AdapterForProfile`, the
+    unused `name` field on both profile structs, and the unused `status`
+    field on `longRow`; four copy-pasted "default ID / default timestamp"
+    blocks across `Patient`/`Specimen`/`LabObservation` constructors,
+    factored into `entities.ensureID`/`ensureTimestamp` (the pre-existing,
+    out-of-scope `example.go` entity was left alone); the identical
+    patient/specimen/status/revision preamble duplicated between `wide.go`
+    and `long.go`, factored into `normalize.go`'s `validateRowHeader`.
+  - **Left open**: the hardcoded case-sensitive `"final"` status literal;
+    the dual date-format representation (`expectedDateFormat` strptime
+    token vs. `dateLayout` Go layout) that can drift out of sync for a
+    future profile; the `wideProfile`/`longProfile` shared-field
+    duplication; the per-entity mapper boilerplate
+    (`patient_registry_mapper.go` vs. `example_mapper.go`); `cmd/ingest`
+    duplicating `cmd/migration`'s config/DB bootstrap sequence. None of
+    these affect correctness; revisit if/when a real 4th/5th hospital
+    profile is added, which is when the date-format and shared-field
+    duplication risk actually bites.
 - Promote any phase-specific decision (e.g. checkpoint granularity,
   suppression threshold default, a specific mapping ambiguity) into
   `docs/decisions/` as that phase starts, per the pattern already used by

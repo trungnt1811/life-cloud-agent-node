@@ -66,6 +66,10 @@ func (u *ingestHospitalExportUseCase) IngestFiles(
 		Files:   len(paths),
 	}
 	now := time.Now().UTC()
+	// Scoped to this run only (not the use case struct): a file with many
+	// specimens for the same patient resolves that patient once instead of
+	// once per specimen.
+	patientCache := map[string]*entities.Patient{}
 
 	for _, path := range paths {
 		specimens, anomalies, err := adapter.ParseFile(path)
@@ -73,7 +77,6 @@ func (u *ingestHospitalExportUseCase) IngestFiles(
 			return nil, fmt.Errorf("parse %s: %w", path, err)
 		}
 		result.SpecimensParsed += len(specimens)
-		result.Anomalies += len(anomalies)
 		for _, anomaly := range anomalies {
 			reason := fmt.Sprintf("%s:%d:%s", anomaly.SourceFile, anomaly.SourceRowNumber, anomaly.Reason)
 			result.AnomalyReasons = append(result.AnomalyReasons, reason)
@@ -88,7 +91,7 @@ func (u *ingestHospitalExportUseCase) IngestFiles(
 
 		for i := range specimens {
 			specimen := specimens[i]
-			if err := u.persistSpecimen(ctx, specimen, now); err != nil {
+			if err := u.persistSpecimen(ctx, specimen, now, patientCache); err != nil {
 				return nil, err
 			}
 			result.SpecimensSaved++
@@ -102,7 +105,7 @@ func (u *ingestHospitalExportUseCase) IngestFiles(
 		loggerpkg.Int("files", result.Files),
 		loggerpkg.Int("specimens_saved", result.SpecimensSaved),
 		loggerpkg.Int("observations_saved", result.ObservationsSaved),
-		loggerpkg.Int("anomalies", result.Anomalies),
+		loggerpkg.Int("anomalies", result.AnomalyCount()),
 	)
 	return result, nil
 }
@@ -111,10 +114,17 @@ func (u *ingestHospitalExportUseCase) persistSpecimen(
 	ctx context.Context,
 	normalized domaintypes.NormalizedSpecimen,
 	now time.Time,
+	patientCache map[string]*entities.Patient,
 ) error {
-	patient, err := u.registry.GetOrCreatePatient(ctx, normalized.ExternalPatientID)
-	if err != nil {
-		return fmt.Errorf("get or create patient %q: %w", normalized.ExternalPatientID, err)
+	patientKey := strings.TrimSpace(normalized.ExternalPatientID)
+	patient, ok := patientCache[patientKey]
+	if !ok {
+		var err error
+		patient, err = u.registry.GetOrCreatePatient(ctx, normalized.ExternalPatientID)
+		if err != nil {
+			return fmt.Errorf("get or create patient %q: %w", normalized.ExternalPatientID, err)
+		}
+		patientCache[patientKey] = patient
 	}
 
 	specimenID := uuid.New()

@@ -3,7 +3,6 @@ package ingestion
 // NewVNAAdapter parses VN_A wide CSV exports (ISO dates, Hb already g/dL).
 func NewVNAAdapter() *wideProfile {
 	return &wideProfile{
-		name:               ProfileVNA,
 		delimiter:          ',',
 		decimalSeparator:   ".",
 		expectedDateFormat: "%Y-%m-%d",

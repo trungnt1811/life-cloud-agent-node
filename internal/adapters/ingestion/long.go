@@ -5,14 +5,12 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strconv"
 	"strings"
 
 	domaintypes "github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/types"
 )
 
 type longProfile struct {
-	name               string
 	delimiter          rune
 	decimalSeparator   string
 	expectedDateFormat string
@@ -31,7 +29,6 @@ type longRow struct {
 	revision   int
 	collected  string
 	dateFormat string
-	status     string
 	testCode   string
 	rawValue   string
 	rawUnit    string
@@ -76,23 +73,9 @@ func (p longProfile) ParseFile(path string) ([]domaintypes.NormalizedSpecimen, [
 		rowNumber++
 		row := rowMap(headers, record)
 
-		patientID := strings.TrimSpace(row[p.columns.PatientID])
-		if patientID == "" {
-			anomalies = append(anomalies, anomaly(path, rowNumber, "missing_patient_id"))
-			continue
-		}
-		if reason := validateFinalRevision(row[p.columns.Status], row[p.columns.Revision]); reason != "" {
-			anomalies = append(anomalies, anomaly(path, rowNumber, reason))
-			continue
-		}
-		revision, err := strconv.Atoi(strings.TrimSpace(row[p.columns.Revision]))
-		if err != nil {
-			anomalies = append(anomalies, anomaly(path, rowNumber, "invalid_revision_or_status"))
-			continue
-		}
-		specimenID := strings.TrimSpace(row[p.columns.SpecimenID])
-		if specimenID == "" {
-			anomalies = append(anomalies, anomaly(path, rowNumber, "missing_specimen_id"))
+		patientID, specimenID, revision, headerReason := validateRowHeader(row, p.columns)
+		if headerReason != "" {
+			anomalies = append(anomalies, anomaly(path, rowNumber, headerReason))
 			continue
 		}
 
@@ -104,7 +87,6 @@ func (p longProfile) ParseFile(path string) ([]domaintypes.NormalizedSpecimen, [
 			revision:   revision,
 			collected:  row[p.columns.Date],
 			dateFormat: row[p.columns.DateFormat],
-			status:     row[p.columns.Status],
 			testCode:   strings.TrimSpace(row[p.testCodeColumn]),
 			rawValue:   row[p.resultColumn],
 			rawUnit:    row[p.unitColumn],

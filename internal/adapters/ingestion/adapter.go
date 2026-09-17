@@ -1,9 +1,6 @@
 package ingestion
 
 import (
-	"fmt"
-	"strings"
-
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/usecases/interfaces"
 )
 
@@ -21,14 +18,4 @@ func DefaultAdapters() map[string]interfaces.HospitalExportAdapter {
 		ProfileVNB: NewVNBAdapter(),
 		ProfileVNC: NewVNCAdapter(),
 	}
-}
-
-// AdapterForProfile resolves a hospital export adapter by profile flag.
-func AdapterForProfile(profile string) (interfaces.HospitalExportAdapter, error) {
-	adapters := DefaultAdapters()
-	adapter := adapters[strings.ToUpper(strings.TrimSpace(profile))]
-	if adapter == nil {
-		return nil, fmt.Errorf("unsupported hospital export profile %q", profile)
-	}
-	return adapter, nil
 }

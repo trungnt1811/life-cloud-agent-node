@@ -136,31 +136,37 @@ func (r *patientRegistryRepository) SaveSpecimen(
 		// safe no-op for the specimen row instead of a duplicate insert.
 		// Unlike file/row provenance, this identity is stable across a
 		// corrected re-export under a new filename or shifted row numbers.
-		if err := tx.
+		insert := tx.
 			Clauses(clause.OnConflict{
 				Columns: []clause.Column{
 					{Name: "source_dataset"}, {Name: "patient_id"}, {Name: "external_specimen_id"},
 				},
 				DoNothing: true,
 			}).
-			Create(specimenModel).Error; err != nil {
-			r.logger.Error("Failed to create specimen", logger.String("id", specimen.ID().String()), logger.Err(err))
-			return err
+			Create(specimenModel)
+		if insert.Error != nil {
+			r.logger.Error("Failed to create specimen", logger.String("id", specimen.ID().String()), logger.Err(insert.Error))
+			return insert.Error
 		}
 
-		// The conflict clause may have skipped the insert if this specimen
-		// was already ingested under a different, earlier-assigned ID; read
-		// back the canonical row by its natural key so observations attach
-		// to the row that actually exists rather than the one just attempted.
-		var canonical models.Specimen
-		if err := tx.
-			Where(
-				"source_dataset = ? AND patient_id = ? AND external_specimen_id = ?",
-				specimenModel.SourceDataset, specimenModel.PatientID, specimenModel.ExternalSpecimenID,
-			).
-			First(&canonical).Error; err != nil {
-			r.logger.Error("Failed to read back specimen", logger.String("id", specimen.ID().String()), logger.Err(err))
-			return err
+		// On the common (first-time) path the insert succeeds and
+		// specimenModel already holds the canonical row - no read-back
+		// needed. The conflict clause only skips the insert when this
+		// specimen was already ingested under a different, earlier-assigned
+		// ID; only then read back the canonical row by its natural key, so
+		// observations attach to the row that actually exists.
+		canonical := specimenModel
+		if insert.RowsAffected == 0 {
+			canonical = &models.Specimen{}
+			if err := tx.
+				Where(
+					"source_dataset = ? AND patient_id = ? AND external_specimen_id = ?",
+					specimenModel.SourceDataset, specimenModel.PatientID, specimenModel.ExternalSpecimenID,
+				).
+				First(canonical).Error; err != nil {
+				r.logger.Error("Failed to read back specimen", logger.String("id", specimen.ID().String()), logger.Err(err))
+				return err
+			}
 		}
 
 		observationModels := make([]*models.LabObservation, 0, len(observations))

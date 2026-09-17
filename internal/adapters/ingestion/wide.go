@@ -6,14 +6,12 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strconv"
 	"strings"
 
 	domaintypes "github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/types"
 )
 
 type wideProfile struct {
-	name               string
 	delimiter          rune
 	stripBOM           bool
 	decimalSeparator   string
@@ -68,23 +66,9 @@ func (p wideProfile) ParseFile(path string) ([]domaintypes.NormalizedSpecimen, [
 		rowNumber++
 		row := rowMap(headers, record)
 
-		patientID := strings.TrimSpace(row[p.columns.PatientID])
-		if patientID == "" {
-			anomalies = append(anomalies, anomaly(path, rowNumber, "missing_patient_id"))
-			continue
-		}
-		specimenID := strings.TrimSpace(row[p.columns.SpecimenID])
-		if specimenID == "" {
-			anomalies = append(anomalies, anomaly(path, rowNumber, "missing_specimen_id"))
-			continue
-		}
-		if reason := validateFinalRevision(row[p.columns.Status], row[p.columns.Revision]); reason != "" {
-			anomalies = append(anomalies, anomaly(path, rowNumber, reason))
-			continue
-		}
-		revision, err := strconv.Atoi(strings.TrimSpace(row[p.columns.Revision]))
-		if err != nil {
-			anomalies = append(anomalies, anomaly(path, rowNumber, "invalid_revision_or_status"))
+		patientID, specimenID, revision, headerReason := validateRowHeader(row, p.columns)
+		if headerReason != "" {
+			anomalies = append(anomalies, anomaly(path, rowNumber, headerReason))
 			continue
 		}
 		collectedAt, reason := parseCollectedAt(

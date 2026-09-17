@@ -65,7 +65,7 @@ func TestIngestHospitalExport_EndToEndFixtures(t *testing.T) {
 			repositorytest.ResetPostgresRepositoryTables(t, db)
 			result, err := ucase.IngestFiles(ctx, tc.profile, []string{ingestionFixture(t, tc.profile, "results.csv")})
 			require.NoError(t, err)
-			require.GreaterOrEqual(t, result.Anomalies, tc.wantAnomaliesAtLeast)
+			require.GreaterOrEqual(t, result.AnomalyCount(), tc.wantAnomaliesAtLeast)
 			require.Equal(t, tc.wantSpecimens, result.SpecimensSaved)
 			require.Equal(t, tc.wantObservations, result.ObservationsSaved)
 

@@ -3,7 +3,6 @@ package ingestion
 // NewVNBAdapter parses VN_B long CSV exports (YYYYMMDD, Hb g/L, HPLC fractions).
 func NewVNBAdapter() *longProfile {
 	return &longProfile{
-		name:               ProfileVNB,
 		delimiter:          ',',
 		decimalSeparator:   ".",
 		expectedDateFormat: "%Y%m%d",

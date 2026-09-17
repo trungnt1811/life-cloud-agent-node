@@ -51,6 +51,6 @@ func main() {
 		result.Files,
 		result.SpecimensSaved,
 		result.ObservationsSaved,
-		result.Anomalies,
+		result.AnomalyCount(),
 	)
 }

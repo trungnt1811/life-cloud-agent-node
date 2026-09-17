@@ -54,16 +54,8 @@ type NewSpecimenParams struct {
 
 // NewSpecimen creates a specimen. CollectedAt is stored as a calendar date.
 func NewSpecimen(params NewSpecimenParams) *Specimen {
-	id := params.ID
-	if id == uuid.Nil {
-		id = uuid.New()
-	}
-	now := params.Now
-	if now.IsZero() {
-		now = time.Now().UTC()
-	}
 	return &Specimen{
-		id:                 id,
+		id:                 ensureID(params.ID),
 		patientID:          params.PatientID,
 		externalSpecimenID: strings.TrimSpace(params.ExternalSpecimenID),
 		collectedAt:        calendarDate(params.CollectedAt),
@@ -71,7 +63,7 @@ func NewSpecimen(params NewSpecimenParams) *Specimen {
 		sourceFile:         strings.TrimSpace(params.SourceFile),
 		sourceRowNumber:    params.SourceRowNumber,
 		sourceRecordID:     strings.TrimSpace(params.SourceRecordID),
-		createdAt:          now.UTC(),
+		createdAt:          ensureTimestamp(params.Now),
 	}
 }
 

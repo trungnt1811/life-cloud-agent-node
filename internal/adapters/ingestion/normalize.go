@@ -69,6 +69,30 @@ func parseCollectedAt(rawDate, rawFormat, expectedFormat, goLayout string) (time
 	return time.Date(parsed.Year(), parsed.Month(), parsed.Day(), 0, 0, 0, 0, time.UTC), ""
 }
 
+// validateRowHeader performs the patient/specimen/status/revision checks
+// shared by every row format before any field-specific normalization is
+// attempted. Returns the trimmed patient and specimen IDs and the parsed
+// revision, or a non-empty anomaly reason when any check fails (the row
+// must be skipped).
+func validateRowHeader(row map[string]string, columns columnNames) (patientID, specimenID string, revision int, reason string) {
+	patientID = strings.TrimSpace(row[columns.PatientID])
+	if patientID == "" {
+		return "", "", 0, "missing_patient_id"
+	}
+	specimenID = strings.TrimSpace(row[columns.SpecimenID])
+	if specimenID == "" {
+		return "", "", 0, "missing_specimen_id"
+	}
+	if r := validateFinalRevision(row[columns.Status], row[columns.Revision]); r != "" {
+		return "", "", 0, r
+	}
+	rev, err := strconv.Atoi(strings.TrimSpace(row[columns.Revision]))
+	if err != nil {
+		return "", "", 0, "invalid_revision_or_status"
+	}
+	return patientID, specimenID, rev, ""
+}
+
 func validateFinalRevision(status, revision string) string {
 	if strings.TrimSpace(status) != "final" {
 		return reasonInvalidRevisionStatus

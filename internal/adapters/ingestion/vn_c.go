@@ -3,7 +3,6 @@ package ingestion
 // NewVNCAdapter parses VN_C semicolon UTF-8-BOM CSV exports (DD/MM/YYYY, comma decimals).
 func NewVNCAdapter() *wideProfile {
 	return &wideProfile{
-		name:               ProfileVNC,
 		delimiter:          ';',
 		stripBOM:           true,
 		decimalSeparator:   ",",

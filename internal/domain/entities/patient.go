@@ -23,16 +23,10 @@ type PatientRecord struct {
 
 // NewPatient creates a patient with a normalized external identifier.
 func NewPatient(id uuid.UUID, externalPatientID string, now time.Time) *Patient {
-	if id == uuid.Nil {
-		id = uuid.New()
-	}
-	if now.IsZero() {
-		now = time.Now().UTC()
-	}
 	return &Patient{
-		id:                id,
+		id:                ensureID(id),
 		externalPatientID: strings.TrimSpace(externalPatientID),
-		createdAt:         now.UTC(),
+		createdAt:         ensureTimestamp(now),
 	}
 }
 

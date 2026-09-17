@@ -18,8 +18,18 @@ type IngestResult struct {
 	SpecimensParsed   int
 	SpecimensSaved    int
 	ObservationsSaved int
-	Anomalies         int
-	AnomalyReasons    []string
+	// AnomalyReasons carries one "file:row:reason" entry per anomaly; its
+	// count *is* the anomaly count, kept as one field so the two can never
+	// drift apart the way a separately-tracked counter could.
+	AnomalyReasons []string
+}
+
+// AnomalyCount returns the number of anomalies recorded for this run.
+func (r *IngestResult) AnomalyCount() int {
+	if r == nil {
+		return 0
+	}
+	return len(r.AnomalyReasons)
 }
 
 // IngestHospitalExportUseCase persists normalized hospital exports into D3.

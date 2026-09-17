@@ -55,16 +55,8 @@ type NewLabObservationParams struct {
 
 // NewLabObservation creates a lab observation with normalized string fields.
 func NewLabObservation(params NewLabObservationParams) *LabObservation {
-	id := params.ID
-	if id == uuid.Nil {
-		id = uuid.New()
-	}
-	now := params.Now
-	if now.IsZero() {
-		now = time.Now().UTC()
-	}
 	return &LabObservation{
-		id:         id,
+		id:         ensureID(params.ID),
 		specimenID: params.SpecimenID,
 		fieldCode:  strings.TrimSpace(params.FieldCode),
 		value:      strings.TrimSpace(params.Value),
@@ -72,7 +64,7 @@ func NewLabObservation(params NewLabObservationParams) *LabObservation {
 		rawValue:   strings.TrimSpace(params.RawValue),
 		rawUnit:    strings.TrimSpace(params.RawUnit),
 		revision:   params.Revision,
-		createdAt:  now.UTC(),
+		createdAt:  ensureTimestamp(params.Now),
 	}
 }
 
