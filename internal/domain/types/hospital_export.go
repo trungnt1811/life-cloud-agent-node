@@ -17,14 +17,19 @@ type NormalizedObservation struct {
 	Censored  bool
 	RawValue  string
 	RawUnit   string
+	Revision  int // source revision/version number for this result
 }
 
 // NormalizedSpecimen is one collected sample ready for D3 persistence.
 type NormalizedSpecimen struct {
 	ExternalPatientID string
-	CollectedAt       time.Time
-	Observations      []NormalizedObservation
-	Provenance        Provenance
+	// ExternalSpecimenID is the hospital's own specimen/sample identifier
+	// (e.g. SpecimenNo, sample_id, MaMau). This, not file/row provenance,
+	// is the real-world identity a corrected re-export refers back to.
+	ExternalSpecimenID string
+	CollectedAt        time.Time
+	Observations       []NormalizedObservation
+	Provenance         Provenance
 }
 
 // Anomaly is a row or measurement that could not be normalized.

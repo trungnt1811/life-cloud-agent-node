@@ -16,6 +16,7 @@ type LabObservation struct {
 	censored   bool
 	rawValue   string
 	rawUnit    string
+	revision   int
 	createdAt  time.Time
 }
 
@@ -28,6 +29,7 @@ type LabObservationRecord struct {
 	Censored   bool
 	RawValue   string
 	RawUnit    string
+	Revision   int
 	CreatedAt  time.Time
 }
 
@@ -43,7 +45,12 @@ type NewLabObservationParams struct {
 	Censored   bool
 	RawValue   string
 	RawUnit    string
-	Now        time.Time
+	// Revision is the source's own revision/version number for this
+	// result. A re-ingested observation only overwrites a stored one when
+	// its Revision is >= the stored Revision - "highest revision wins"
+	// regardless of which ingest run happens to run last.
+	Revision int
+	Now      time.Time
 }
 
 // NewLabObservation creates a lab observation with normalized string fields.
@@ -64,6 +71,7 @@ func NewLabObservation(params NewLabObservationParams) *LabObservation {
 		censored:   params.Censored,
 		rawValue:   strings.TrimSpace(params.RawValue),
 		rawUnit:    strings.TrimSpace(params.RawUnit),
+		revision:   params.Revision,
 		createdAt:  now.UTC(),
 	}
 }
@@ -81,6 +89,7 @@ func NewLabObservationFromRecord(record LabObservationRecord) *LabObservation {
 		censored:   record.Censored,
 		rawValue:   record.RawValue,
 		rawUnit:    record.RawUnit,
+		revision:   record.Revision,
 		createdAt:  record.CreatedAt,
 	}
 }
@@ -98,6 +107,7 @@ func (o *LabObservation) Record() LabObservationRecord {
 		Censored:   o.censored,
 		RawValue:   o.rawValue,
 		RawUnit:    o.rawUnit,
+		Revision:   o.revision,
 		CreatedAt:  o.createdAt,
 	}
 }
@@ -149,6 +159,13 @@ func (o *LabObservation) RawUnit() string {
 		return ""
 	}
 	return o.rawUnit
+}
+
+func (o *LabObservation) Revision() int {
+	if o == nil {
+		return 0
+	}
+	return o.revision
 }
 
 func (o *LabObservation) CreatedAt() time.Time {

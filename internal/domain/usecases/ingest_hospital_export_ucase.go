@@ -119,14 +119,15 @@ func (u *ingestHospitalExportUseCase) persistSpecimen(
 
 	specimenID := uuid.New()
 	specimen := entities.NewSpecimen(entities.NewSpecimenParams{
-		ID:              specimenID,
-		PatientID:       patient.ID(),
-		CollectedAt:     normalized.CollectedAt,
-		SourceDataset:   normalized.Provenance.SourceDataset,
-		SourceFile:      normalized.Provenance.SourceFile,
-		SourceRecordID:  normalized.Provenance.SourceRecordID,
-		SourceRowNumber: normalized.Provenance.SourceRowNumber,
-		Now:             now,
+		ID:                 specimenID,
+		PatientID:          patient.ID(),
+		ExternalSpecimenID: normalized.ExternalSpecimenID,
+		CollectedAt:        normalized.CollectedAt,
+		SourceDataset:      normalized.Provenance.SourceDataset,
+		SourceFile:         normalized.Provenance.SourceFile,
+		SourceRecordID:     normalized.Provenance.SourceRecordID,
+		SourceRowNumber:    normalized.Provenance.SourceRowNumber,
+		Now:                now,
 	})
 
 	observations := make([]*entities.LabObservation, 0, len(normalized.Observations))
@@ -139,6 +140,7 @@ func (u *ingestHospitalExportUseCase) persistSpecimen(
 			RawValue:   observation.RawValue,
 			RawUnit:    observation.RawUnit,
 			Censored:   observation.Censored,
+			Revision:   observation.Revision,
 			Now:        now,
 		}))
 	}

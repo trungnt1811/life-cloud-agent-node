@@ -36,4 +36,44 @@ func TestVNBAdapter_ConvertsUnitsAndGroupsLongRows(t *testing.T) {
 		}
 	}
 	require.True(t, foundCensored)
+	for _, specimen := range specimens {
+		require.NotEmpty(t, specimen.ExternalSpecimenID)
+	}
+}
+
+const vnBHeader = "pid,visit_id,sample_id,ts,ts_format,ver,state,source_dataset,source_file,source_row_number,source_record_id,result_id,test_code,result,uom\n"
+
+func TestVNBAdapter_FlagsDateMismatchWithinGroup(t *testing.T) {
+	// Two rows for the same patient/specimen group disagree on the
+	// collection date - a real data-quality conflict, not something to
+	// resolve by silently keeping the first row's date.
+	rows := vnBHeader +
+		"P1,E1,S1,20240101,%Y%m%d,1,final,VN_B,t.csv,1,rec-1,r1,0301,100,g/L\n" +
+		"P1,E1,S1,20240102,%Y%m%d,1,final,VN_B,t.csv,2,rec-2,r2,0304,80,fL\n"
+	path := writeTempCSV(t, rows)
+
+	adapter := ingestion.NewVNBAdapter()
+	specimens, anomalies, err := adapter.ParseFile(path)
+	require.NoError(t, err)
+	require.Empty(t, specimens, "a group with disagreeing dates must be quarantined, not silently resolved")
+	require.True(t, hasAnomalyReason(anomalies, "date_mismatch_in_group"))
+}
+
+func TestVNBAdapter_FlagsConflictingValueAtSameRevision(t *testing.T) {
+	// Two rows claim the same revision for the same test code but disagree
+	// on the value - excluded from the result and flagged, not silently
+	// resolved by file order. The unaffected MCV field still comes through.
+	rows := vnBHeader +
+		"P2,E2,S2,20240101,%Y%m%d,1,final,VN_B,t.csv,1,rec-1,r1,0301,100,g/L\n" +
+		"P2,E2,S2,20240101,%Y%m%d,1,final,VN_B,t.csv,2,rec-2,r2,0301,200,g/L\n" +
+		"P2,E2,S2,20240101,%Y%m%d,1,final,VN_B,t.csv,3,rec-3,r3,0304,80,fL\n"
+	path := writeTempCSV(t, rows)
+
+	adapter := ingestion.NewVNBAdapter()
+	specimens, anomalies, err := adapter.ParseFile(path)
+	require.NoError(t, err)
+	require.True(t, hasAnomalyReason(anomalies, "conflicting_value_same_revision:HB"))
+	require.Len(t, specimens, 1)
+	require.Len(t, specimens[0].Observations, 1, "the conflicting HB field is excluded; only MCV remains")
+	require.Equal(t, "MCV", specimens[0].Observations[0].FieldCode)
 }

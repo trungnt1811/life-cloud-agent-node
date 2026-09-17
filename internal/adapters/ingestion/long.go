@@ -140,12 +140,27 @@ func (p longProfile) normalizeGroup(path string, rows []longRow) (*domaintypes.N
 		return nil, anomalies
 	}
 
+	// Every row in the group is expected to describe the same specimen
+	// collection event. A row that disagrees with the head's date is a
+	// real data-quality conflict, not something to resolve by picking the
+	// first row silently - quarantine the whole group instead.
+	for _, row := range rows[1:] {
+		rowDate, rowReason := parseCollectedAt(row.collected, row.dateFormat, p.expectedDateFormat, p.dateLayout)
+		if rowReason != "" || !rowDate.Equal(collectedAt) {
+			for _, r := range rows {
+				anomalies = append(anomalies, anomaly(path, r.rowNumber, "date_mismatch_in_group"))
+			}
+			return nil, anomalies
+		}
+	}
+
 	type candidate struct {
 		row         longRow
 		observation domaintypes.NormalizedObservation
 		revision    int
 	}
 	best := map[string]candidate{}
+	conflicted := map[string]bool{}
 	for _, row := range rows {
 		mapping, ok := p.tests[row.testCode]
 		if !ok {
@@ -157,10 +172,24 @@ func (p longProfile) normalizeGroup(path string, rows []longRow) (*domaintypes.N
 			anomalies = append(anomalies, anomaly(path, row.rowNumber, obsReason+":"+mapping.Code))
 			continue
 		}
+		observation.Revision = row.revision
+
 		prev, exists := best[mapping.Code]
-		if !exists || row.revision > prev.revision {
+		switch {
+		case !exists || row.revision > prev.revision:
 			best[mapping.Code] = candidate{row: row, observation: observation, revision: row.revision}
+			delete(conflicted, mapping.Code) // a strictly newer revision supersedes an earlier same-revision conflict
+		case row.revision == prev.revision && !sameObservationValue(observation, prev.observation):
+			// Two rows claim the same revision for the same test but
+			// disagree on the value - a real conflict. Record it and
+			// exclude the field rather than silently keeping whichever
+			// row happened to appear first.
+			anomalies = append(anomalies, anomaly(path, row.rowNumber, "conflicting_value_same_revision:"+mapping.Code))
+			conflicted[mapping.Code] = true
 		}
+	}
+	for code := range conflicted {
+		delete(best, code)
 	}
 	if len(best) == 0 {
 		anomalies = append(anomalies, anomaly(path, head.rowNumber, "no_accepted_observations"))
@@ -173,9 +202,14 @@ func (p longProfile) normalizeGroup(path string, rows []longRow) (*domaintypes.N
 	}
 
 	return &domaintypes.NormalizedSpecimen{
-		ExternalPatientID: head.patientID,
-		CollectedAt:       collectedAt,
-		Observations:      observations,
-		Provenance:        head.provenance,
+		ExternalPatientID:  head.patientID,
+		ExternalSpecimenID: head.specimenID,
+		CollectedAt:        collectedAt,
+		Observations:       observations,
+		Provenance:         head.provenance,
 	}, anomalies
+}
+
+func sameObservationValue(a, b domaintypes.NormalizedObservation) bool {
+	return a.Value == b.Value && a.Censored == b.Censored
 }

@@ -34,14 +34,15 @@ func specimenModelFromEntity(entity *entities.Specimen) *models.Specimen {
 	}
 	record := entity.Record()
 	return &models.Specimen{
-		ID:              record.ID,
-		PatientID:       record.PatientID,
-		CollectedAt:     record.CollectedAt,
-		SourceDataset:   record.SourceDataset,
-		SourceFile:      record.SourceFile,
-		SourceRowNumber: record.SourceRowNumber,
-		SourceRecordID:  record.SourceRecordID,
-		CreatedAt:       record.CreatedAt,
+		ID:                 record.ID,
+		PatientID:          record.PatientID,
+		ExternalSpecimenID: record.ExternalSpecimenID,
+		CollectedAt:        record.CollectedAt,
+		SourceDataset:      record.SourceDataset,
+		SourceFile:         record.SourceFile,
+		SourceRowNumber:    record.SourceRowNumber,
+		SourceRecordID:     record.SourceRecordID,
+		CreatedAt:          record.CreatedAt,
 	}
 }
 
@@ -50,14 +51,15 @@ func specimenEntityFromModel(model *models.Specimen) *entities.Specimen {
 		return nil
 	}
 	return entities.NewSpecimenFromRecord(entities.SpecimenRecord{
-		ID:              model.ID,
-		PatientID:       model.PatientID,
-		CollectedAt:     model.CollectedAt,
-		SourceDataset:   model.SourceDataset,
-		SourceFile:      model.SourceFile,
-		SourceRowNumber: model.SourceRowNumber,
-		SourceRecordID:  model.SourceRecordID,
-		CreatedAt:       model.CreatedAt,
+		ID:                 model.ID,
+		PatientID:          model.PatientID,
+		ExternalSpecimenID: model.ExternalSpecimenID,
+		CollectedAt:        model.CollectedAt,
+		SourceDataset:      model.SourceDataset,
+		SourceFile:         model.SourceFile,
+		SourceRowNumber:    model.SourceRowNumber,
+		SourceRecordID:     model.SourceRecordID,
+		CreatedAt:          model.CreatedAt,
 	})
 }
 
@@ -74,6 +76,7 @@ func labObservationModelFromEntity(entity *entities.LabObservation) *models.LabO
 		Censored:   record.Censored,
 		RawValue:   record.RawValue,
 		RawUnit:    record.RawUnit,
+		Revision:   record.Revision,
 		CreatedAt:  record.CreatedAt,
 	}
 }
@@ -90,6 +93,7 @@ func labObservationEntityFromModel(model *models.LabObservation) *entities.LabOb
 		Censored:   model.Censored,
 		RawValue:   model.RawValue,
 		RawUnit:    model.RawUnit,
+		Revision:   model.Revision,
 		CreatedAt:  model.CreatedAt,
 	})
 }

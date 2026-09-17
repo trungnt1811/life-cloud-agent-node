@@ -9,40 +9,47 @@ import (
 
 // Specimen is one collected sample for a patient in the local registry.
 type Specimen struct {
-	id              uuid.UUID
-	patientID       uuid.UUID
-	collectedAt     time.Time
-	sourceDataset   string
-	sourceFile      string
-	sourceRowNumber int
-	sourceRecordID  string
-	createdAt       time.Time
+	id                 uuid.UUID
+	patientID          uuid.UUID
+	externalSpecimenID string
+	collectedAt        time.Time
+	sourceDataset      string
+	sourceFile         string
+	sourceRowNumber    int
+	sourceRecordID     string
+	createdAt          time.Time
 }
 
 // SpecimenRecord is a persistence snapshot used at repository boundaries.
 type SpecimenRecord struct {
-	ID              uuid.UUID
-	PatientID       uuid.UUID
-	CollectedAt     time.Time
-	SourceDataset   string
-	SourceFile      string
-	SourceRowNumber int
-	SourceRecordID  string
-	CreatedAt       time.Time
+	ID                 uuid.UUID
+	PatientID          uuid.UUID
+	ExternalSpecimenID string
+	CollectedAt        time.Time
+	SourceDataset      string
+	SourceFile         string
+	SourceRowNumber    int
+	SourceRecordID     string
+	CreatedAt          time.Time
 }
 
 // NewSpecimenParams are the inputs to NewSpecimen, grouped in a struct so
-// same-typed fields (the three source-provenance strings) can't be silently
+// same-typed fields (the source-provenance strings) can't be silently
 // transposed at a call site the way positional string arguments can.
 type NewSpecimenParams struct {
-	ID              uuid.UUID
-	PatientID       uuid.UUID
-	CollectedAt     time.Time
-	SourceDataset   string
-	SourceFile      string
-	SourceRowNumber int
-	SourceRecordID  string
-	Now             time.Time
+	ID        uuid.UUID
+	PatientID uuid.UUID
+	// ExternalSpecimenID is the hospital's own specimen/sample identifier
+	// (e.g. SpecimenNo, sample_id, MaMau). Together with SourceDataset and
+	// PatientID, this is the real-world identity used to detect a
+	// corrected re-export of the same specimen - not file/row provenance.
+	ExternalSpecimenID string
+	CollectedAt        time.Time
+	SourceDataset      string
+	SourceFile         string
+	SourceRowNumber    int
+	SourceRecordID     string
+	Now                time.Time
 }
 
 // NewSpecimen creates a specimen. CollectedAt is stored as a calendar date.
@@ -56,14 +63,15 @@ func NewSpecimen(params NewSpecimenParams) *Specimen {
 		now = time.Now().UTC()
 	}
 	return &Specimen{
-		id:              id,
-		patientID:       params.PatientID,
-		collectedAt:     calendarDate(params.CollectedAt),
-		sourceDataset:   strings.TrimSpace(params.SourceDataset),
-		sourceFile:      strings.TrimSpace(params.SourceFile),
-		sourceRowNumber: params.SourceRowNumber,
-		sourceRecordID:  strings.TrimSpace(params.SourceRecordID),
-		createdAt:       now.UTC(),
+		id:                 id,
+		patientID:          params.PatientID,
+		externalSpecimenID: strings.TrimSpace(params.ExternalSpecimenID),
+		collectedAt:        calendarDate(params.CollectedAt),
+		sourceDataset:      strings.TrimSpace(params.SourceDataset),
+		sourceFile:         strings.TrimSpace(params.SourceFile),
+		sourceRowNumber:    params.SourceRowNumber,
+		sourceRecordID:     strings.TrimSpace(params.SourceRecordID),
+		createdAt:          now.UTC(),
 	}
 }
 
@@ -73,14 +81,15 @@ func NewSpecimenFromRecord(record SpecimenRecord) *Specimen {
 		return nil
 	}
 	return &Specimen{
-		id:              record.ID,
-		patientID:       record.PatientID,
-		collectedAt:     calendarDate(record.CollectedAt),
-		sourceDataset:   record.SourceDataset,
-		sourceFile:      record.SourceFile,
-		sourceRowNumber: record.SourceRowNumber,
-		sourceRecordID:  record.SourceRecordID,
-		createdAt:       record.CreatedAt,
+		id:                 record.ID,
+		patientID:          record.PatientID,
+		externalSpecimenID: record.ExternalSpecimenID,
+		collectedAt:        calendarDate(record.CollectedAt),
+		sourceDataset:      record.SourceDataset,
+		sourceFile:         record.SourceFile,
+		sourceRowNumber:    record.SourceRowNumber,
+		sourceRecordID:     record.SourceRecordID,
+		createdAt:          record.CreatedAt,
 	}
 }
 
@@ -90,14 +99,15 @@ func (s *Specimen) Record() SpecimenRecord {
 		return SpecimenRecord{}
 	}
 	return SpecimenRecord{
-		ID:              s.id,
-		PatientID:       s.patientID,
-		CollectedAt:     s.collectedAt,
-		SourceDataset:   s.sourceDataset,
-		SourceFile:      s.sourceFile,
-		SourceRowNumber: s.sourceRowNumber,
-		SourceRecordID:  s.sourceRecordID,
-		CreatedAt:       s.createdAt,
+		ID:                 s.id,
+		PatientID:          s.patientID,
+		ExternalSpecimenID: s.externalSpecimenID,
+		CollectedAt:        s.collectedAt,
+		SourceDataset:      s.sourceDataset,
+		SourceFile:         s.sourceFile,
+		SourceRowNumber:    s.sourceRowNumber,
+		SourceRecordID:     s.sourceRecordID,
+		CreatedAt:          s.createdAt,
 	}
 }
 
@@ -113,6 +123,13 @@ func (s *Specimen) PatientID() uuid.UUID {
 		return uuid.Nil
 	}
 	return s.patientID
+}
+
+func (s *Specimen) ExternalSpecimenID() string {
+	if s == nil {
+		return ""
+	}
+	return s.externalSpecimenID
 }
 
 func (s *Specimen) CollectedAt() time.Time {

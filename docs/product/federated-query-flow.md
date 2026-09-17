@@ -217,6 +217,63 @@ different version between advisory and applied update. Rollback reuses the
 same two commands against the previous image tag — no bespoke rollback path
 to maintain.
 
+## Fig. 6 — DFD Level 2: inside 4.0, messy data to canonical form
+
+```mermaid
+flowchart TD
+  RAW["Raw CSV row<br/>VN_A / VN_C: wide · VN_B: long"]
+  COLCHECK{"Required columns present,<br/>patient_id non-empty?"}
+  A_MISSING(["Anomaly:<br/>missing_patient_id"])
+  STATUSCHECK{"Status = final?<br/>(validateFinalRevision)"}
+  A_STATUS(["Anomaly:<br/>invalid_revision_or_status"])
+  DATECHECK{"Date parses against<br/>declared format token?"}
+  A_DATE(["Anomaly:<br/>ambiguous_date / invalid_date"])
+  ISLONG{"Long format?<br/>(VN_B)"}
+  GROUP["Group rows by patient + specimen<br/>+ date; keep highest revision<br/>per test_code"]
+  ONEROW["One row = one specimen<br/>(wide format)"]
+  NORMALIZE["Normalize: map test code to<br/>canonical field_code, convert unit<br/>(big.Rat), keep censored '&lt;' operator"]
+  BUILD["Build NormalizedSpecimen +<br/>Provenance (dataset/file/row/record_id)"]
+  PERSIST["GetOrCreatePatient -> SaveSpecimen<br/>(D3: patients / specimens / lab_observations)"]
+
+  RAW --> COLCHECK
+  COLCHECK -- no --> A_MISSING
+  COLCHECK -- yes --> STATUSCHECK
+  STATUSCHECK -- no --> A_STATUS
+  STATUSCHECK -- yes --> DATECHECK
+  DATECHECK -- no --> A_DATE
+  DATECHECK -- yes --> ISLONG
+  ISLONG -- yes --> GROUP
+  ISLONG -- no --> ONEROW
+  GROUP --> NORMALIZE
+  ONEROW --> NORMALIZE
+  NORMALIZE --> BUILD
+  BUILD --> PERSIST
+
+  classDef gap stroke:#c77d2e,stroke-width:2px,stroke-dasharray:4 4;
+  class STATUSCHECK,GROUP,ONEROW,PERSIST gap
+```
+
+The nodes with a dashed amber border are where `/code-review` found real gaps
+(2026-09-17, tracked in the Phase 2 plan, not yet fixed): `STATUSCHECK`
+compares status case-sensitively to `"final"`; `GROUP` picks only the first
+row's collection date within a group and silently drops a same-revision
+conflicting value instead of raising an anomaly; `ONEROW` never validates
+that the wide-format specimen ID column is non-empty (unlike the long-format
+path); `PERSIST` dedupes/upserts specimens by *file/row provenance*
+(`source_dataset, source_file, source_record_id`), not by the hospital's own
+specimen identifier that every adapter parses but discards — so a genuinely
+corrected re-export (new filename or shifted row numbers for the same real
+specimen) creates a duplicate specimen instead of updating it, and the
+observation-level "latest revision wins" fix only compares *call order*, not
+an actual revision number, across separate ingest runs.
+
+Every anomaly carries `{source_file, source_row_number, reason}` and is
+recorded, never used to silently drop, correct, or guess a value — matching
+`life-cloud`'s own stated policy for messy source data. `wide.go` (VN_A,
+VN_C) and `long.go` (VN_B) diverge only at grouping: a wide row is already
+one specimen; a long file's rows must be grouped and revision-resolved
+first. Both converge on the same normalization and persistence path.
+
 ## Data flow dictionary
 
 The diagrams show shape; this is the content behind every box and arrow —

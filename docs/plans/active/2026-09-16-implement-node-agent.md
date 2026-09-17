@@ -447,17 +447,52 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
   each site's `mapping.json` (`g/L→g/dL` ×0.1, HPLC fraction→% ×100).
   Ambiguous/blank date formats quarantine the whole specimen/row as
   `ambiguous_date` (no silent DMY/MDY choice).
-- 2026-09-17 (Phase 1/2 boundary, messy-data revision handling): a
-  re-ingested `(specimen_id, field_code)` now overwrites
-  `value`/`censored`/`raw_value`/`raw_unit` (`ON CONFLICT DO UPDATE`)
-  instead of `DO NOTHING`. A later hospital export correcting an earlier
-  result (life-cloud's own example: MCV `70` → `85`) must win, not be
-  silently discarded because a row already exists; an identical retry of
-  the same batch is a harmless no-op either way. The specimen row itself
-  (identity/collection date) still uses `DO NOTHING` on its provenance
-  key — only observation *values* are revisable, not which specimen a
-  source row maps to. Covered by
-  `TestPatientRegistryRepository_SaveSpecimenLatestRevisionWins`.
+- 2026-09-17 (Phase 1/2 boundary, messy-data revision handling, first
+  pass — **superseded by the entry below**): a re-ingested `(specimen_id,
+  field_code)` overwrote `value`/`censored`/`raw_value`/`raw_unit`
+  unconditionally (`ON CONFLICT DO UPDATE`) instead of `DO NOTHING`, and
+  the specimen row still deduped on file/row provenance
+  (`source_dataset, source_file, source_record_id`). `/code-review` on
+  the Phase 2 commit found this was last-write-wins, not
+  highest-revision-wins, and that file/row provenance is the wrong
+  specimen identity (a genuinely corrected re-export under a new
+  filename would create a duplicate specimen, not update the existing
+  one) — see the follow-up fix below.
+- 2026-09-17 (Phase 1/2 boundary, messy-data revision handling — current):
+  fixed the three correctness gaps `/code-review` found in the ingestion
+  pipeline (`docs/product/federated-query-flow.md` Fig. 6's dashed-amber
+  nodes):
+  - **Specimen identity.** Added `external_specimen_id` (the hospital's own
+    SpecimenNo/sample_id/MaMau, threaded through both `wide.go` and
+    `long.go`, previously parsed and discarded). `specimens`'s unique key
+    changed from `(source_dataset, source_file, source_record_id)` to
+    `(source_dataset, patient_id, external_specimen_id)` — a corrected
+    re-export under a new filename now correctly updates the existing
+    specimen instead of duplicating it. `wide.go` now validates it
+    non-empty (`missing_specimen_id`), matching `long.go` — closing the
+    blank-`source_record_id`-merges-two-specimens gap for free, since
+    file/row provenance is no longer the identity key at all.
+  - **Revision, not call order.** Added a `revision` column to
+    `lab_observations`. The upsert's `ON CONFLICT ... DO UPDATE` now
+    carries a `WHERE lab_observations.revision <= EXCLUDED.revision`
+    guard (verified against real Postgres, not just assumed from the
+    GORM API) — a stale re-ingest of an older export can no longer
+    clobber an already-corrected result, regardless of which ingest run
+    executes last.
+  - **`long.go` grouping gaps.** A group whose rows disagree on collection
+    date now quarantines the whole specimen (`date_mismatch_in_group`)
+    instead of silently keeping only the first row's date. Two rows at
+    the same revision for the same test code with different values are
+    now excluded and flagged (`conflicting_value_same_revision:<code>`)
+    instead of one silently winning by file order.
+  Covered by `TestPatientRegistryRepository_SaveSpecimenIsIdempotentOnRetry`,
+  `TestPatientRegistryRepository_SaveSpecimenHigherRevisionWinsRegardlessOfCallOrder`
+  (both directions of call order), `TestVNAAdapter_FlagsMissingSpecimenID`,
+  `TestVNBAdapter_FlagsDateMismatchWithinGroup`, and
+  `TestVNBAdapter_FlagsConflictingValueAtSameRevision`. Not fixed in this
+  pass (simplification/efficiency findings, not correctness): the
+  hardcoded `"final"` status literal, the dual date-format representation,
+  and the N+1 patient-upsert/read-back round trips.
 - Promote any phase-specific decision (e.g. checkpoint granularity,
   suppression threshold default, a specific mapping ambiguity) into
   `docs/decisions/` as that phase starts, per the pattern already used by

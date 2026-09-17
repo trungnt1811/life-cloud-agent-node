@@ -130,13 +130,16 @@ func (r *patientRegistryRepository) SaveSpecimen(
 
 	return r.dbWithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		specimenModel := specimenModelFromEntity(specimen)
-		// DoNothing on the source-provenance key makes a retried ingestion
-		// batch a safe no-op for the specimen row instead of a duplicate
-		// insert or a hard transaction failure.
+		// DoNothing on the specimen's real-world identity (dataset +
+		// patient + the hospital's own specimen ID - not file/row
+		// provenance) makes a retried or re-exported ingestion batch a
+		// safe no-op for the specimen row instead of a duplicate insert.
+		// Unlike file/row provenance, this identity is stable across a
+		// corrected re-export under a new filename or shifted row numbers.
 		if err := tx.
 			Clauses(clause.OnConflict{
 				Columns: []clause.Column{
-					{Name: "source_dataset"}, {Name: "source_file"}, {Name: "source_record_id"},
+					{Name: "source_dataset"}, {Name: "patient_id"}, {Name: "external_specimen_id"},
 				},
 				DoNothing: true,
 			}).
@@ -147,13 +150,13 @@ func (r *patientRegistryRepository) SaveSpecimen(
 
 		// The conflict clause may have skipped the insert if this specimen
 		// was already ingested under a different, earlier-assigned ID; read
-		// back the canonical row by provenance so observations attach to
-		// the row that actually exists rather than the one just attempted.
+		// back the canonical row by its natural key so observations attach
+		// to the row that actually exists rather than the one just attempted.
 		var canonical models.Specimen
 		if err := tx.
 			Where(
-				"source_dataset = ? AND source_file = ? AND source_record_id = ?",
-				specimenModel.SourceDataset, specimenModel.SourceFile, specimenModel.SourceRecordID,
+				"source_dataset = ? AND patient_id = ? AND external_specimen_id = ?",
+				specimenModel.SourceDataset, specimenModel.PatientID, specimenModel.ExternalSpecimenID,
 			).
 			First(&canonical).Error; err != nil {
 			r.logger.Error("Failed to read back specimen", logger.String("id", specimen.ID().String()), logger.Err(err))
@@ -178,14 +181,20 @@ func (r *patientRegistryRepository) SaveSpecimen(
 
 		// One batched insert instead of one round trip per observation. A
 		// re-ingested (specimen_id, field_code) overwrites value/censored/
-		// raw_value/raw_unit instead of DoNothing: a later hospital export
-		// correcting an earlier result (e.g. MCV 70 -> 85) must win, not be
-		// silently ignored because a row already exists. An identical retry
-		// of the same batch is harmless to "overwrite" with the same value.
+		// raw_value/raw_unit/revision only when the incoming revision is >=
+		// the stored one - "highest revision wins" regardless of which
+		// ingest run happens to execute last. A later hospital export
+		// correcting an earlier result (e.g. MCV 70 -> 85) must win; a
+		// stale re-ingest of an older export must not clobber a correction.
 		if err := tx.
 			Clauses(clause.OnConflict{
 				Columns:   []clause.Column{{Name: "specimen_id"}, {Name: "field_code"}},
-				DoUpdates: clause.AssignmentColumns([]string{"value", "censored", "raw_value", "raw_unit"}),
+				DoUpdates: clause.AssignmentColumns([]string{"value", "censored", "raw_value", "raw_unit", "revision"}),
+				Where: clause.Where{
+					Exprs: []clause.Expression{
+						gorm.Expr("lab_observations.revision <= EXCLUDED.revision"),
+					},
+				},
 			}).
 			Create(&observationModels).Error; err != nil {
 			r.logger.Error(
