@@ -222,18 +222,18 @@ to maintain.
 ```mermaid
 flowchart TD
   RAW["Raw CSV row<br/>VN_A / VN_C: wide · VN_B: long"]
-  COLCHECK{"Required columns present,<br/>patient_id non-empty?"}
-  A_MISSING(["Anomaly:<br/>missing_patient_id"])
+  COLCHECK{"Required columns present,<br/>patient_id and specimen_id non-empty?"}
+  A_MISSING(["Anomaly:<br/>missing_patient_id / missing_specimen_id"])
   STATUSCHECK{"Status = final?<br/>(validateFinalRevision)"}
   A_STATUS(["Anomaly:<br/>invalid_revision_or_status"])
   DATECHECK{"Date parses against<br/>declared format token?"}
   A_DATE(["Anomaly:<br/>ambiguous_date / invalid_date"])
   ISLONG{"Long format?<br/>(VN_B)"}
-  GROUP["Group rows by patient + specimen<br/>+ date; keep highest revision<br/>per test_code"]
+  GROUP["Group rows by patient + specimen;<br/>quarantine on date_mismatch_in_group;<br/>keep highest revision per test_code,<br/>flag conflicting_value_same_revision"]
   ONEROW["One row = one specimen<br/>(wide format)"]
   NORMALIZE["Normalize: map test code to<br/>canonical field_code, convert unit<br/>(big.Rat), keep censored '&lt;' operator"]
-  BUILD["Build NormalizedSpecimen +<br/>Provenance (dataset/file/row/record_id)"]
-  PERSIST["GetOrCreatePatient -> SaveSpecimen<br/>(D3: patients / specimens / lab_observations)"]
+  BUILD["Build NormalizedSpecimen<br/>(incl. external_specimen_id) +<br/>Provenance (dataset/file/row/record_id)"]
+  PERSIST["GetOrCreatePatient -> SaveSpecimen<br/>(D3, keyed on dataset+patient+specimen id,<br/>revision-guarded observation upsert)"]
 
   RAW --> COLCHECK
   COLCHECK -- no --> A_MISSING
@@ -250,22 +250,23 @@ flowchart TD
   BUILD --> PERSIST
 
   classDef gap stroke:#c77d2e,stroke-width:2px,stroke-dasharray:4 4;
-  class STATUSCHECK,GROUP,ONEROW,PERSIST gap
+  class STATUSCHECK gap
 ```
 
-The nodes with a dashed amber border are where `/code-review` found real gaps
-(2026-09-17, tracked in the Phase 2 plan, not yet fixed): `STATUSCHECK`
-compares status case-sensitively to `"final"`; `GROUP` picks only the first
-row's collection date within a group and silently drops a same-revision
-conflicting value instead of raising an anomaly; `ONEROW` never validates
-that the wide-format specimen ID column is non-empty (unlike the long-format
-path); `PERSIST` dedupes/upserts specimens by *file/row provenance*
-(`source_dataset, source_file, source_record_id`), not by the hospital's own
-specimen identifier that every adapter parses but discards — so a genuinely
-corrected re-export (new filename or shifted row numbers for the same real
-specimen) creates a duplicate specimen instead of updating it, and the
-observation-level "latest revision wins" fix only compares *call order*, not
-an actual revision number, across separate ingest runs.
+`/code-review` on the Phase 2 ingestion commit (2026-09-17) found four real
+gaps here; three are fixed (`GROUP`, `ONEROW`, `PERSIST`, tracked in the
+Phase 2 plan): specimen dedup/upsert now keys on the hospital's own
+`external_specimen_id` (threaded through both adapters, previously parsed
+and discarded) plus patient and dataset — not file/row provenance — so a
+corrected re-export under a new filename updates the existing specimen
+instead of duplicating it; the observation upsert's `ON CONFLICT DO UPDATE`
+now carries a `revision <= EXCLUDED.revision` guard, so a stale re-ingest can
+no longer clobber an already-corrected result regardless of call order;
+`long.go` now quarantines a group whose rows disagree on collection date and
+excludes+flags a same-revision conflicting value instead of resolving either
+silently. `STATUSCHECK` remains a known, unfixed gap (lower severity,
+simplification not correctness): it compares status case-sensitively to
+`"final"`.
 
 Every anomaly carries `{source_file, source_row_number, reason}` and is
 recorded, never used to silently drop, correct, or guess a value — matching
