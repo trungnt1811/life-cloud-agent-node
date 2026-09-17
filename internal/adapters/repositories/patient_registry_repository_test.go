@@ -165,6 +165,60 @@ func TestPatientRegistryRepository_SaveSpecimenIsIdempotentOnRetry(t *testing.T)
 	require.NotNil(t, canonical, "observations must attach to the specimen actually persisted")
 }
 
+func TestPatientRegistryRepository_SaveSpecimenLatestRevisionWins(t *testing.T) {
+	db := openPatientRegistryRepositoryTestDB(t)
+	ctx := context.Background()
+	repo := NewPatientRegistryRepository(db, logger.GetLogger())
+	now := time.Now().UTC()
+
+	patient, err := repo.GetOrCreatePatient(ctx, "EXT-400")
+	require.NoError(t, err)
+
+	buildSpecimen := func() *entities.Specimen {
+		return entities.NewSpecimen(entities.NewSpecimenParams{
+			ID:              uuid.New(),
+			PatientID:       patient.ID(),
+			CollectedAt:     time.Date(2024, 5, 1, 0, 0, 0, 0, time.UTC),
+			SourceDataset:   "VN_A",
+			SourceFile:      "cbc.csv",
+			SourceRecordID:  "rec-revision-1",
+			SourceRowNumber: 9,
+			Now:             now,
+		})
+	}
+
+	// First export: MCV = 70.
+	original := buildSpecimen()
+	require.NoError(t, repo.SaveSpecimen(ctx, original, []*entities.LabObservation{
+		entities.NewLabObservation(entities.NewLabObservationParams{
+			ID: uuid.New(), SpecimenID: original.ID(), FieldCode: "MCV", Value: "70", RawValue: "70", RawUnit: "fL", Now: now,
+		}),
+	}))
+
+	// A later hospital export re-sends the same source row with a corrected
+	// MCV value (70 -> 85). The correction must win, not be discarded
+	// because a row already exists for (specimen, field_code).
+	revised := buildSpecimen()
+	require.NoError(t, repo.SaveSpecimen(ctx, revised, []*entities.LabObservation{
+		entities.NewLabObservation(entities.NewLabObservationParams{
+			ID: uuid.New(), SpecimenID: revised.ID(), FieldCode: "MCV", Value: "85", RawValue: "85", RawUnit: "fL", Now: now,
+		}),
+	}))
+
+	specimens, err := repo.CountSpecimens(ctx)
+	require.NoError(t, err)
+	require.Equal(t, 1, specimens, "a revision must not create a second specimen row")
+
+	labs, err := repo.CountLabObservations(ctx)
+	require.NoError(t, err)
+	require.Equal(t, 1, labs, "a revision must overwrite, not duplicate, the observation row")
+
+	observations, err := repo.ListObservationsBySpecimenID(ctx, original.ID())
+	require.NoError(t, err)
+	require.Len(t, observations, 1)
+	require.Equal(t, "85", observations[0].Value(), "the corrected value must win over the original")
+}
+
 func TestPatientRegistryRepository_RejectsObservationSpecimenMismatch(t *testing.T) {
 	db := openPatientRegistryRepositoryTestDB(t)
 	ctx := context.Background()

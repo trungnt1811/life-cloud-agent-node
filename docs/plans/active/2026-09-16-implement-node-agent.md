@@ -188,23 +188,23 @@ type Anomaly struct {
 }
 ```
 
-- [ ] VN_A adapter: wide CSV, one row per panel, ISO dates, Hb in `g/dL`
+- [x] VN_A adapter: wide CSV, one row per panel, ISO dates, Hb in `g/dL`
       directly. Unit test against a small fixture.
-- [ ] VN_B adapter: long CSV, one row per test, site codes `0301`/`H02`,
+- [x] VN_B adapter: long CSV, one row per test, site codes `0301`/`H02`,
       Hb `g/L` → `g/dL` conversion, HbA2 fraction → percent, `YYYYMMDD`
       dates. Unit test.
-- [ ] VN_C adapter: semicolon-delimited UTF-8-BOM CSV, unaccented
+- [x] VN_C adapter: semicolon-delimited UTF-8-BOM CSV, unaccented
       Vietnamese headers, comma decimal separator, `DD/MM/YYYY` dates.
       Unit test.
-- [ ] Anomalies (unknown codes, missing units, ambiguous dates, negative
+- [x] Anomalies (unknown codes, missing units, ambiguous dates, negative
       values) are recorded via the `Anomaly` return, never silently
       corrected or dropped. If a genuinely ambiguous mapping choice comes
       up implementing any of the three, stop and record it as a short
       decision before choosing (per Risks).
-- [ ] Ingestion usecase: pick adapter by profile flag, call
+- [x] Ingestion usecase: pick adapter by profile flag, call
       `PatientRegistryRepository` from Phase 1 to persist normalized
       output; log anomaly count/reasons.
-- [ ] Integration test: ingest the copied fixtures end-to-end, assert
+- [x] Integration test: ingest the copied fixtures end-to-end, assert
       expected patient/specimen/observation counts land in D3.
 
 ### Phase 3 — D5: Enabled Query Fields store + admin REST
@@ -394,7 +394,7 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
 ## Progress
 
 - [x] Phase 1 — D3 Local Patient Registry domain model + migration.
-- [ ] Phase 2 — Ingestion adapters for VN_A/B/C profiles into D3.
+- [x] Phase 2 — Ingestion adapters for VN_A/B/C profiles into D3.
 - [ ] Phase 3 — D5 Enabled Query Fields store + admin REST.
 - [ ] Phase 4 — Validation layers 2 (whitelist) & 3 (semantic).
 - [ ] Phase 5 — Query execution (3.5) + output suppression (3.6).
@@ -440,6 +440,24 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
   `repohelpers.DBWithContext`; `GetOrCreatePatient` now upserts with
   `DoUpdates` (a no-op self-assignment) so Postgres always `RETURNING`s
   the canonical row in one round trip instead of up to three.
+- 2026-09-17 (Phase 2): Adapter interface + normalized types live in
+  domain (`types` + usecase port); CSV parsers stay in
+  `internal/adapters/ingestion`. Profile selection is by usecase map keyed
+  `VN_A`/`VN_B`/`VN_C`. Unit conversion uses exact `big.Rat` factors from
+  each site's `mapping.json` (`g/L→g/dL` ×0.1, HPLC fraction→% ×100).
+  Ambiguous/blank date formats quarantine the whole specimen/row as
+  `ambiguous_date` (no silent DMY/MDY choice).
+- 2026-09-17 (Phase 1/2 boundary, messy-data revision handling): a
+  re-ingested `(specimen_id, field_code)` now overwrites
+  `value`/`censored`/`raw_value`/`raw_unit` (`ON CONFLICT DO UPDATE`)
+  instead of `DO NOTHING`. A later hospital export correcting an earlier
+  result (life-cloud's own example: MCV `70` → `85`) must win, not be
+  silently discarded because a row already exists; an identical retry of
+  the same batch is a harmless no-op either way. The specimen row itself
+  (identity/collection date) still uses `DO NOTHING` on its provenance
+  key — only observation *values* are revisable, not which specimen a
+  source row maps to. Covered by
+  `TestPatientRegistryRepository_SaveSpecimenLatestRevisionWins`.
 - Promote any phase-specific decision (e.g. checkpoint granularity,
   suppression threshold default, a specific mapping ambiguity) into
   `docs/decisions/` as that phase starts, per the pattern already used by
@@ -458,6 +476,6 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
 
 ## Result
 
-Phase 1 complete — D3 local patient registry domain, migration, GORM
-repository, mocks, and Postgres Testcontainers proof are in place. Phase 2
-(ingestion) is next.
+Phase 2 complete — VN_A/B/C ingestion adapters, usecase, `make ingest`,
+fixture unit tests, and D3 integration proof are in place. Phase 3 (D5
+enabled query fields + admin REST) is next.

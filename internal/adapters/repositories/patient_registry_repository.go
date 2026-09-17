@@ -176,13 +176,16 @@ func (r *patientRegistryRepository) SaveSpecimen(
 			return nil
 		}
 
-		// One batched insert instead of one round trip per observation;
-		// DoNothing on (specimen_id, field_code) makes a retried batch a
-		// safe no-op here too.
+		// One batched insert instead of one round trip per observation. A
+		// re-ingested (specimen_id, field_code) overwrites value/censored/
+		// raw_value/raw_unit instead of DoNothing: a later hospital export
+		// correcting an earlier result (e.g. MCV 70 -> 85) must win, not be
+		// silently ignored because a row already exists. An identical retry
+		// of the same batch is harmless to "overwrite" with the same value.
 		if err := tx.
 			Clauses(clause.OnConflict{
 				Columns:   []clause.Column{{Name: "specimen_id"}, {Name: "field_code"}},
-				DoNothing: true,
+				DoUpdates: clause.AssignmentColumns([]string{"value", "censored", "raw_value", "raw_unit"}),
 			}).
 			Create(&observationModels).Error; err != nil {
 			r.logger.Error(
