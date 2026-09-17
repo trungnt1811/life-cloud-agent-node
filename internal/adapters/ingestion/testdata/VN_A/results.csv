@@ -1,0 +1,6 @@
+MRN,EncounterNo,SpecimenNo,Collected,DateFormat,Revision,Status,source_dataset,source_file,source_row_number,source_record_id,HGB,HGB_unit,MCV,MCV_unit,MCH,MCH_unit,RBC,RBC_unit,MCHC,MCHC_unit,RDW_CV,RDW_CV_unit,HbA0,HbA0_unit,HbA2,HbA2_unit,HbF,HbF_unit
+0000001,E0000001,S0000001,2024-12-13,%Y-%m-%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2,2,10.9,g/dL,78.9,fL,26.1,pg,4.18,10^12/L,33,g/dL,14.6,%,86.4,%,4.8,%,0.4,%
+0000002,E0000002,S0000002,2024-06-25,%Y-%m-%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3,3,13.6,g/dL,87,fL,25.6,pg,5.31,10^12/L,29.4,g/dL,13.7,%,87.3,%,3.2,%,0.5,%
+9000001,E9000001,S9000001,2024-06-15,%Y-%m-%d,1,final,synthetic_scenarios,synthetic_scenarios_v2,1,CASE01,10.8,g/dL,70,fL,22,pg,5.12,10^12/L,32,g/dL,14,%,90,%,2.6,%,0.11,%
+9000010,E9000010,S9000010,2024-06-15,%Y-%m-%d,1,final,synthetic_scenarios,synthetic_scenarios_v2,10,CASE10,10.8,g/dL,70,fL,22,pg,5.12,10^12/L,32,g/dL,14,%,90,%,2.6,%,<0.1,%
+9000009,E9000009,S9000009,03/04/2024,,1,final,synthetic_scenarios,synthetic_scenarios_v2,9,CASE09,10.8,g/dL,70,fL,22,pg,5.12,10^12/L,32,g/dL,14,%,90,%,2.6,%,0.11,%

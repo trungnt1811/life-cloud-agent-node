@@ -1,0 +1,37 @@
+pid,visit_id,sample_id,ts,ts_format,ver,state,source_dataset,source_file,source_row_number,source_record_id,result_id,test_code,result,uom
+0000001,E0000001,S0000001,20240108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4,4,S0000001:HB:v1,0301,115,g/L
+0000001,E0000001,S0000001,20240108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4,4,S0000001:MCV:v1,0304,78.7,fL
+0000001,E0000001,S0000001,20240108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4,4,S0000001:MCH:v1,0305,44.8,pg
+0000001,E0000001,S0000001,20240108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4,4,S0000001:RBC:v1,0302,4.64,10^12/L
+0000001,E0000001,S0000001,20240108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4,4,S0000001:MCHC:v1,0306,31.5,g/dL
+0000001,E0000001,S0000001,20240108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4,4,S0000001:RDW:v1,0307,14.5,%
+0000001,E0000001,S0000001,20240108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4,4,S0000001:HBA0:v1,H01,0.879,fraction
+0000001,E0000001,S0000001,20240108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4,4,S0000001:HBA2:v1,H02,0.028,fraction
+0000001,E0000001,S0000001,20240108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4,4,S0000001:HBF:v1,H03,0.002,fraction
+0000002,E0000002,S0000002,20241002,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7,7,S0000002:HB:v1,0301,141,g/L
+0000002,E0000002,S0000002,20241002,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7,7,S0000002:MCV:v1,0304,65.5,fL
+0000002,E0000002,S0000002,20241002,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7,7,S0000002:MCH:v1,0305,20.3,pg
+0000002,E0000002,S0000002,20241002,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7,7,S0000002:RBC:v1,0302,5.15,10^12/L
+0000002,E0000002,S0000002,20241002,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7,7,S0000002:MCHC:v1,0306,31,g/dL
+0000002,E0000002,S0000002,20241002,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7,7,S0000002:RDW:v1,0307,15,%
+0000002,E0000002,S0000002,20241002,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7,7,S0000002:HBA0:v1,H01,0.838,fraction
+0000002,E0000002,S0000002,20241002,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7,7,S0000002:HBA2:v1,H02,0.058,fraction
+0000002,E0000002,S0000002,20241002,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7,7,S0000002:HBF:v1,H03,0.004,fraction
+9000009,E9000009,S9000009,03/04/2024,,1,final,synthetic_scenarios,synthetic_scenarios_v2,9,CASE09,S9000009:HB:v1,0301,108,g/L
+9000009,E9000009,S9000009,03/04/2024,,1,final,synthetic_scenarios,synthetic_scenarios_v2,9,CASE09,S9000009:MCV:v1,0304,70,fL
+9000009,E9000009,S9000009,03/04/2024,,1,final,synthetic_scenarios,synthetic_scenarios_v2,9,CASE09,S9000009:MCH:v1,0305,22,pg
+9000009,E9000009,S9000009,03/04/2024,,1,final,synthetic_scenarios,synthetic_scenarios_v2,9,CASE09,S9000009:RBC:v1,0302,5.12,10^12/L
+9000009,E9000009,S9000009,03/04/2024,,1,final,synthetic_scenarios,synthetic_scenarios_v2,9,CASE09,S9000009:MCHC:v1,0306,32,g/dL
+9000009,E9000009,S9000009,03/04/2024,,1,final,synthetic_scenarios,synthetic_scenarios_v2,9,CASE09,S9000009:RDW:v1,0307,14,%
+9000009,E9000009,S9000009,03/04/2024,,1,final,synthetic_scenarios,synthetic_scenarios_v2,9,CASE09,S9000009:HBA0:v1,H01,0.9,fraction
+9000009,E9000009,S9000009,03/04/2024,,1,final,synthetic_scenarios,synthetic_scenarios_v2,9,CASE09,S9000009:HBA2:v1,H02,0.026,fraction
+9000009,E9000009,S9000009,03/04/2024,,1,final,synthetic_scenarios,synthetic_scenarios_v2,9,CASE09,S9000009:HBF:v1,H03,0.0011,fraction
+9000010,E9000010,S9000010,20240615,%Y%m%d,1,final,synthetic_scenarios,synthetic_scenarios_v2,10,CASE10,S9000010:HB:v1,0301,108,g/L
+9000010,E9000010,S9000010,20240615,%Y%m%d,1,final,synthetic_scenarios,synthetic_scenarios_v2,10,CASE10,S9000010:MCV:v1,0304,70,fL
+9000010,E9000010,S9000010,20240615,%Y%m%d,1,final,synthetic_scenarios,synthetic_scenarios_v2,10,CASE10,S9000010:MCH:v1,0305,22,pg
+9000010,E9000010,S9000010,20240615,%Y%m%d,1,final,synthetic_scenarios,synthetic_scenarios_v2,10,CASE10,S9000010:RBC:v1,0302,5.12,10^12/L
+9000010,E9000010,S9000010,20240615,%Y%m%d,1,final,synthetic_scenarios,synthetic_scenarios_v2,10,CASE10,S9000010:MCHC:v1,0306,32,g/dL
+9000010,E9000010,S9000010,20240615,%Y%m%d,1,final,synthetic_scenarios,synthetic_scenarios_v2,10,CASE10,S9000010:RDW:v1,0307,14,%
+9000010,E9000010,S9000010,20240615,%Y%m%d,1,final,synthetic_scenarios,synthetic_scenarios_v2,10,CASE10,S9000010:HBA0:v1,H01,0.9,fraction
+9000010,E9000010,S9000010,20240615,%Y%m%d,1,final,synthetic_scenarios,synthetic_scenarios_v2,10,CASE10,S9000010:HBA2:v1,H02,0.026,fraction
+9000010,E9000010,S9000010,20240615,%Y%m%d,1,final,synthetic_scenarios,synthetic_scenarios_v2,10,CASE10,S9000010:HBF:v1,H03,<0.001,fraction

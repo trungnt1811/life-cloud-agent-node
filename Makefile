@@ -19,7 +19,7 @@ TOOLS_BIN := $(TOOLS_DIR)/bin
 PROTOC := $(TOOLS_BIN)/protoc
 PROTOC_INCLUDE := $(TOOLS_DIR)/include
 
-.PHONY: build clean run test test-coverage lint swagger swagger-check proto proto-tools proto-check template-identity-check migrate mockgen mocks dev-up dev-down docker-db-up docker-db-down test-postgres-repositories test-postgres-repositories-fast
+.PHONY: build clean run test test-coverage lint swagger swagger-check proto proto-tools proto-check template-identity-check migrate ingest mockgen mocks dev-up dev-down docker-db-up docker-db-down test-postgres-repositories test-postgres-repositories-fast
 
 build:
 	go build -o ./bin/$(APP_BIN) ./cmd/main.go
@@ -126,6 +126,9 @@ template-identity-check:
 
 migrate:
 	go run ./cmd/migration/main.go
+
+ingest:
+	go run ./cmd/ingest -profile $(PROFILE) $(FILES)
 
 mocks: mockgen
 

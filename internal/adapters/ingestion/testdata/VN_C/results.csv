@@ -1,0 +1,6 @@
+﻿MaBN;MaKham;MaMau;NgayXN;KieuNgay;LanSua;TrangThai;source_dataset;source_file;source_row_number;source_record_id;Huyet sac to;Huyet sac to_unit;The tich HC;The tich HC_unit;Luong Hb HC;Luong Hb HC_unit;So luong HC;So luong HC_unit;Nong do Hb HC;Nong do Hb HC_unit;RDW;RDW_unit;Hb A0;Hb A0_unit;Hb A2;Hb A2_unit;Hb F;Hb F_unit
+0000001;E0000001;S0000001;09/05/2024;%d/%m/%Y;1;final;kaggle_hplc_screening;kaggle_hplc_screening/HPLC data.csv;1;1;13,2;g / dL;86,7;fL;28,8;pg;4,81;10^12/L;33;g / dL;13,8;%;86,2;%;2,9;%;0,3;%
+0000002;E0000002;S0000002;22/07/2024;%d/%m/%Y;1;final;kaggle_hplc_screening;kaggle_hplc_screening/HPLC data.csv;6;6;13;g / dL;98,4;fL;29,3;pg;4,43;10^12/L;31,2;g / dL;12;%;86,2;%;3,6;%;0,4;%
+9000001;E9000001;S9000001;15/06/2024;%d/%m/%Y;1;final;synthetic_scenarios;synthetic_scenarios_v2;1;CASE01;10,8;g / dL;70;fL;22;pg;5,12;10^12/L;32;g / dL;14;%;90;%;2,6;%;0,11;%
+9000009;E9000009;S9000009;03/04/2024;;1;final;synthetic_scenarios;synthetic_scenarios_v2;9;CASE09;10,8;g / dL;70;fL;22;pg;5,12;10^12/L;32;g / dL;14;%;90;%;2,6;%;0,11;%
+9000010;E9000010;S9000010;15/06/2024;%d/%m/%Y;1;final;synthetic_scenarios;synthetic_scenarios_v2;10;CASE10;10,8;g / dL;70;fL;22;pg;5,12;10^12/L;32;g / dL;14;%;90;%;2,6;%;<0,1;%
