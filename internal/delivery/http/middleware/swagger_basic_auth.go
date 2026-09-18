@@ -9,10 +9,11 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// SwaggerBasicAuth protects Swagger endpoints using HTTP Basic Auth.
-// If credentials are missing, it is recommended to not register the swagger route.
-func SwaggerBasicAuth(username, password string) gin.HandlerFunc {
-	realm := "swagger"
+// HTTPBasicAuth protects endpoints using HTTP Basic Auth.
+func HTTPBasicAuth(username, password, realm string) gin.HandlerFunc {
+	if strings.TrimSpace(realm) == "" {
+		realm = "restricted"
+	}
 
 	unauthorized := func(c *gin.Context) {
 		c.Header("WWW-Authenticate", `Basic realm="`+realm+`"`)
@@ -39,11 +40,8 @@ func SwaggerBasicAuth(username, password string) gin.HandlerFunc {
 			return
 		}
 
-		u := before
-		p := after
-
-		userOK := subtle.ConstantTimeCompare([]byte(u), []byte(username)) == 1
-		passOK := subtle.ConstantTimeCompare([]byte(p), []byte(password)) == 1
+		userOK := subtle.ConstantTimeCompare([]byte(before), []byte(username)) == 1
+		passOK := subtle.ConstantTimeCompare([]byte(after), []byte(password)) == 1
 		if !userOK || !passOK {
 			unauthorized(c)
 			return
@@ -51,4 +49,10 @@ func SwaggerBasicAuth(username, password string) gin.HandlerFunc {
 
 		c.Next()
 	}
+}
+
+// SwaggerBasicAuth protects Swagger endpoints using HTTP Basic Auth.
+// If credentials are missing, it is recommended to not register the swagger route.
+func SwaggerBasicAuth(username, password string) gin.HandlerFunc {
+	return HTTPBasicAuth(username, password, "swagger")
 }

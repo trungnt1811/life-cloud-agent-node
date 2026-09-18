@@ -33,7 +33,7 @@ type Options struct {
 func SetupWithDependencies(useCases *di.UseCases, log logger.Logger, options ...Options) *gin.Engine {
 	resolved := resolveOptions(options...)
 	r := initialize(resolved, log)
-	setupApplicationRoutes(r, useCases, log)
+	setupApplicationRoutes(r, useCases, log, resolved)
 	registerSwaggerRoute(r, resolved, log)
 	return r
 }
@@ -99,13 +99,18 @@ func initialize(options Options, log logger.Logger) *gin.Engine {
 	return r
 }
 
-func setupApplicationRoutes(r *gin.Engine, useCases *di.UseCases, log logger.Logger) {
+func setupApplicationRoutes(r *gin.Engine, useCases *di.UseCases, log logger.Logger, options Options) {
 	if useCases == nil {
 		useCases = &di.UseCases{}
 	}
 	exampleHandler := handlers.NewExampleHandler(useCases.ExampleUseCase, log)
+	enabledQueryFieldHandler := handlers.NewEnabledQueryFieldHandler(useCases.EnabledQueryFieldUseCase, log)
 	routev1.SetupHealthRoutes(r)
 	routev1.SetupExampleRoutes(r, exampleHandler)
+	routev1.SetupEnabledQueryFieldRoutes(r, enabledQueryFieldHandler, routev1.AdminAuthOptions{
+		Username: options.SwaggerAuthUser,
+		Password: options.SwaggerAuthPass,
+	}, log)
 }
 
 func registerSwaggerRoute(r *gin.Engine, options Options, log logger.Logger) {

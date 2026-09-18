@@ -4,6 +4,97 @@
         "contact": {}
     },
     "paths": {
+        "/admin/query-fields": {
+            "get": {
+                "description": "List all schema v1 field codes with this node's local whitelist state",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "List enabled query fields",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EnabledQueryFieldListDTO"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/query-fields/{field_code}": {
+            "put": {
+                "description": "Set enabled and updated_by for one schema v1 field_code",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Update an enabled query field",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Schema v1 field code",
+                        "name": "field_code",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Enablement update",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.UpdateEnabledQueryFieldRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.EnabledQueryFieldDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/examples": {
             "get": {
                 "description": "List examples with pagination",
@@ -268,6 +359,34 @@
                 }
             }
         },
+        "dto.EnabledQueryFieldDTO": {
+            "type": "object",
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "field_code": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "updated_by": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.EnabledQueryFieldListDTO": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.EnabledQueryFieldDTO"
+                    }
+                }
+            }
+        },
         "dto.ErrorDTOResponse": {
             "type": "object",
             "properties": {
@@ -334,6 +453,20 @@
                 },
                 "total_count": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.UpdateEnabledQueryFieldRequest": {
+            "type": "object",
+            "required": [
+                "updated_by"
+            ],
+            "properties": {
+                "enabled": {
+                    "type": "boolean"
+                },
+                "updated_by": {
+                    "type": "string"
                 }
             }
         },

@@ -17,8 +17,9 @@ import (
 
 // Repos holds all initialized repositories.
 type Repos struct {
-	ExampleRepo        repoInterfaces.ExampleRepository
-	TransactionManager repoInterfaces.TransactionManager
+	ExampleRepo           repoInterfaces.ExampleRepository
+	EnabledQueryFieldRepo repoInterfaces.EnabledQueryFieldRepository
+	TransactionManager    repoInterfaces.TransactionManager
 }
 
 // InitializeRepos initializes all repositories.
@@ -34,7 +35,8 @@ func InitializeRepos(ctx context.Context, db *gorm.DB, appLogger logger.Logger, 
 	)
 
 	return &Repos{
-		ExampleRepo: exampleRepo,
+		ExampleRepo:           exampleRepo,
+		EnabledQueryFieldRepo: repositories.NewEnabledQueryFieldRepository(db, appLogger),
 		TransactionManager: transactionrepo.NewTransactionManager(db, transactionrepo.TransactionManagerDeps{
 			ExampleRepo: exampleRepo,
 		}),
@@ -43,18 +45,22 @@ func InitializeRepos(ctx context.Context, db *gorm.DB, appLogger logger.Logger, 
 
 // UseCases holds all initialized use cases.
 type UseCases struct {
-	ExampleUseCase interfaces.ExampleUseCase
+	ExampleUseCase           interfaces.ExampleUseCase
+	EnabledQueryFieldUseCase interfaces.EnabledQueryFieldUseCase
 }
 
 // InitializeUseCases initializes all use cases.
 func InitializeUseCases(repos *Repos, appLogger logger.Logger) *UseCases {
 	var exampleRepo repoInterfaces.ExampleRepository
+	var enabledQueryFieldRepo repoInterfaces.EnabledQueryFieldRepository
 	if repos != nil {
 		exampleRepo = repos.ExampleRepo
+		enabledQueryFieldRepo = repos.EnabledQueryFieldRepo
 	}
 
 	return &UseCases{
-		ExampleUseCase: usecases.NewExampleUseCase(exampleRepo, transactionManager(repos), appLogger),
+		ExampleUseCase:           usecases.NewExampleUseCase(exampleRepo, transactionManager(repos), appLogger),
+		EnabledQueryFieldUseCase: usecases.NewEnabledQueryFieldUseCase(enabledQueryFieldRepo, appLogger),
 	}
 }
 

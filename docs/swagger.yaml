@@ -8,6 +8,24 @@ definitions:
     required:
     - name
     type: object
+  dto.EnabledQueryFieldDTO:
+    properties:
+      enabled:
+        type: boolean
+      field_code:
+        type: string
+      updated_at:
+        type: string
+      updated_by:
+        type: string
+    type: object
+  dto.EnabledQueryFieldListDTO:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.EnabledQueryFieldDTO'
+        type: array
+    type: object
   dto.ErrorDTOResponse:
     properties:
       code:
@@ -53,6 +71,15 @@ definitions:
       total_count:
         type: integer
     type: object
+  dto.UpdateEnabledQueryFieldRequest:
+    properties:
+      enabled:
+        type: boolean
+      updated_by:
+        type: string
+    required:
+    - updated_by
+    type: object
   dto.UpdateExampleRequest:
     properties:
       description:
@@ -65,6 +92,67 @@ definitions:
 info:
   contact: {}
 paths:
+  /admin/query-fields:
+    get:
+      description: List all schema v1 field codes with this node's local whitelist
+        state
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EnabledQueryFieldListDTO'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+      summary: List enabled query fields
+      tags:
+      - admin
+  /admin/query-fields/{field_code}:
+    put:
+      consumes:
+      - application/json
+      description: Set enabled and updated_by for one schema v1 field_code
+      parameters:
+      - description: Schema v1 field code
+        in: path
+        name: field_code
+        required: true
+        type: string
+      - description: Enablement update
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateEnabledQueryFieldRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.EnabledQueryFieldDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+      summary: Update an enabled query field
+      tags:
+      - admin
   /api/v1/examples:
     get:
       consumes:

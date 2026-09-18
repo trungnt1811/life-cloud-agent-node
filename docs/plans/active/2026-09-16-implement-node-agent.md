@@ -210,7 +210,7 @@ type Anomaly struct {
 ### Phase 3 — D5: Enabled Query Fields store + admin REST
 
 Files: `internal/domain/entities/enabled_query_field.go`,
-`internal/domain/repositories/interfaces.go` (add
+`internal/domain/repositories/enabled_query_field.go` (add
 `EnabledQueryFieldRepository`), matching adapter/model/mapper/test,
 `internal/adapters/postgres/scripts/03_create_enabled_query_fields_table.sql`,
 `internal/domain/usecases/enabled_query_field_ucase.go`,
@@ -231,14 +231,14 @@ Endpoints (admin-auth protected, same middleware family as Swagger's):
 `GET /admin/query-fields` (list all 9 global codes + this node's state),
 `PUT /admin/query-fields/:field_code` (`{enabled, updated_by}`).
 
-- [ ] Migration seeds all 9 global field codes with `enabled=false` —
+- [x] Migration seeds all 9 global field codes with `enabled=false` —
       explicit per-hospital opt-in, not a default-open list.
-- [ ] Repository + usecase + handler + route, following the `example_*`
+- [x] Repository + usecase + handler + route, following the `example_*`
       layering exactly.
-- [ ] Reuse `SWAGGER_BASIC_AUTH_USER`/`_PASS`-style middleware for these
+- [x] Reuse `SWAGGER_BASIC_AUTH_USER`/`_PASS`-style middleware for these
       admin routes; if that coupling turns out wrong once written, flag it
       rather than silently introducing a second auth scheme.
-- [ ] `make swagger` updated; handler + repository tests; `go build/test/lint`.
+- [x] `make swagger` updated; handler + repository tests; `go build/test/lint`.
 
 ### Phase 4 — Validation layers 2 (whitelist) & 3 (semantic)
 
@@ -395,7 +395,7 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
 
 - [x] Phase 1 — D3 Local Patient Registry domain model + migration.
 - [x] Phase 2 — Ingestion adapters for VN_A/B/C profiles into D3.
-- [ ] Phase 3 — D5 Enabled Query Fields store + admin REST.
+- [x] Phase 3 — D5 Enabled Query Fields store + admin REST.
 - [ ] Phase 4 — Validation layers 2 (whitelist) & 3 (semantic).
 - [ ] Phase 5 — Query execution (3.5) + output suppression (3.6).
 - [ ] Phase 6 — D4 Job Progress Checkpoint + resumable execution.
@@ -519,6 +519,18 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
     these affect correctness; revisit if/when a real 4th/5th hospital
     profile is added, which is when the date-format and shared-field
     duplication risk actually bites.
+- 2026-09-18 (Phase 3): D5 enabled-query-fields store + admin REST.
+  Entity follows the private-fields + `Record()` pattern. Repository
+  lives in its own file with `-source` mockgen (same as patient
+  registry). `ListQueryFields` always returns all 9 schema-v1 codes
+  from `internal/domain/queryfields`, merging stored rows so a truncated
+  or partially seeded DB still presents the full dictionary; `PUT`
+  rejects unknown codes and requires `updated_by`. Admin routes reuse
+  `SWAGGER_BASIC_AUTH_USER`/`_PASS` via shared `HTTPBasicAuth` (realm
+  `admin`) — flagged coupling: empty credentials leave admin open in
+  non-prod the same way Swagger does; a dedicated admin credential set
+  is a follow-up if operators need Swagger open while locking field
+  whitelist changes. Migration seeds all 9 codes `enabled=false`.
 - Promote any phase-specific decision (e.g. checkpoint granularity,
   suppression threshold default, a specific mapping ambiguity) into
   `docs/decisions/` as that phase starts, per the pattern already used by
@@ -537,6 +549,6 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
 
 ## Result
 
-Phase 2 complete — VN_A/B/C ingestion adapters, usecase, `make ingest`,
-fixture unit tests, and D3 integration proof are in place. Phase 3 (D5
-enabled query fields + admin REST) is next.
+Phase 3 complete — D5 `enabled_query_fields` migration (seeded disabled),
+repository/usecase/admin REST (`GET`/`PUT /admin/query-fields`), Swagger,
+and focused proof are in place. Phase 4 (validation layers 2 & 3) is next.
