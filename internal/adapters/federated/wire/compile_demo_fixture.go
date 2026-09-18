@@ -85,10 +85,11 @@ func CompileDemoQueryTask(fixture DemoQueryDefinition) *nodev1.QueryTask {
 // ValidateQueryTaskStructureV1 applies schema-v1 wire rules that protobuf
 // decode alone does not enforce (decision 0004): required enums, a required
 // time_range, and reserved group_by. Schema version is layer 4
-// (ValidateQueryTaskVersionV1). Whitelist and semantic checks are layers 2–3.
+// (ValidateQueryTaskVersionV1). Whitelist and semantic checks are layers 2-3.
 //
-// Canonicalizes in place: trims time_range bounds and normalizes field_code
-// values so later layers see the same keys D5 / the dictionary use.
+// It never modifies task. Blank checks use locally trimmed copies; padded
+// dates are rejected by layer 3, and field codes are normalized on read by
+// each layer that consumes them.
 func ValidateQueryTaskStructureV1(task *nodev1.QueryTask) error {
 	if err := requireTask(task); err != nil {
 		return err
@@ -99,12 +100,10 @@ func ValidateQueryTaskStructureV1(task *nodev1.QueryTask) error {
 	if task.GetTimeRange() == nil {
 		return rejectedInvalidQuery("time_range is required")
 	}
-	task.TimeRange.From = strings.TrimSpace(task.TimeRange.GetFrom())
-	task.TimeRange.To = strings.TrimSpace(task.TimeRange.GetTo())
-	if task.TimeRange.From == "" {
+	if strings.TrimSpace(task.GetTimeRange().GetFrom()) == "" {
 		return rejectedInvalidQuery("time_range.from is required")
 	}
-	if task.TimeRange.To == "" {
+	if strings.TrimSpace(task.GetTimeRange().GetTo()) == "" {
 		return rejectedInvalidQuery("time_range.to is required")
 	}
 	if len(task.GetGroupBy()) > 0 {
@@ -114,8 +113,7 @@ func ValidateQueryTaskStructureV1(task *nodev1.QueryTask) error {
 		if condition == nil {
 			return rejectedInvalidQuery(fmt.Sprintf("conditions[%d] is nil", i))
 		}
-		condition.FieldCode = queryfields.NormalizeFieldCode(condition.GetFieldCode())
-		if condition.FieldCode == "" {
+		if queryfields.NormalizeFieldCode(condition.GetFieldCode()) == "" {
 			return rejectedInvalidQuery(fmt.Sprintf("conditions[%d].field_code is required", i))
 		}
 		if condition.GetOp() == nodev1.ComparisonOperator_COMPARISON_OPERATOR_UNSPECIFIED {
@@ -132,14 +130,12 @@ func ValidateQueryTaskStructureV1(task *nodev1.QueryTask) error {
 		if len(panel.GetFieldCodes()) == 0 {
 			return rejectedInvalidQuery(fmt.Sprintf("required_panels[%d].field_codes must not be empty", i))
 		}
-		for j, rawCode := range panel.FieldCodes {
-			normalized := queryfields.NormalizeFieldCode(rawCode)
-			if normalized == "" {
+		for j, rawCode := range panel.GetFieldCodes() {
+			if queryfields.NormalizeFieldCode(rawCode) == "" {
 				return rejectedInvalidQuery(fmt.Sprintf(
 					"required_panels[%d].field_codes[%d] is required", i, j,
 				))
 			}
-			panel.FieldCodes[j] = normalized
 		}
 		if panel.GetValueConstraint() == nodev1.ValueConstraint_VALUE_CONSTRAINT_UNSPECIFIED {
 			return rejectedInvalidQuery(fmt.Sprintf("required_panels[%d].value_constraint must be set", i))

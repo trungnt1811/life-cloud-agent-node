@@ -37,7 +37,14 @@ func ValidateQueryTaskWhitelistV1(
 		if code == "" {
 			continue
 		}
-		enabled[code] = field.Enabled()
+		// Fail closed: rows that collide after normalization (e.g. a
+		// hand-inserted "mcv" beside the seeded "MCV") enable the code only
+		// if every one of them is enabled, so row order can't decide it.
+		if prev, seen := enabled[code]; seen {
+			enabled[code] = prev && field.Enabled()
+		} else {
+			enabled[code] = field.Enabled()
+		}
 	}
 
 	for i, condition := range task.GetConditions() {

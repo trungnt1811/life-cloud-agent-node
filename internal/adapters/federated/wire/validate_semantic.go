@@ -2,8 +2,7 @@ package wire
 
 import (
 	"fmt"
-	"math/big"
-	"strings"
+	"regexp"
 	"time"
 
 	nodev1 "github.com/lifenetwork-ai/life-cloud-agent-node/gen/lifecloud/node/v1"
@@ -11,6 +10,17 @@ import (
 )
 
 const schemaV1DateLayout = "2006-01-02"
+
+// maxDecimalLen bounds number_value before it reaches big.Rat, so a peer
+// cannot make layer 3 burn CPU on a multi-megabyte numeric string. Lab
+// values in the v1 dictionary need a handful of digits.
+const maxDecimalLen = 32
+
+// exactDecimalPattern is the canonical plain-decimal form: optional minus,
+// digits, optional fraction. No '+', hex/binary/octal prefixes, '_'
+// separators, exponents, or padding - what big.Rat.SetString alone accepts
+// is far broader than the wire contract's "decimal string".
+var exactDecimalPattern = regexp.MustCompile(`^-?\d+(\.\d+)?$`)
 
 // ValidateQueryTaskSemanticV1 is layer 3: operators match field kinds,
 // condition values are exact decimals, and time_range bounds are valid
@@ -68,8 +78,10 @@ func validateTimeRangeSemantic(tr *nodev1.DateRange) error {
 	return nil
 }
 
+// parseSchemaV1Date rejects padded input rather than trimming it: the task is
+// never rewritten, so accepting " 2024-01-01 " here would hand the executor a
+// string that fails to parse.
 func parseSchemaV1Date(raw, field string) (time.Time, error) {
-	raw = strings.TrimSpace(raw)
 	if raw == "" {
 		return time.Time{}, rejectedInvalidQuery(field + " is required")
 	}
@@ -137,18 +149,18 @@ func validateMeasurementCondition(index int, op nodev1.ComparisonOperator, value
 	}
 }
 
-// parseExactDecimalString accepts unrounded decimal strings (no binary float).
-// Rejects empty input, scientific notation, and rational a/b forms.
+// parseExactDecimalString accepts only canonical, bounded, unrounded decimal
+// strings (no binary float). The task is never rewritten, so padding is
+// rejected rather than trimmed.
 func parseExactDecimalString(raw string) error {
-	text := strings.TrimSpace(raw)
-	if text == "" {
+	if raw == "" {
 		return fmt.Errorf("empty")
 	}
-	if strings.ContainsAny(text, "/eE") {
-		return fmt.Errorf("scientific or fractional form is not allowed")
+	if len(raw) > maxDecimalLen {
+		return fmt.Errorf("longer than %d characters", maxDecimalLen)
 	}
-	if _, ok := new(big.Rat).SetString(text); !ok { //nolint:gosec // G113: bounded query condition strings, not attacker-controlled unbounded input
-		return fmt.Errorf("invalid decimal %q", text)
+	if !exactDecimalPattern.MatchString(raw) {
+		return fmt.Errorf("invalid decimal %q", raw)
 	}
 	return nil
 }

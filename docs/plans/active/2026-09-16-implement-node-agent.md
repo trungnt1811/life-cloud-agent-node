@@ -265,7 +265,8 @@ func ValidateQueryTaskSemanticV1(task *nodev1.QueryTask) error
       the `.proto` comment on `ConditionValue`); `time_range.from <=
       time_range.to`; both are valid `YYYY-MM-DD`.
 - [x] Combine all four layers into one `ValidateQueryTaskV1` matching
-      Fig. 3's exact order (structural → whitelist → semantic → version),
+      Fig. 3's order (version runs first, then structural → whitelist →
+      semantic — see the Phase 4 post-review Decisions entry),
       used by the gRPC handler in Phase 7 instead of calling each layer
       separately.
 - [x] One test per rejection reason, following the existing
@@ -568,7 +569,8 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
   - **Left open**: none — all 10 findings were either fixed above or folded
     into a fix above (e.g. the partial-credential 404 and the shared-secret
     findings both resolved by the credential split).
-- 2026-09-18 (Phase 4): Four-layer `ValidateQueryTaskV1` (Fig. 3 order:
+- 2026-09-18 (Phase 4 — layer order and in-place normalization
+  superseded by the post-review entry below): Four-layer `ValidateQueryTaskV1` (Fig. 3 order:
   structural → whitelist → semantic → version). Schema-version check moved
   out of `ValidateQueryTaskStructureV1` into `ValidateQueryTaskVersionV1`
   so unsupported versions map to `UNSUPPORTED_VERSION` only after earlier
@@ -581,6 +583,26 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
   list). Structural validation trims/normalizes time bounds and
   `field_code`s in place. Nil repo / D5 `ListAll` failures use
   `QUERY_RESULT_STATUS_ERROR`, not `REJECTED_INVALID_QUERY`.
+- 2026-09-18 (Phase 4 post-review fixes): `/code-review` on the Phase 4
+  commits found 6 issues; all fixed.
+  - **Version gate first.** `ValidateQueryTaskV1` now runs version →
+    structural → whitelist → semantic (Fig. 3 and ADR 0002 updated). Layers
+    1-3 hard-code v1 rules, so a v2 task was answered
+    `REJECTED_INVALID_QUERY`, cost a D5 read, and turned into `ERROR` on a
+    D5 outage. Supersedes the "structural → … → version" order above.
+  - **Strict decimals.** `number_value` must match `^-?\d+(\.\d+)?$` and be
+    ≤ 32 chars. `big.Rat.SetString` alone accepted `0x10`, `0b101`,
+    `1_000`, `0x1p4`, `+5`, `-.5` and unbounded-length input (~750ms CPU
+    for a 1M-digit hex string).
+  - **No mutation, no trimming.** `ValidateQueryTaskStructureV1` no longer
+    rewrites the task (previously trimmed `time_range`, rewrote field
+    codes, and could leave it half-normalized on failure). Padded dates and
+    decimals are now *rejected* by layer 3 instead of trimmed. Field codes
+    may still arrive padded/lower-case: every layer normalizes on read, and
+    the Phase 5 executor must too (`queryfields.NormalizeFieldCode`).
+  - **Fail-closed whitelist.** Rows that collide after normalization enable
+    a code only if all of them are enabled, so row order can't turn a
+    disabled field on.
 - Promote any phase-specific decision (e.g. checkpoint granularity,
   suppression threshold default, a specific mapping ambiguity) into
   `docs/decisions/` as that phase starts, per the pattern already used by

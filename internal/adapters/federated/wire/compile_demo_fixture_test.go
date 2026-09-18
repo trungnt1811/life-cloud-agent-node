@@ -3,6 +3,7 @@ package wire_test
 import (
 	"context"
 	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -122,14 +123,21 @@ func TestQueryTaskV1_RejectsStructuralViolations(t *testing.T) {
 		requireRejectedInvalidQuery(t, err, "time_range.from")
 	})
 
-	t.Run("normalizes_field_codes_in_place", func(t *testing.T) {
+	t.Run("does_not_mutate_task", func(t *testing.T) {
 		task, err := federatedwire.CompileDemoQueryTaskFromFixture()
 		require.NoError(t, err)
 		task.Conditions[0].FieldCode = "  mcv "
 		task.RequiredPanels[0].FieldCodes[0] = " hb "
+		task.TimeRange.From = " 2024-01-01 "
+		before := proto.Clone(task)
 		require.NoError(t, federatedwire.ValidateQueryTaskStructureV1(task))
-		require.Equal(t, "MCV", task.Conditions[0].FieldCode)
-		require.Equal(t, "HB", task.RequiredPanels[0].FieldCodes[0])
+		require.True(t, proto.Equal(before, task), "structural validation must not rewrite the task")
+
+		// Also holds on failure: nothing half-normalized.
+		task.RequiredPanels[1].ValueConstraint = nodev1.ValueConstraint_VALUE_CONSTRAINT_UNSPECIFIED
+		before = proto.Clone(task)
+		require.Error(t, federatedwire.ValidateQueryTaskStructureV1(task))
+		require.True(t, proto.Equal(before, task))
 	})
 }
 
@@ -177,6 +185,27 @@ func TestQueryTaskV1_RejectsWhitelistViolations(t *testing.T) {
 		requireRejectedInvalidQuery(t, err, "NOT_A_FIELD")
 	})
 
+	t.Run("colliding_rows_fail_closed_regardless_of_order", func(t *testing.T) {
+		now := time.Date(2026, 9, 18, 0, 0, 0, 0, time.UTC)
+		for name, rows := range map[string][]*entities.EnabledQueryField{
+			"enabled_last":  {entities.NewEnabledQueryField("MCV", false, "t", now), entities.NewEnabledQueryField("mcv", true, "t", now)},
+			"disabled_last": {entities.NewEnabledQueryField("mcv", true, "t", now), entities.NewEnabledQueryField("MCV", false, "t", now)},
+		} {
+			t.Run(name, func(t *testing.T) {
+				ctrl := gomock.NewController(t)
+				defer ctrl.Finish()
+
+				task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+				require.NoError(t, err)
+				repo := mocks.NewMockEnabledQueryFieldRepository(ctrl)
+				repo.EXPECT().ListAll(gomock.Any()).Return(append(enabledFieldsExcept("MCV"), rows...), nil)
+
+				err = federatedwire.ValidateQueryTaskWhitelistV1(context.Background(), task, repo)
+				requireRejectedInvalidQuery(t, err, "MCV")
+			})
+		}
+	})
+
 	t.Run("nil_repository_is_internal_error", func(t *testing.T) {
 		task, err := federatedwire.CompileDemoQueryTaskFromFixture()
 		require.NoError(t, err)
@@ -219,6 +248,50 @@ func TestQueryTaskV1_RejectsSemanticViolations(t *testing.T) {
 		}
 		err = federatedwire.ValidateQueryTaskSemanticV1(task)
 		requireRejectedInvalidQuery(t, err, "number_value")
+	})
+
+	t.Run("non_decimal_number_value_forms", func(t *testing.T) {
+		for _, raw := range []string{
+			"0x10", "0b101", "0o17", "1_000", "0x1p4", "+5", "-.5", "5.", ".5",
+			" 80 ", "80 ", "1/2", "1E2", "NaN", "Inf", "--1", "1.2.3",
+		} {
+			task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+			require.NoError(t, err)
+			task.Conditions[0].Value = &nodev1.ConditionValue{
+				Kind: &nodev1.ConditionValue_NumberValue{NumberValue: raw},
+			}
+			err = federatedwire.ValidateQueryTaskSemanticV1(task)
+			requireRejectedInvalidQuery(t, err, "number_value")
+		}
+	})
+
+	t.Run("canonical_decimals_accepted", func(t *testing.T) {
+		for _, raw := range []string{"0", "80", "79.5", "-1", "0.001", "007"} {
+			task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+			require.NoError(t, err)
+			task.Conditions[0].Value = &nodev1.ConditionValue{
+				Kind: &nodev1.ConditionValue_NumberValue{NumberValue: raw},
+			}
+			require.NoError(t, federatedwire.ValidateQueryTaskSemanticV1(task), raw)
+		}
+	})
+
+	t.Run("oversized_number_value", func(t *testing.T) {
+		task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+		require.NoError(t, err)
+		task.Conditions[0].Value = &nodev1.ConditionValue{
+			Kind: &nodev1.ConditionValue_NumberValue{NumberValue: strings.Repeat("9", 33)},
+		}
+		err = federatedwire.ValidateQueryTaskSemanticV1(task)
+		requireRejectedInvalidQuery(t, err, "longer than")
+	})
+
+	t.Run("padded_time_range_rejected", func(t *testing.T) {
+		task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+		require.NoError(t, err)
+		task.TimeRange.From = " 2024-01-01 "
+		err = federatedwire.ValidateQueryTaskSemanticV1(task)
+		requireRejectedInvalidQuery(t, err, "YYYY-MM-DD")
 	})
 
 	t.Run("string_value_for_measurement", func(t *testing.T) {
@@ -269,7 +342,7 @@ func TestQueryTaskV1_RejectsUnsupportedVersion(t *testing.T) {
 	require.Contains(t, validationErr.Reason, "query_schema_version")
 }
 
-func TestValidateQueryTaskV1_RunsLayersInFig3Order(t *testing.T) {
+func TestValidateQueryTaskV1_LayerOrder(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -280,6 +353,26 @@ func TestValidateQueryTaskV1_RunsLayersInFig3Order(t *testing.T) {
 	repo.EXPECT().ListAll(gomock.Any()).Return(allEnabledFields(), nil)
 
 	require.NoError(t, federatedwire.ValidateQueryTaskV1(context.Background(), task, repo))
+
+	t.Run("version_before_everything_and_skips_d5", func(t *testing.T) {
+		bad, err := federatedwire.CompileDemoQueryTaskFromFixture()
+		require.NoError(t, err)
+		bad.QuerySchemaVersion = 99
+		bad.GroupBy = []string{"HB"}
+		bad.TimeRange.From = "not-a-date"
+		// No ListAll expectation: an unsupported version must not read D5.
+		err = federatedwire.ValidateQueryTaskV1(context.Background(), bad, mocks.NewMockEnabledQueryFieldRepository(ctrl))
+		requireQueryStatus(t, err, nodev1.QueryResultStatus_QUERY_RESULT_STATUS_UNSUPPORTED_VERSION, "query_schema_version")
+	})
+
+	t.Run("unsupported_version_survives_d5_outage", func(t *testing.T) {
+		bad, err := federatedwire.CompileDemoQueryTaskFromFixture()
+		require.NoError(t, err)
+		bad.QuerySchemaVersion = 2
+		downRepo := mocks.NewMockEnabledQueryFieldRepository(ctrl)
+		err = federatedwire.ValidateQueryTaskV1(context.Background(), bad, downRepo)
+		requireQueryStatus(t, err, nodev1.QueryResultStatus_QUERY_RESULT_STATUS_UNSUPPORTED_VERSION, "query_schema_version")
+	})
 
 	t.Run("structural_before_whitelist", func(t *testing.T) {
 		bad, err := federatedwire.CompileDemoQueryTaskFromFixture()
@@ -302,10 +395,9 @@ func TestValidateQueryTaskV1_RunsLayersInFig3Order(t *testing.T) {
 		requireRejectedInvalidQuery(t, err, "MCV")
 	})
 
-	t.Run("semantic_before_version", func(t *testing.T) {
+	t.Run("semantic_last", func(t *testing.T) {
 		bad, err := federatedwire.CompileDemoQueryTaskFromFixture()
 		require.NoError(t, err)
-		bad.QuerySchemaVersion = 99
 		bad.TimeRange.From = "not-a-date"
 		okRepo := mocks.NewMockEnabledQueryFieldRepository(ctrl)
 		okRepo.EXPECT().ListAll(gomock.Any()).Return(allEnabledFields(), nil)
@@ -313,16 +405,15 @@ func TestValidateQueryTaskV1_RunsLayersInFig3Order(t *testing.T) {
 		requireRejectedInvalidQuery(t, err, "YYYY-MM-DD")
 	})
 
-	t.Run("version_last_unsupported", func(t *testing.T) {
-		bad, err := federatedwire.CompileDemoQueryTaskFromFixture()
+	t.Run("does_not_mutate_padded_but_valid_codes", func(t *testing.T) {
+		padded, err := federatedwire.CompileDemoQueryTaskFromFixture()
 		require.NoError(t, err)
-		bad.QuerySchemaVersion = 99
+		padded.Conditions[0].FieldCode = " mcv "
+		before := proto.Clone(padded)
 		okRepo := mocks.NewMockEnabledQueryFieldRepository(ctrl)
 		okRepo.EXPECT().ListAll(gomock.Any()).Return(allEnabledFields(), nil)
-		err = federatedwire.ValidateQueryTaskV1(context.Background(), bad, okRepo)
-		var validationErr *federatedwire.QueryValidationError
-		require.ErrorAs(t, err, &validationErr)
-		require.Equal(t, nodev1.QueryResultStatus_QUERY_RESULT_STATUS_UNSUPPORTED_VERSION, validationErr.Status)
+		require.NoError(t, federatedwire.ValidateQueryTaskV1(context.Background(), padded, okRepo))
+		require.True(t, proto.Equal(before, padded))
 	})
 }
 

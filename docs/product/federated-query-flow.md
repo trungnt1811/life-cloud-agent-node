@@ -107,18 +107,23 @@ flowchart TD
   REJ1(["QueryResult<br/>status = rejected_invalid_query"])
   REJ2(["QueryResult<br/>status = unsupported_version"])
 
-  START --> V1
+  START --> V4
+  V4 -- no --> REJ2
+  V4 -- yes --> V1
   V1 -- no --> REJ1
   V1 -- yes --> V2
   V2 -- no --> REJ1
   V2 -- yes --> V3
   V3 -- no --> REJ1
-  V3 -- yes --> V4
-  V4 -- no --> REJ2
-  V4 -- yes --> EXEC
+  V3 -- yes --> EXEC
   EXEC --> SUPPRESS
   SUPPRESS --> OK
 ```
+
+The version check (3.4) runs first even though it is numbered last: a task
+from a schema version this build does not understand must not be judged by
+v1 rules, or a v2 task would be answered `rejected_invalid_query` instead of
+`unsupported_version`, and would cost a D5 read.
 
 No step here waits on a person — decision 0002 chose automatic execution
 once a task clears all four checks, so every guarantee the system makes has

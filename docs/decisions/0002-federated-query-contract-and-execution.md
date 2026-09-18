@@ -53,6 +53,11 @@ anything:**
 4. Version — the task's `query_schema_version` is one this node's build
    understands.
 
+The numbering names the layers; the version check *runs first*. Layers 1-3
+encode schema-v1 rules, so a task from another schema version must be
+answered `unsupported_version` before those rules (and the D5 read in layer
+2) can misjudge it.
+
 Any failure returns a `QueryResult` carrying a specific rejection status
 (`rejected_invalid_query` or `unsupported_version`) instead of running
 anything. There is no silent partial execution of a partially-invalid query.
