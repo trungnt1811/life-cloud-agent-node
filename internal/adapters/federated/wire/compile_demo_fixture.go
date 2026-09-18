@@ -81,54 +81,51 @@ func CompileDemoQueryTask(fixture DemoQueryDefinition) *nodev1.QueryTask {
 }
 
 // ValidateQueryTaskStructureV1 applies schema-v1 wire rules that protobuf
-// decode alone does not enforce (decision 0004): required enums, schema
-// version, a required time_range, and reserved group_by. Whitelist and
-// semantic checks remain later validation layers.
+// decode alone does not enforce (decision 0004): required enums, a required
+// time_range, and reserved group_by. Schema version is layer 4
+// (ValidateQueryTaskVersionV1). Whitelist and semantic checks are layers 2–3.
 func ValidateQueryTaskStructureV1(task *nodev1.QueryTask) error {
-	if task == nil {
-		return fmt.Errorf("query task is nil")
-	}
-	if task.GetQuerySchemaVersion() != demoQuerySchemaVersion {
-		return fmt.Errorf("unsupported query_schema_version %d; schema v1 requires %d", task.GetQuerySchemaVersion(), demoQuerySchemaVersion)
+	if err := requireTask(task); err != nil {
+		return err
 	}
 	if task.GetSpecimenPolicy() != nodev1.SpecimenPolicy_SPECIMEN_POLICY_LATEST_IN_RANGE {
-		return fmt.Errorf("specimen_policy must be LATEST_IN_RANGE for schema v1")
+		return rejectedInvalidQuery("specimen_policy must be LATEST_IN_RANGE for schema v1")
 	}
 	if task.GetTimeRange() == nil {
-		return fmt.Errorf("time_range is required")
+		return rejectedInvalidQuery("time_range is required")
 	}
 	if task.GetTimeRange().GetFrom() == "" {
-		return fmt.Errorf("time_range.from is required")
+		return rejectedInvalidQuery("time_range.from is required")
 	}
 	if task.GetTimeRange().GetTo() == "" {
-		return fmt.Errorf("time_range.to is required")
+		return rejectedInvalidQuery("time_range.to is required")
 	}
 	if len(task.GetGroupBy()) > 0 {
-		return fmt.Errorf("group_by is reserved in schema v1 and must be empty")
+		return rejectedInvalidQuery("group_by is reserved in schema v1 and must be empty")
 	}
 	for i, condition := range task.GetConditions() {
 		if condition == nil {
-			return fmt.Errorf("conditions[%d] is nil", i)
+			return rejectedInvalidQuery(fmt.Sprintf("conditions[%d] is nil", i))
 		}
 		if condition.GetFieldCode() == "" {
-			return fmt.Errorf("conditions[%d].field_code is required", i)
+			return rejectedInvalidQuery(fmt.Sprintf("conditions[%d].field_code is required", i))
 		}
 		if condition.GetOp() == nodev1.ComparisonOperator_COMPARISON_OPERATOR_UNSPECIFIED {
-			return fmt.Errorf("conditions[%d].op must be set", i)
+			return rejectedInvalidQuery(fmt.Sprintf("conditions[%d].op must be set", i))
 		}
 		if condition.GetValue() == nil || condition.GetValue().GetKind() == nil {
-			return fmt.Errorf("conditions[%d].value is required", i)
+			return rejectedInvalidQuery(fmt.Sprintf("conditions[%d].value is required", i))
 		}
 	}
 	for i, panel := range task.GetRequiredPanels() {
 		if panel == nil {
-			return fmt.Errorf("required_panels[%d] is nil", i)
+			return rejectedInvalidQuery(fmt.Sprintf("required_panels[%d] is nil", i))
 		}
 		if len(panel.GetFieldCodes()) == 0 {
-			return fmt.Errorf("required_panels[%d].field_codes must not be empty", i)
+			return rejectedInvalidQuery(fmt.Sprintf("required_panels[%d].field_codes must not be empty", i))
 		}
 		if panel.GetValueConstraint() == nodev1.ValueConstraint_VALUE_CONSTRAINT_UNSPECIFIED {
-			return fmt.Errorf("required_panels[%d].value_constraint must be set", i)
+			return rejectedInvalidQuery(fmt.Sprintf("required_panels[%d].value_constraint must be set", i))
 		}
 	}
 	return nil

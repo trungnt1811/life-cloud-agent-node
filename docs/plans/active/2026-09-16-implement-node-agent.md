@@ -258,17 +258,17 @@ func ValidateQueryTaskWhitelistV1(ctx context.Context, task *nodev1.QueryTask, r
 func ValidateQueryTaskSemanticV1(task *nodev1.QueryTask) error
 ```
 
-- [ ] Whitelist: unknown or disabled `field_code` in any condition or
+- [x] Whitelist: unknown or disabled `field_code` in any condition or
       required panel → `REJECTED_INVALID_QUERY`, reason names the field.
-- [ ] Semantic: value parses as an unrounded decimal (reuse the pattern
+- [x] Semantic: value parses as an unrounded decimal (reuse the pattern
       `life-cloud`'s own generator uses — no binary float on the wire, per
       the `.proto` comment on `ConditionValue`); `time_range.from <=
       time_range.to`; both are valid `YYYY-MM-DD`.
-- [ ] Combine all four layers into one `ValidateQueryTaskV1` matching
+- [x] Combine all four layers into one `ValidateQueryTaskV1` matching
       Fig. 3's exact order (structural → whitelist → semantic → version),
       used by the gRPC handler in Phase 7 instead of calling each layer
       separately.
-- [ ] One test per rejection reason, following the existing
+- [x] One test per rejection reason, following the existing
       `TestQueryTaskV1_RejectsStructuralViolations` pattern.
 
 ### Phase 5 — Execution (3.5) + output policy (3.6)
@@ -396,7 +396,7 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
 - [x] Phase 1 — D3 Local Patient Registry domain model + migration.
 - [x] Phase 2 — Ingestion adapters for VN_A/B/C profiles into D3.
 - [x] Phase 3 — D5 Enabled Query Fields store + admin REST.
-- [ ] Phase 4 — Validation layers 2 (whitelist) & 3 (semantic).
+- [x] Phase 4 — Validation layers 2 (whitelist) & 3 (semantic).
 - [ ] Phase 5 — Query execution (3.5) + output suppression (3.6).
 - [ ] Phase 6 — D4 Job Progress Checkpoint + resumable execution.
 - [ ] Phase 7 — gRPC client: dial-out, Register/Heartbeat, task handling.
@@ -568,6 +568,17 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
   - **Left open**: none — all 10 findings were either fixed above or folded
     into a fix above (e.g. the partial-credential 404 and the shared-secret
     findings both resolved by the credential split).
+- 2026-09-18 (Phase 4): Four-layer `ValidateQueryTaskV1` (Fig. 3 order:
+  structural → whitelist → semantic → version). Schema-version check moved
+  out of `ValidateQueryTaskStructureV1` into `ValidateQueryTaskVersionV1`
+  so unsupported versions map to `UNSUPPORTED_VERSION` only after earlier
+  layers pass. Failures use typed `QueryValidationError` with the
+  corresponding `QueryResultStatus`. Whitelist reads D5 via
+  `EnabledQueryFieldRepository.ListAll`; semantic requires exact decimal
+  `number_value` (`big.Rat`, no `e`/`/`), measurement ops only with
+  `number_value`, and ordered `YYYY-MM-DD` time bounds. Field kinds live
+  in `wire/field_dictionary.go`, linked to
+  `docs/product/query-field-dictionary.md`.
 - Promote any phase-specific decision (e.g. checkpoint granularity,
   suppression threshold default, a specific mapping ambiguity) into
   `docs/decisions/` as that phase starts, per the pattern already used by
@@ -586,9 +597,7 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
 
 ## Result
 
-Phase 3 complete — D5 `enabled_query_fields` migration (seeded disabled),
-repository/usecase/admin REST (`GET`/`PUT /admin/query-fields`), Swagger,
-and focused proof are in place, including a post-review hardening pass
-(dedicated admin credentials, fail-fast on partial config, auth-derived
-`updated_by`, mapper test coverage). Phase 4 (validation layers 2 & 3) is
-next.
+Phase 4 complete — four-layer `ValidateQueryTaskV1` (structural,
+whitelist against D5, semantic decimals/dates, version) with typed
+rejection statuses and focused proof. Phase 5 (execution + suppression)
+is next.
