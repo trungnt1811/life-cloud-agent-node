@@ -20,12 +20,12 @@ func ValidateQueryTaskWhitelistV1(
 		return err
 	}
 	if repo == nil {
-		return rejectedInvalidQuery("enabled query field repository is not configured")
+		return internalError("enabled query field repository is not configured")
 	}
 
 	stored, err := repo.ListAll(ctx)
 	if err != nil {
-		return fmt.Errorf("list enabled query fields: %w", err)
+		return internalErrorWithCause("list enabled query fields", err)
 	}
 
 	enabled := make(map[string]bool, len(stored))

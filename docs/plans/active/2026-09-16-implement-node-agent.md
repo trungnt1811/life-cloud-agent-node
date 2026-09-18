@@ -576,9 +576,11 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
   corresponding `QueryResultStatus`. Whitelist reads D5 via
   `EnabledQueryFieldRepository.ListAll`; semantic requires exact decimal
   `number_value` (`big.Rat`, no `e`/`/`), measurement ops only with
-  `number_value`, and ordered `YYYY-MM-DD` time bounds. Field kinds live
-  in `wire/field_dictionary.go`, linked to
-  `docs/product/query-field-dictionary.md`.
+  `number_value`, and ordered `YYYY-MM-DD` time bounds. Field kinds are
+  derived from `queryfields.SchemaV1FieldCodes` (no second hard-coded
+  list). Structural validation trims/normalizes time bounds and
+  `field_code`s in place. Nil repo / D5 `ListAll` failures use
+  `QUERY_RESULT_STATUS_ERROR`, not `REJECTED_INVALID_QUERY`.
 - Promote any phase-specific decision (e.g. checkpoint granularity,
   suppression threshold default, a specific mapping ambiguity) into
   `docs/decisions/` as that phase starts, per the pattern already used by

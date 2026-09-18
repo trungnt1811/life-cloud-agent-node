@@ -12,13 +12,24 @@ import (
 type QueryValidationError struct {
 	Status nodev1.QueryResultStatus
 	Reason string
+	Cause  error
 }
 
 func (e *QueryValidationError) Error() string {
 	if e == nil {
 		return ""
 	}
+	if e.Cause != nil {
+		return fmt.Sprintf("%s: %v", e.Reason, e.Cause)
+	}
 	return e.Reason
+}
+
+func (e *QueryValidationError) Unwrap() error {
+	if e == nil {
+		return nil
+	}
+	return e.Cause
 }
 
 func rejectedInvalidQuery(reason string) error {
@@ -32,6 +43,21 @@ func unsupportedVersion(reason string) error {
 	return &QueryValidationError{
 		Status: nodev1.QueryResultStatus_QUERY_RESULT_STATUS_UNSUPPORTED_VERSION,
 		Reason: reason,
+	}
+}
+
+func internalError(reason string) error {
+	return &QueryValidationError{
+		Status: nodev1.QueryResultStatus_QUERY_RESULT_STATUS_ERROR,
+		Reason: reason,
+	}
+}
+
+func internalErrorWithCause(reason string, cause error) error {
+	return &QueryValidationError{
+		Status: nodev1.QueryResultStatus_QUERY_RESULT_STATUS_ERROR,
+		Reason: reason,
+		Cause:  cause,
 	}
 }
 

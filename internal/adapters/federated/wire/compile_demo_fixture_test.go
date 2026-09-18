@@ -105,6 +105,32 @@ func TestQueryTaskV1_RejectsStructuralViolations(t *testing.T) {
 		err = federatedwire.ValidateQueryTaskStructureV1(task)
 		requireRejectedInvalidQuery(t, err, "time_range.to")
 	})
+
+	t.Run("whitespace_only_field_code", func(t *testing.T) {
+		task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+		require.NoError(t, err)
+		task.Conditions[0].FieldCode = "   "
+		err = federatedwire.ValidateQueryTaskStructureV1(task)
+		requireRejectedInvalidQuery(t, err, "field_code is required")
+	})
+
+	t.Run("whitespace_only_time_range_from", func(t *testing.T) {
+		task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+		require.NoError(t, err)
+		task.TimeRange.From = "  "
+		err = federatedwire.ValidateQueryTaskStructureV1(task)
+		requireRejectedInvalidQuery(t, err, "time_range.from")
+	})
+
+	t.Run("normalizes_field_codes_in_place", func(t *testing.T) {
+		task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+		require.NoError(t, err)
+		task.Conditions[0].FieldCode = "  mcv "
+		task.RequiredPanels[0].FieldCodes[0] = " hb "
+		require.NoError(t, federatedwire.ValidateQueryTaskStructureV1(task))
+		require.Equal(t, "MCV", task.Conditions[0].FieldCode)
+		require.Equal(t, "HB", task.RequiredPanels[0].FieldCodes[0])
+	})
 }
 
 func TestQueryTaskV1_RejectsWhitelistViolations(t *testing.T) {
@@ -149,6 +175,28 @@ func TestQueryTaskV1_RejectsWhitelistViolations(t *testing.T) {
 
 		err = federatedwire.ValidateQueryTaskWhitelistV1(context.Background(), task, repo)
 		requireRejectedInvalidQuery(t, err, "NOT_A_FIELD")
+	})
+
+	t.Run("nil_repository_is_internal_error", func(t *testing.T) {
+		task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+		require.NoError(t, err)
+		err = federatedwire.ValidateQueryTaskWhitelistV1(context.Background(), task, nil)
+		requireQueryStatus(t, err, nodev1.QueryResultStatus_QUERY_RESULT_STATUS_ERROR, "repository")
+	})
+
+	t.Run("list_all_failure_is_internal_error", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+		require.NoError(t, err)
+
+		repo := mocks.NewMockEnabledQueryFieldRepository(ctrl)
+		repo.EXPECT().ListAll(gomock.Any()).Return(nil, errors.New("db down"))
+
+		err = federatedwire.ValidateQueryTaskWhitelistV1(context.Background(), task, repo)
+		requireQueryStatus(t, err, nodev1.QueryResultStatus_QUERY_RESULT_STATUS_ERROR, "list enabled query fields")
+		require.ErrorContains(t, err, "db down")
 	})
 }
 
@@ -279,6 +327,7 @@ func TestValidateQueryTaskV1_RunsLayersInFig3Order(t *testing.T) {
 }
 
 func TestFieldDictionary_CoversSchemaV1Codes(t *testing.T) {
+	require.Len(t, queryfields.SchemaV1FieldCodes, 9)
 	for _, code := range queryfields.SchemaV1FieldCodes {
 		kind, ok := federatedwire.FieldKindV1(code)
 		require.Truef(t, ok, "missing kind for %s", code)
@@ -286,7 +335,6 @@ func TestFieldDictionary_CoversSchemaV1Codes(t *testing.T) {
 	}
 	_, ok := federatedwire.FieldKindV1("NOPE")
 	require.False(t, ok)
-	require.Len(t, queryfields.SchemaV1FieldCodes, 9)
 }
 
 func TestNodeControlConnect_ServiceRegistered(t *testing.T) {
@@ -299,10 +347,15 @@ func TestNodeControlConnect_ServiceRegistered(t *testing.T) {
 
 func requireRejectedInvalidQuery(t *testing.T, err error, reasonFragment string) {
 	t.Helper()
+	requireQueryStatus(t, err, nodev1.QueryResultStatus_QUERY_RESULT_STATUS_REJECTED_INVALID_QUERY, reasonFragment)
+}
+
+func requireQueryStatus(t *testing.T, err error, status nodev1.QueryResultStatus, reasonFragment string) {
+	t.Helper()
 	require.Error(t, err)
 	var validationErr *federatedwire.QueryValidationError
 	require.True(t, errors.As(err, &validationErr), "got %T: %v", err, err)
-	require.Equal(t, nodev1.QueryResultStatus_QUERY_RESULT_STATUS_REJECTED_INVALID_QUERY, validationErr.Status)
+	require.Equal(t, status, validationErr.Status)
 	require.Contains(t, validationErr.Reason, reasonFragment)
 }
 

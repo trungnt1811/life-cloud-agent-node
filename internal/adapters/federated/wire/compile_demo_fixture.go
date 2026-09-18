@@ -5,8 +5,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"strconv"
+	"strings"
 
 	nodev1 "github.com/lifenetwork-ai/life-cloud-agent-node/gen/lifecloud/node/v1"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/queryfields"
 )
 
 const demoQuerySchemaVersion uint32 = 1
@@ -84,6 +86,9 @@ func CompileDemoQueryTask(fixture DemoQueryDefinition) *nodev1.QueryTask {
 // decode alone does not enforce (decision 0004): required enums, a required
 // time_range, and reserved group_by. Schema version is layer 4
 // (ValidateQueryTaskVersionV1). Whitelist and semantic checks are layers 2–3.
+//
+// Canonicalizes in place: trims time_range bounds and normalizes field_code
+// values so later layers see the same keys D5 / the dictionary use.
 func ValidateQueryTaskStructureV1(task *nodev1.QueryTask) error {
 	if err := requireTask(task); err != nil {
 		return err
@@ -94,10 +99,12 @@ func ValidateQueryTaskStructureV1(task *nodev1.QueryTask) error {
 	if task.GetTimeRange() == nil {
 		return rejectedInvalidQuery("time_range is required")
 	}
-	if task.GetTimeRange().GetFrom() == "" {
+	task.TimeRange.From = strings.TrimSpace(task.TimeRange.GetFrom())
+	task.TimeRange.To = strings.TrimSpace(task.TimeRange.GetTo())
+	if task.TimeRange.From == "" {
 		return rejectedInvalidQuery("time_range.from is required")
 	}
-	if task.GetTimeRange().GetTo() == "" {
+	if task.TimeRange.To == "" {
 		return rejectedInvalidQuery("time_range.to is required")
 	}
 	if len(task.GetGroupBy()) > 0 {
@@ -107,7 +114,8 @@ func ValidateQueryTaskStructureV1(task *nodev1.QueryTask) error {
 		if condition == nil {
 			return rejectedInvalidQuery(fmt.Sprintf("conditions[%d] is nil", i))
 		}
-		if condition.GetFieldCode() == "" {
+		condition.FieldCode = queryfields.NormalizeFieldCode(condition.GetFieldCode())
+		if condition.FieldCode == "" {
 			return rejectedInvalidQuery(fmt.Sprintf("conditions[%d].field_code is required", i))
 		}
 		if condition.GetOp() == nodev1.ComparisonOperator_COMPARISON_OPERATOR_UNSPECIFIED {
@@ -123,6 +131,15 @@ func ValidateQueryTaskStructureV1(task *nodev1.QueryTask) error {
 		}
 		if len(panel.GetFieldCodes()) == 0 {
 			return rejectedInvalidQuery(fmt.Sprintf("required_panels[%d].field_codes must not be empty", i))
+		}
+		for j, rawCode := range panel.FieldCodes {
+			normalized := queryfields.NormalizeFieldCode(rawCode)
+			if normalized == "" {
+				return rejectedInvalidQuery(fmt.Sprintf(
+					"required_panels[%d].field_codes[%d] is required", i, j,
+				))
+			}
+			panel.FieldCodes[j] = normalized
 		}
 		if panel.GetValueConstraint() == nodev1.ValueConstraint_VALUE_CONSTRAINT_UNSPECIFIED {
 			return rejectedInvalidQuery(fmt.Sprintf("required_panels[%d].value_constraint must be set", i))

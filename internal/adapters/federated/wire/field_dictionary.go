@@ -13,20 +13,16 @@ const (
 	FieldKindMeasurement FieldKind = "measurement"
 )
 
-// schemaV1FieldKinds maps every schema-v1 field_code to its kind.
-// Keep in sync with docs/product/query-field-dictionary.md and
-// queryfields.SchemaV1FieldCodes.
-var schemaV1FieldKinds = map[string]FieldKind{
-	"HB":   FieldKindMeasurement,
-	"MCV":  FieldKindMeasurement,
-	"MCH":  FieldKindMeasurement,
-	"RBC":  FieldKindMeasurement,
-	"MCHC": FieldKindMeasurement,
-	"RDW":  FieldKindMeasurement,
-	"HBA0": FieldKindMeasurement,
-	"HBA2": FieldKindMeasurement,
-	"HBF":  FieldKindMeasurement,
-}
+// schemaV1FieldKinds is derived from queryfields.SchemaV1FieldCodes so the
+// kind map cannot drift from the domain dictionary / migration seed.
+// For schema v1 every listed code is a numeric measurement (query-field-dictionary.md).
+var schemaV1FieldKinds = func() map[string]FieldKind {
+	kinds := make(map[string]FieldKind, len(queryfields.SchemaV1FieldCodes))
+	for _, code := range queryfields.SchemaV1FieldCodes {
+		kinds[code] = FieldKindMeasurement
+	}
+	return kinds
+}()
 
 // FieldKindV1 returns the schema-v1 kind for fieldCode, if known.
 func FieldKindV1(fieldCode string) (FieldKind, bool) {
