@@ -12,5 +12,8 @@ import (
 type EnabledQueryFieldRepository interface {
 	ListAll(ctx context.Context) ([]*entities.EnabledQueryField, error)
 	GetByFieldCode(ctx context.Context, fieldCode string) (*entities.EnabledQueryField, error)
+	// Upsert inserts or overwrites a whitelist row. It returns an error for a
+	// nil entity or a blank field code rather than silently no-oping, so a
+	// caller can't mistake a rejected write for a successful one.
 	Upsert(ctx context.Context, entity *entities.EnabledQueryField) error
 }

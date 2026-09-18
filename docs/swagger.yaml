@@ -75,11 +75,8 @@ definitions:
     properties:
       enabled:
         type: boolean
-      updated_by:
-        type: string
     required:
     - enabled
-    - updated_by
     type: object
   dto.UpdateExampleRequest:
     properties:
@@ -122,7 +119,9 @@ paths:
     put:
       consumes:
       - application/json
-      description: Set enabled and updated_by for one schema v1 field_code
+      description: |-
+        Set enabled for one schema v1 field_code; updated_by is
+        derived from the authenticated Basic Auth identity
       parameters:
       - description: Schema v1 field code
         in: path

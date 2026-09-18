@@ -532,6 +532,42 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
   without both credentials (stricter than Swagger's empty-open non-prod
   behavior). Migration seeds all 9 codes `enabled=false`; seed↔Go list
   drift is guarded by `queryfields.TestMigrationSeedMatchesSchemaV1FieldCodes`.
+- 2026-09-18 (Phase 3 post-review fixes): `/code-review` on the D5 admin
+  REST commits found 10 issues; fixed the ones with real correctness or
+  security value.
+  - **Fixed**: admin routes now gate on their own `ADMIN_BASIC_AUTH_USER/PASS`
+    instead of reusing `SWAGGER_BASIC_AUTH_USER/PASS` — rotating docs
+    access no longer also rotates the ability to change which clinical
+    fields this node exposes. Registration is now a 3-way switch: both set
+    → register; both blank → warn and skip (intentional non-prod state);
+    exactly one set → `log.Panic`/`panic` at startup (was: silently
+    register nothing and 404 forever). `NewEnabledQueryFieldFromRecord` now
+    normalizes `field_code` via `queryfields.NormalizeFieldCode`, matching
+    `NewEnabledQueryField` (previously only `NewEnabledQueryField`
+    normalized, so a hand-run SQL row with a lowercase code would silently
+    miss `GetByFieldCode`/`ListQueryFields` lookups). `updated_by` is now
+    derived from the authenticated Basic Auth identity
+    (`middleware.AuthenticatedUserContextKey`, set by `HTTPBasicAuth`) —
+    the request DTO no longer accepts an `updated_by` field a client could
+    set to any value. `UpdateQueryField` goes straight to the atomic
+    `Upsert` (`ON CONFLICT ... DO UPDATE`); removed the preceding
+    `GetByFieldCode` call, which was both wasted (nothing from the fetched
+    row was used) and a check-then-act race between concurrent `PUT`s for
+    the same `field_code`. `swagger_basic_auth.go`/`_test.go` renamed to
+    `basic_auth.go`/`_test.go` (the middleware is shared infra, not
+    Swagger-specific — it now also gates `/admin/query-fields`). Repository
+    `Upsert` now returns an error for a nil entity or blank `field_code`
+    instead of silently no-oping (documented on the interface); dropped
+    the dead `WithTx` method (never on the interface, never called, no
+    `TransactionManager` wiring) and the nil-pointer guards in the two
+    single-item mapper functions, which were unreachable at every current
+    call site. Added `enabled_query_field_mapper_test.go`
+    (`mappingtest.AssertSameNamedFieldCoverage` + round-trip test), closing
+    the one place D5 diverged from the patient-registry mapper test
+    pattern.
+  - **Left open**: none — all 10 findings were either fixed above or folded
+    into a fix above (e.g. the partial-credential 404 and the shared-secret
+    findings both resolved by the credential split).
 - Promote any phase-specific decision (e.g. checkpoint granularity,
   suppression threshold default, a specific mapping ambiguity) into
   `docs/decisions/` as that phase starts, per the pattern already used by
@@ -552,4 +588,7 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
 
 Phase 3 complete — D5 `enabled_query_fields` migration (seeded disabled),
 repository/usecase/admin REST (`GET`/`PUT /admin/query-fields`), Swagger,
-and focused proof are in place. Phase 4 (validation layers 2 & 3) is next.
+and focused proof are in place, including a post-review hardening pass
+(dedicated admin credentials, fail-fast on partial config, auth-derived
+`updated_by`, mapper test coverage). Phase 4 (validation layers 2 & 3) is
+next.

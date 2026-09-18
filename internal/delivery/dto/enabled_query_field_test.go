@@ -36,10 +36,9 @@ func TestUpdateEnabledQueryFieldRequestRequiresEnabled(t *testing.T) {
 
 	enabled := true
 	input := UpdateEnabledQueryFieldRequest{
-		Enabled:   &enabled,
-		UpdatedBy: "alice",
-	}.ToInput("hb")
+		Enabled: &enabled,
+	}.ToInput("hb", "alice")
 	require.Equal(t, "hb", input.FieldCode)
 	require.True(t, input.Enabled)
-	require.Equal(t, "alice", input.UpdatedBy)
+	require.Equal(t, "alice", input.UpdatedBy, "updated_by comes from ToInput's parameter (the authenticated identity), not the request body")
 }

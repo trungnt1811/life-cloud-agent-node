@@ -27,7 +27,11 @@ type Options struct {
 	EnableSwagger      bool
 	SwaggerAuthUser    string
 	SwaggerAuthPass    string
-	Env                string
+	// AdminAuthUser/Pass gate /admin/query-fields. Deliberately separate
+	// from SwaggerAuthUser/Pass - see AdminAuthOptions's doc comment.
+	AdminAuthUser string
+	AdminAuthPass string
+	Env           string
 }
 
 func SetupWithDependencies(useCases *di.UseCases, log logger.Logger, options ...Options) *gin.Engine {
@@ -46,6 +50,8 @@ func OptionsFromConfiguration(config *conf.Configuration) Options {
 		EnableSwagger:      config == nil || !isProductionLikeEnv(config.Env),
 		SwaggerAuthUser:    strings.TrimSpace(valueOrEmpty(config, func(c *conf.Configuration) string { return c.SwaggerBasicAuthUser })),
 		SwaggerAuthPass:    strings.TrimSpace(valueOrEmpty(config, func(c *conf.Configuration) string { return c.SwaggerBasicAuthPass })),
+		AdminAuthUser:      strings.TrimSpace(valueOrEmpty(config, func(c *conf.Configuration) string { return c.AdminBasicAuthUser })),
+		AdminAuthPass:      strings.TrimSpace(valueOrEmpty(config, func(c *conf.Configuration) string { return c.AdminBasicAuthPass })),
 		Env:                valueOrEmpty(config, func(c *conf.Configuration) string { return c.Env }),
 	}
 }
@@ -108,8 +114,8 @@ func setupApplicationRoutes(r *gin.Engine, useCases *di.UseCases, log logger.Log
 	routev1.SetupHealthRoutes(r)
 	routev1.SetupExampleRoutes(r, exampleHandler)
 	routev1.SetupEnabledQueryFieldRoutes(r, enabledQueryFieldHandler, routev1.AdminAuthOptions{
-		Username: options.SwaggerAuthUser,
-		Password: options.SwaggerAuthPass,
+		Username: options.AdminAuthUser,
+		Password: options.AdminAuthPass,
 	}, log)
 }
 

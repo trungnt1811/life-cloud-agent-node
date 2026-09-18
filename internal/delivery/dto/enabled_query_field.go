@@ -8,9 +8,11 @@ import (
 
 // UpdateEnabledQueryFieldRequest is the HTTP body for toggling a query field.
 // Enabled is a pointer so omitted JSON does not silently disable the field.
+// There is no client-supplied "updated_by": the handler derives it from the
+// Basic Auth identity that authenticated the request, so the audit trail
+// reflects a verified credential rather than free text the caller typed.
 type UpdateEnabledQueryFieldRequest struct {
-	Enabled   *bool  `json:"enabled" binding:"required"`
-	UpdatedBy string `json:"updated_by" binding:"required"`
+	Enabled *bool `json:"enabled" binding:"required"`
 }
 
 // EnabledQueryFieldDTO is the HTTP representation of one whitelist entry.
@@ -26,8 +28,10 @@ type EnabledQueryFieldListDTO struct {
 	Items []EnabledQueryFieldDTO `json:"items"`
 }
 
-// ToInput maps the request to an update use-case command.
-func (r UpdateEnabledQueryFieldRequest) ToInput(fieldCode string) contracts.UpdateEnabledQueryFieldInput {
+// ToInput maps the request to an update use-case command. updatedBy comes
+// from the authenticated Basic Auth identity (middleware.AuthenticatedUserContextKey),
+// never from the request body.
+func (r UpdateEnabledQueryFieldRequest) ToInput(fieldCode, updatedBy string) contracts.UpdateEnabledQueryFieldInput {
 	enabled := false
 	if r.Enabled != nil {
 		enabled = *r.Enabled
@@ -35,7 +39,7 @@ func (r UpdateEnabledQueryFieldRequest) ToInput(fieldCode string) contracts.Upda
 	return contracts.UpdateEnabledQueryFieldInput{
 		FieldCode: fieldCode,
 		Enabled:   enabled,
-		UpdatedBy: r.UpdatedBy,
+		UpdatedBy: updatedBy,
 	}
 }
 

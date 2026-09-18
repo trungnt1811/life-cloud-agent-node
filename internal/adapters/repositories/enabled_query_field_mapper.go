@@ -5,10 +5,9 @@ import (
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/entities"
 )
 
+// enabledQueryFieldModelFromEntity assumes entity is non-nil; both call
+// sites (Upsert, after its own field_code check) already guarantee that.
 func enabledQueryFieldModelFromEntity(entity *entities.EnabledQueryField) *models.EnabledQueryField {
-	if entity == nil {
-		return nil
-	}
 	record := entity.Record()
 	return &models.EnabledQueryField{
 		FieldCode: record.FieldCode,
@@ -18,10 +17,12 @@ func enabledQueryFieldModelFromEntity(entity *entities.EnabledQueryField) *model
 	}
 }
 
+// enabledQueryFieldEntityFromModel assumes model is non-nil; every call site
+// passes the address of a local or indexed struct, never a nil pointer. It
+// can still return nil - entities.NewEnabledQueryFieldFromRecord rejects a
+// blank field_code - which is the filter enabledQueryFieldEntitiesFromModels
+// relies on.
 func enabledQueryFieldEntityFromModel(model *models.EnabledQueryField) *entities.EnabledQueryField {
-	if model == nil {
-		return nil
-	}
 	return entities.NewEnabledQueryFieldFromRecord(entities.EnabledQueryFieldRecord{
 		FieldCode: model.FieldCode,
 		Enabled:   model.Enabled,

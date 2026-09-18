@@ -3,6 +3,8 @@ package entities
 import (
 	"strings"
 	"time"
+
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/queryfields"
 )
 
 // EnabledQueryField is one hospital-local whitelist entry for a schema field.
@@ -24,20 +26,25 @@ type EnabledQueryFieldRecord struct {
 // NewEnabledQueryField creates a whitelist entry with normalized fields.
 func NewEnabledQueryField(fieldCode string, enabled bool, updatedBy string, now time.Time) *EnabledQueryField {
 	return &EnabledQueryField{
-		fieldCode: strings.ToUpper(strings.TrimSpace(fieldCode)),
+		fieldCode: queryfields.NormalizeFieldCode(fieldCode),
 		enabled:   enabled,
 		updatedAt: ensureTimestamp(now),
 		updatedBy: strings.TrimSpace(updatedBy),
 	}
 }
 
-// NewEnabledQueryFieldFromRecord hydrates a whitelist entry from persistence data.
+// NewEnabledQueryFieldFromRecord hydrates a whitelist entry from persistence
+// data. Normalizes fieldCode the same way NewEnabledQueryField does, so a
+// stray non-canonical row (hand-run SQL, a future import path) still
+// hydrates to the same key ListQueryFields/GetByFieldCode look up by,
+// instead of silently falling out of both.
 func NewEnabledQueryFieldFromRecord(record EnabledQueryFieldRecord) *EnabledQueryField {
-	if strings.TrimSpace(record.FieldCode) == "" {
+	fieldCode := queryfields.NormalizeFieldCode(record.FieldCode)
+	if fieldCode == "" {
 		return nil
 	}
 	return &EnabledQueryField{
-		fieldCode: record.FieldCode,
+		fieldCode: fieldCode,
 		enabled:   record.Enabled,
 		updatedAt: record.UpdatedAt,
 		updatedBy: record.UpdatedBy,

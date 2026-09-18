@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"context"
+	"errors"
 	"strings"
 
 	"gorm.io/gorm"
@@ -62,10 +63,13 @@ func (r *enabledQueryFieldRepository) GetByFieldCode(ctx context.Context, fieldC
 	return enabledQueryFieldEntityFromModel(&model), nil
 }
 
-// Upsert inserts or overwrites a whitelist row.
+// Upsert inserts or overwrites a whitelist row. It errors rather than
+// silently no-oping on a nil entity or blank field code, so a caller can't
+// mistake a rejected write for a successful one.
 func (r *enabledQueryFieldRepository) Upsert(ctx context.Context, entity *entities.EnabledQueryField) error {
-	if entity == nil || strings.TrimSpace(entity.FieldCode()) == "" {
-		return nil
+	// entity.FieldCode() is nil-receiver safe, so this also catches entity == nil.
+	if strings.TrimSpace(entity.FieldCode()) == "" {
+		return errors.New("enabled query field: field_code is required")
 	}
 
 	model := enabledQueryFieldModelFromEntity(entity)
@@ -79,15 +83,4 @@ func (r *enabledQueryFieldRepository) Upsert(ctx context.Context, entity *entiti
 		return err
 	}
 	return nil
-}
-
-// WithTx returns a repository instance bound to the provided transaction.
-func (r *enabledQueryFieldRepository) WithTx(tx *gorm.DB) repositories.EnabledQueryFieldRepository {
-	if tx == nil {
-		return r
-	}
-	return &enabledQueryFieldRepository{
-		db:     tx,
-		logger: r.logger,
-	}
 }

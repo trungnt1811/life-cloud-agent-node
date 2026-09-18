@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/delivery/dto"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/delivery/http/middleware"
 	httpresponse "github.com/lifenetwork-ai/life-cloud-agent-node/internal/delivery/http/response"
 	domainerrors "github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/usecases/errors"
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/usecases/interfaces"
@@ -49,7 +50,8 @@ func (h *EnabledQueryFieldHandler) ListQueryFields(c *gin.Context) {
 
 // UpdateQueryField enables or disables one schema v1 field on this node.
 // @Summary Update an enabled query field
-// @Description Set enabled and updated_by for one schema v1 field_code
+// @Description Set enabled for one schema v1 field_code; updated_by is
+// @Description derived from the authenticated Basic Auth identity
 // @Tags admin
 // @Accept json
 // @Produce json
@@ -74,7 +76,13 @@ func (h *EnabledQueryFieldHandler) UpdateQueryField(c *gin.Context) {
 		return
 	}
 
-	result, err := h.useCase.UpdateQueryField(c.Request.Context(), req.ToInput(fieldCode))
+	// The audit identity comes from the Basic Auth credential that actually
+	// authenticated this request (set by middleware.HTTPBasicAuth), never
+	// from client-supplied JSON - a request body can claim anything.
+	updatedBy, _ := c.Get(middleware.AuthenticatedUserContextKey)
+	updatedByStr, _ := updatedBy.(string)
+
+	result, err := h.useCase.UpdateQueryField(c.Request.Context(), req.ToInput(fieldCode, updatedByStr))
 	if err != nil {
 		h.handleError(c, err)
 		return

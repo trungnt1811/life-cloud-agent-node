@@ -59,7 +59,7 @@ const docTemplate = `{
                         "BasicAuth": []
                     }
                 ],
-                "description": "Set enabled and updated_by for one schema v1 field_code",
+                "description": "Set enabled for one schema v1 field_code; updated_by is\nderived from the authenticated Basic Auth identity",
                 "consumes": [
                     "application/json"
                 ],
@@ -480,15 +480,11 @@ const docTemplate = `{
         "dto.UpdateEnabledQueryFieldRequest": {
             "type": "object",
             "required": [
-                "enabled",
-                "updated_by"
+                "enabled"
             ],
             "properties": {
                 "enabled": {
                     "type": "boolean"
-                },
-                "updated_by": {
-                    "type": "string"
                 }
             }
         },

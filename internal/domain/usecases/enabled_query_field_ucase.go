@@ -119,17 +119,12 @@ func (u *enabledQueryFieldUseCase) UpdateQueryField(
 		return nil, domainerrors.NewInternalError(eqfErrCodeRepositoryError, eqfErrInternalMessage)
 	}
 
-	now := time.Now().UTC()
-	entity, err := u.repo.GetByFieldCode(ctx, fieldCode)
-	if err != nil {
-		u.logger.Error("Failed to get enabled query field", loggerpkg.String("field_code", fieldCode), loggerpkg.Err(err))
-		return nil, domainerrors.NewInternalErrorWithCause(eqfErrCodeRepositoryError, eqfErrInternalMessage, err)
-	}
-	if entity == nil {
-		entity = entities.NewEnabledQueryField(fieldCode, input.Enabled, updatedBy, now)
-	} else {
-		entity.SetEnabled(input.Enabled, updatedBy, now)
-	}
+	// Upsert alone (ON CONFLICT ... DO UPDATE) already handles both the
+	// insert and update cases atomically; a prior GetByFieldCode added a
+	// wasted round trip and a check-then-act race between concurrent PUTs
+	// for the same field_code with no benefit (nothing from the fetched
+	// row is used - SetEnabled would unconditionally overwrite it anyway).
+	entity := entities.NewEnabledQueryField(fieldCode, input.Enabled, updatedBy, time.Now().UTC())
 
 	if err := u.repo.Upsert(ctx, entity); err != nil {
 		u.logger.Error("Failed to upsert enabled query field", loggerpkg.String("field_code", fieldCode), loggerpkg.Err(err))

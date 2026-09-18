@@ -64,7 +64,8 @@ func TestEnabledQueryFieldUseCase_UpdateUpsertsEnabledField(t *testing.T) {
 	defer ctrl.Finish()
 
 	repo := mocks.NewMockEnabledQueryFieldRepository(ctrl)
-	repo.EXPECT().GetByFieldCode(gomock.Any(), "HB").Return(nil, nil)
+	// No GetByFieldCode expectation: UpdateQueryField goes straight to
+	// Upsert (atomic ON CONFLICT), it no longer reads-before-writing.
 	repo.EXPECT().
 		Upsert(gomock.Any(), gomock.AssignableToTypeOf(&entities.EnabledQueryField{})).
 		DoAndReturn(func(_ context.Context, entity *entities.EnabledQueryField) error {

@@ -55,16 +55,19 @@ func TestEnabledQueryFieldHandlerUpdateSuccess(t *testing.T) {
 	now := time.Date(2026, 9, 18, 12, 0, 0, 0, time.UTC)
 	useCase := mocks.NewMockEnabledQueryFieldUseCase(ctrl)
 	useCase.EXPECT().
+		// updated_by ("admin") is the Basic Auth username performEnabledQueryFieldRequest
+		// authenticates with below, not the request body - proving the
+		// handler derives it from the authenticated identity, not the client.
 		UpdateQueryField(gomock.Any(), contracts.UpdateEnabledQueryFieldInput{
 			FieldCode: "HB",
 			Enabled:   true,
-			UpdatedBy: "alice",
+			UpdatedBy: "admin",
 		}).
 		Return(&contracts.EnabledQueryFieldOutput{
 			FieldCode: "HB",
 			Enabled:   true,
 			UpdatedAt: &now,
-			UpdatedBy: "alice",
+			UpdatedBy: "admin",
 		}, nil)
 
 	status, payload := performEnabledQueryFieldRequest(
@@ -72,13 +75,14 @@ func TestEnabledQueryFieldHandlerUpdateSuccess(t *testing.T) {
 		NewEnabledQueryFieldHandler(useCase, nil),
 		http.MethodPut,
 		"/admin/query-fields/HB",
-		map[string]any{"enabled": true, "updated_by": "alice"},
+		map[string]any{"enabled": true},
 		"admin",
 		"secret",
 	)
 	require.Equal(t, http.StatusOK, status)
 	require.Equal(t, "HB", payload["field_code"])
 	require.Equal(t, true, payload["enabled"])
+	require.Equal(t, "admin", payload["updated_by"])
 }
 
 func TestEnabledQueryFieldHandlerUnauthorizedWithoutCredentials(t *testing.T) {
@@ -111,7 +115,7 @@ func TestEnabledQueryFieldHandlerDomainError(t *testing.T) {
 		NewEnabledQueryFieldHandler(useCase, nil),
 		http.MethodPut,
 		"/admin/query-fields/ZZZ",
-		map[string]any{"enabled": true, "updated_by": "alice"},
+		map[string]any{"enabled": true},
 		"admin",
 		"secret",
 	)
@@ -128,7 +132,7 @@ func TestEnabledQueryFieldHandlerRejectsOmittedEnabled(t *testing.T) {
 		NewEnabledQueryFieldHandler(mocks.NewMockEnabledQueryFieldUseCase(ctrl), nil),
 		http.MethodPut,
 		"/admin/query-fields/HB",
-		map[string]any{"updated_by": "alice"},
+		map[string]any{},
 		"admin",
 		"secret",
 	)

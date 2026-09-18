@@ -51,6 +51,12 @@ type Configuration struct {
 	EnableAutoMigrate    bool                  `mapstructure:"ENABLE_AUTO_MIGRATE"`
 	SwaggerBasicAuthUser string                `mapstructure:"SWAGGER_BASIC_AUTH_USER"`
 	SwaggerBasicAuthPass string                `mapstructure:"SWAGGER_BASIC_AUTH_PASS"`
+	// AdminBasicAuthUser/Pass gate node-local admin routes (e.g.
+	// /admin/query-fields). Deliberately separate from the Swagger
+	// credentials: rotating docs access must not also rotate the ability
+	// to mutate which clinical fields this node exposes, and vice versa.
+	AdminBasicAuthUser string `mapstructure:"ADMIN_BASIC_AUTH_USER"`
+	AdminBasicAuthPass string `mapstructure:"ADMIN_BASIC_AUTH_PASS"`
 }
 
 var configuration = NormalizeConfiguration(Configuration{})
@@ -109,6 +115,8 @@ var defaultConfigurations = map[string]any{
 	"ENABLE_AUTO_MIGRATE":            "false",
 	"SWAGGER_BASIC_AUTH_USER":        "",
 	"SWAGGER_BASIC_AUTH_PASS":        "",
+	"ADMIN_BASIC_AUTH_USER":          "",
+	"ADMIN_BASIC_AUTH_PASS":          "",
 }
 
 // DefaultConfiguration returns the normalized config used when no env is loaded.

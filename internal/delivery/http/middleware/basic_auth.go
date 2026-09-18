@@ -9,6 +9,12 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// AuthenticatedUserContextKey is the gin.Context key HTTPBasicAuth stores
+// the authenticated username under, so handlers can attribute an action to
+// the credential that was actually verified instead of trusting a
+// client-supplied claim (e.g. a free-text "updated_by" field).
+const AuthenticatedUserContextKey = "authenticated_user"
+
 // HTTPBasicAuth protects endpoints using HTTP Basic Auth.
 func HTTPBasicAuth(username, password, realm string) gin.HandlerFunc {
 	if strings.TrimSpace(realm) == "" {
@@ -47,6 +53,7 @@ func HTTPBasicAuth(username, password, realm string) gin.HandlerFunc {
 			return
 		}
 
+		c.Set(AuthenticatedUserContextKey, before)
 		c.Next()
 	}
 }

@@ -30,14 +30,11 @@ func TestSetupEnabledQueryFieldRoutesRequiresCredentials(t *testing.T) {
 		require.Equal(t, http.StatusNotFound, rec.Code)
 	})
 
-	t.Run("partial credentials skips registration", func(t *testing.T) {
+	t.Run("partial credentials panics instead of silently 404ing forever", func(t *testing.T) {
 		router := gin.New()
-		SetupEnabledQueryFieldRoutes(router, handler, AdminAuthOptions{Username: "admin"}, nil)
-
-		req := httptest.NewRequest(http.MethodGet, "/admin/query-fields", nil)
-		rec := httptest.NewRecorder()
-		router.ServeHTTP(rec, req)
-		require.Equal(t, http.StatusNotFound, rec.Code)
+		require.Panics(t, func() {
+			SetupEnabledQueryFieldRoutes(router, handler, AdminAuthOptions{Username: "admin"}, nil)
+		})
 	})
 
 	t.Run("credentials register protected route", func(t *testing.T) {
