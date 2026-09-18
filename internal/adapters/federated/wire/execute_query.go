@@ -2,9 +2,10 @@ package wire
 
 import (
 	"context"
+	"errors"
 	"fmt"
-	"time"
 
+	"github.com/lifenetwork-ai/life-cloud-agent-node/constants"
 	nodev1 "github.com/lifenetwork-ai/life-cloud-agent-node/gen/lifecloud/node/v1"
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/queryfields"
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/repositories"
@@ -13,16 +14,30 @@ import (
 
 // SuppressMatchingCount applies process 3.6 small-cell suppression.
 // When 0 < raw < threshold, the visible count is zero and suppressed=true.
-// threshold 0 disables suppression.
+// It fails closed: threshold 0 means "not configured" and uses
+// constants.DefaultSuppressionThreshold, never "disabled" - otherwise a
+// mis-wired caller would leak raw counts of 1-4. A threshold of 1 hides
+// nothing.
 func SuppressMatchingCount(raw, threshold uint64) (matchingCount uint64, suppressed bool) {
-	if threshold > 0 && raw > 0 && raw < threshold {
+	if threshold == 0 {
+		threshold = constants.DefaultSuppressionThreshold
+	}
+	if raw > 0 && raw < threshold {
 		return 0, true
 	}
 	return raw, false
 }
 
-// ExecuteQueryTaskV1 runs process 3.5 then 3.6 against a validated schema-v1
-// QueryTask. Callers should run ValidateQueryTaskV1 first (Phase 7).
+// ExecuteQueryTaskV1 runs process 3.5 then 3.6 against a schema-v1
+// QueryTask. It re-runs the pure validation layers (version, structural,
+// semantic) itself so a mis-ordered caller cannot get an OK count for a v2
+// task, a group_by query, or a non-decimal value, and maps those failures to
+// their QueryResult status. The whitelist layer needs D5, so the caller must
+// still run ValidateQueryTaskV1 first (Phase 7).
+//
+// A canceled or expired ctx is returned as a Go error, not a terminal ERROR
+// result, so the caller can tell an interrupted job (resumable, Phase 6)
+// from a failed one.
 func ExecuteQueryTaskV1(
 	ctx context.Context,
 	task *nodev1.QueryTask,
@@ -36,6 +51,23 @@ func ExecuteQueryTaskV1(
 		return nil, fmt.Errorf("patient registry repository is not configured")
 	}
 
+	for _, validate := range []func(*nodev1.QueryTask) error{
+		ValidateQueryTaskVersionV1,
+		ValidateQueryTaskStructureV1,
+		ValidateQueryTaskSemanticV1,
+	} {
+		if err := validate(task); err != nil {
+			if validationErr, ok := AsQueryValidationError(err); ok {
+				return &nodev1.QueryResult{
+					JobId:  task.GetJobId(),
+					Status: validationErr.Status,
+					Reason: validationErr.Reason,
+				}, nil
+			}
+			return nil, err
+		}
+	}
+
 	criteria, err := CohortCriteriaFromQueryTaskV1(task)
 	if err != nil {
 		return &nodev1.QueryResult{
@@ -47,6 +79,9 @@ func ExecuteQueryTaskV1(
 
 	rawCount, err := repo.CountMatchingCohort(ctx, criteria)
 	if err != nil {
+		if ctx.Err() != nil || errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+			return nil, err
+		}
 		return &nodev1.QueryResult{
 			JobId:  task.GetJobId(),
 			Status: nodev1.QueryResultStatus_QUERY_RESULT_STATUS_ERROR,
@@ -72,11 +107,11 @@ func CohortCriteriaFromQueryTaskV1(task *nodev1.QueryTask) (types.CohortCriteria
 	if tr == nil {
 		return types.CohortCriteria{}, fmt.Errorf("time_range is required")
 	}
-	from, err := parseCohortDate(tr.GetFrom(), "time_range.from")
+	from, err := parseSchemaV1Date(tr.GetFrom(), "time_range.from")
 	if err != nil {
 		return types.CohortCriteria{}, err
 	}
-	to, err := parseCohortDate(tr.GetTo(), "time_range.to")
+	to, err := parseSchemaV1Date(tr.GetTo(), "time_range.to")
 	if err != nil {
 		return types.CohortCriteria{}, err
 	}
@@ -108,17 +143,6 @@ func CohortCriteriaFromQueryTaskV1(task *nodev1.QueryTask) (types.CohortCriteria
 		Conditions:     conditions,
 		RequiredPanels: panels,
 	}, nil
-}
-
-func parseCohortDate(raw, field string) (time.Time, error) {
-	if raw == "" {
-		return time.Time{}, fmt.Errorf("%s is required", field)
-	}
-	parsed, err := time.Parse(schemaV1DateLayout, raw)
-	if err != nil || parsed.Format(schemaV1DateLayout) != raw {
-		return time.Time{}, fmt.Errorf("%s must be a valid YYYY-MM-DD calendar date", field)
-	}
-	return parsed, nil
 }
 
 func mapCondition(index int, condition *nodev1.QueryCondition) (types.CohortCondition, error) {

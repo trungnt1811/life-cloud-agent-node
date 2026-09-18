@@ -58,3 +58,9 @@ const (
 	BaseRetryDuration        = 1 * time.Second
 	DefaultChallengeDuration = 30 * time.Second
 )
+
+// DefaultSuppressionThreshold is the node-local small-cell threshold used
+// whenever none is configured. Suppression fails closed: a zero threshold
+// means "use this default", never "disabled" (a threshold of 1 hides
+// nothing, since only 0 < count < threshold is suppressed).
+const DefaultSuppressionThreshold uint64 = 5

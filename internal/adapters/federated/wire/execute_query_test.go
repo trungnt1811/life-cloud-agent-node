@@ -3,6 +3,7 @@ package wire_test
 import (
 	"context"
 	"errors"
+	"fmt"
 	"testing"
 	"time"
 
@@ -30,7 +31,13 @@ func TestSuppressMatchingCount(t *testing.T) {
 	require.Equal(t, uint64(5), matching)
 	require.False(t, suppressed)
 
+	// Fails closed: 0 means "not configured" (default 5), not "disabled".
 	matching, suppressed = federatedwire.SuppressMatchingCount(3, 0)
+	require.Equal(t, uint64(0), matching)
+	require.True(t, suppressed)
+
+	// A threshold of 1 hides nothing.
+	matching, suppressed = federatedwire.SuppressMatchingCount(3, 1)
 	require.Equal(t, uint64(3), matching)
 	require.False(t, suppressed)
 }
@@ -70,6 +77,96 @@ func TestExecuteQueryTaskV1_AppliesSuppression(t *testing.T) {
 	require.Equal(t, uint64(0), result.GetMatchingCount())
 	require.True(t, result.GetSuppressed())
 	require.Equal(t, task.GetJobId(), result.GetJobId())
+}
+
+func TestExecuteQueryTaskV1_ZeroThresholdStillSuppresses(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+	require.NoError(t, err)
+	repo := mocks.NewMockPatientRegistryRepository(ctrl)
+	repo.EXPECT().CountMatchingCohort(gomock.Any(), gomock.Any()).Return(uint64(2), nil)
+
+	result, err := federatedwire.ExecuteQueryTaskV1(context.Background(), task, repo, 0)
+	require.NoError(t, err)
+	require.Equal(t, uint64(0), result.GetMatchingCount())
+	require.True(t, result.GetSuppressed())
+}
+
+func TestExecuteQueryTaskV1_EnforcesPreconditionsWithoutTouchingRepo(t *testing.T) {
+	cases := map[string]struct {
+		mutate func(*nodev1.QueryTask)
+		status nodev1.QueryResultStatus
+	}{
+		"unsupported_version": {
+			func(task *nodev1.QueryTask) { task.QuerySchemaVersion = 2 },
+			nodev1.QueryResultStatus_QUERY_RESULT_STATUS_UNSUPPORTED_VERSION,
+		},
+		"group_by": {
+			func(task *nodev1.QueryTask) { task.GroupBy = []string{"HB"} },
+			nodev1.QueryResultStatus_QUERY_RESULT_STATUS_REJECTED_INVALID_QUERY,
+		},
+		"unspecified_specimen_policy": {
+			func(task *nodev1.QueryTask) {
+				task.SpecimenPolicy = nodev1.SpecimenPolicy_SPECIMEN_POLICY_UNSPECIFIED
+			},
+			nodev1.QueryResultStatus_QUERY_RESULT_STATUS_REJECTED_INVALID_QUERY,
+		},
+		"non_decimal_value": {
+			func(task *nodev1.QueryTask) {
+				task.Conditions[0].Value = &nodev1.ConditionValue{
+					Kind: &nodev1.ConditionValue_NumberValue{NumberValue: "0x10"},
+				}
+			},
+			nodev1.QueryResultStatus_QUERY_RESULT_STATUS_REJECTED_INVALID_QUERY,
+		},
+		"bad_date": {
+			func(task *nodev1.QueryTask) { task.TimeRange.From = "2024-1-01" },
+			nodev1.QueryResultStatus_QUERY_RESULT_STATUS_REJECTED_INVALID_QUERY,
+		},
+	}
+	for name, tc := range cases {
+		t.Run(name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+			require.NoError(t, err)
+			tc.mutate(task)
+
+			// No CountMatchingCohort expectation: the repo must not be reached.
+			result, err := federatedwire.ExecuteQueryTaskV1(
+				context.Background(), task, mocks.NewMockPatientRegistryRepository(ctrl), 5,
+			)
+			require.NoError(t, err)
+			require.Equal(t, tc.status, result.GetStatus())
+			require.NotEmpty(t, result.GetReason())
+		})
+	}
+}
+
+func TestExecuteQueryTaskV1_PropagatesContextErrors(t *testing.T) {
+	for name, cause := range map[string]error{
+		"canceled":          context.Canceled,
+		"deadline_exceeded": context.DeadlineExceeded,
+	} {
+		t.Run(name, func(t *testing.T) {
+			ctrl := gomock.NewController(t)
+			defer ctrl.Finish()
+
+			task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+			require.NoError(t, err)
+			repo := mocks.NewMockPatientRegistryRepository(ctrl)
+			repo.EXPECT().
+				CountMatchingCohort(gomock.Any(), gomock.Any()).
+				Return(uint64(0), fmt.Errorf("query: %w", cause))
+
+			result, err := federatedwire.ExecuteQueryTaskV1(context.Background(), task, repo, 5)
+			require.Nil(t, result, "an interrupted job must not become a terminal ERROR result")
+			require.ErrorIs(t, err, cause)
+		})
+	}
 }
 
 func TestExecuteQueryTaskV1_RepoFailureIsErrorStatus(t *testing.T) {

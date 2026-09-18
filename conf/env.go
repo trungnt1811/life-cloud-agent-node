@@ -59,9 +59,9 @@ type Configuration struct {
 	AdminBasicAuthPass string `mapstructure:"ADMIN_BASIC_AUTH_PASS"`
 	// SuppressionThreshold is the node-local small-cell threshold (process
 	// 3.6). When 0 < matching_count < threshold the visible count is zero
-	// and suppressed=true. Default is 5. Zero in NormalizeConfiguration is
-	// treated as unset and replaced by the default; pass an explicit
-	// threshold into ExecuteQueryTaskV1 to disable suppression in tests.
+	// and suppressed=true. Default is 5. Suppression fails closed: 0 (unset
+	// or explicitly "0") is replaced by the default, never treated as
+	// "disabled". A threshold of 1 hides nothing, for tests.
 	SuppressionThreshold uint64 `mapstructure:"SUPPRESSION_THRESHOLD"`
 }
 
@@ -88,7 +88,7 @@ const (
 	defaultDBConnMaxLifetimeMin        = 60
 	defaultCORSAllowedOrigins          = "*"
 	defaultCORSAllowedHeaders          = "Content-Type,Content-Length,Accept-Encoding,X-CSRF-Token,Authorization,accept,origin,Cache-Control,X-Requested-With,X-Request-ID,X-Correlation-ID"
-	defaultSuppressionThreshold uint64 = 5
+	defaultSuppressionThreshold uint64 = constants.DefaultSuppressionThreshold
 )
 
 // NOTE: when adding a new env, add it here and expose only scoped config to modules.

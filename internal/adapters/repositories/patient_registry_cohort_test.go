@@ -9,6 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/entities"
+	domainrepos "github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/repositories"
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/types"
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/platform/logger"
 )
@@ -20,41 +21,10 @@ func TestPatientRegistryRepository_CountMatchingCohort_DemoRuleFixture(t *testin
 	db := openPatientRegistryRepositoryTestDB(t)
 	ctx := context.Background()
 	repo := NewPatientRegistryRepository(db, logger.GetLogger())
-	now := time.Now().UTC()
 
 	seed := func(externalID string, specimens []cohortSpecimenSeed) {
 		t.Helper()
-		patient, err := repo.GetOrCreatePatient(ctx, externalID)
-		require.NoError(t, err)
-		for _, specimenSeed := range specimens {
-			specimenID := uuid.New()
-			specimen := entities.NewSpecimen(entities.NewSpecimenParams{
-				ID:                 specimenID,
-				PatientID:          patient.ID(),
-				ExternalSpecimenID: specimenSeed.ExternalID,
-				CollectedAt:        specimenSeed.CollectedAt,
-				SourceDataset:      "TEST",
-				SourceFile:         "fixture.csv",
-				SourceRecordID:     specimenSeed.ExternalID,
-				SourceRowNumber:    1,
-				Now:                now,
-			})
-			observations := make([]*entities.LabObservation, 0, len(specimenSeed.Obs))
-			for _, obs := range specimenSeed.Obs {
-				observations = append(observations, entities.NewLabObservation(entities.NewLabObservationParams{
-					ID:         uuid.New(),
-					SpecimenID: specimenID,
-					FieldCode:  obs.FieldCode,
-					Value:      obs.Value,
-					Censored:   obs.Censored,
-					RawValue:   obs.Value,
-					RawUnit:    "u",
-					Revision:   1,
-					Now:        now,
-				}))
-			}
-			require.NoError(t, repo.SaveSpecimen(ctx, specimen, observations))
-		}
+		seedCohortPatient(t, repo, externalID, specimens)
 	}
 
 	cbcExact := func(hb, mcv, mch, rbc string) []cohortObsSeed {
@@ -198,6 +168,65 @@ func TestPatientRegistryRepository_CountMatchingCohort_DemoRuleFixture(t *testin
 	require.Equal(t, uint64(2), count)
 }
 
+func TestPatientRegistryRepository_CountMatchingCohort_CensoredValuesNeverSatisfyConditions(t *testing.T) {
+	db := openPatientRegistryRepositoryTestDB(t)
+	repo := NewPatientRegistryRepository(db, logger.GetLogger())
+	day := time.Date(2024, 6, 1, 0, 0, 0, 0, time.UTC)
+
+	// '<0.1' is stored as value 0.1, censored=true: the true value is unknown.
+	seedCohortPatient(t, repo, "CENSORED-BOUND", []cohortSpecimenSeed{{
+		ExternalID: "S-1", CollectedAt: day,
+		Obs: []cohortObsSeed{{FieldCode: "HBF", Value: "0.1", Censored: true}},
+	}})
+	seedCohortPatient(t, repo, "EXACT-VALUE", []cohortSpecimenSeed{{
+		ExternalID: "S-2", CollectedAt: day,
+		Obs: []cohortObsSeed{{FieldCode: "HBF", Value: "0.1"}},
+	}})
+
+	for _, op := range []types.ComparisonOp{types.ComparisonOpEQ, types.ComparisonOpGTE, types.ComparisonOpLTE} {
+		count, err := repo.CountMatchingCohort(context.Background(), types.CohortCriteria{
+			From:       day,
+			To:         day,
+			Conditions: []types.CohortCondition{{FieldCode: "HBF", Op: op, NumberValue: "0.1"}},
+		})
+		require.NoError(t, err)
+		require.Equal(t, uint64(1), count, "op %s: only the exact observation may match", op)
+	}
+}
+
+// Decision 0004 pins the "latest specimen" tie-break to byte order: 'S-a1'
+// (0x61) sorts after 'S-B1' (0x42), so S-a1 must be the selected specimen.
+// The Alpine test container already compares bytewise, so this documents the
+// behavior but cannot fail on its own; the SQL-text test below is what
+// guards the COLLATE "C" pin against a locale-aware production database.
+func TestPatientRegistryRepository_CountMatchingCohort_TieBreakUsesByteOrder(t *testing.T) {
+	db := openPatientRegistryRepositoryTestDB(t)
+	repo := NewPatientRegistryRepository(db, logger.GetLogger())
+	day := time.Date(2024, 6, 1, 0, 0, 0, 0, time.UTC)
+
+	seedCohortPatient(t, repo, "TIE", []cohortSpecimenSeed{
+		{ExternalID: "S-a1", CollectedAt: day, Obs: []cohortObsSeed{{FieldCode: "MCV", Value: "70"}}},
+		{ExternalID: "S-B1", CollectedAt: day, Obs: []cohortObsSeed{{FieldCode: "MCV", Value: "90"}}},
+	})
+
+	count, err := repo.CountMatchingCohort(context.Background(), types.CohortCriteria{
+		From:       day,
+		To:         day,
+		Conditions: []types.CohortCondition{{FieldCode: "MCV", Op: types.ComparisonOpLT, NumberValue: "80"}},
+	})
+	require.NoError(t, err)
+	require.Equal(t, uint64(1), count, "byte-order latest is S-a1 (MCV 70), which matches")
+}
+
+func TestBuildCountMatchingCohortSQL_PinsByteOrderTieBreak(t *testing.T) {
+	sql, _, err := buildCountMatchingCohortSQL(types.CohortCriteria{
+		From: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),
+		To:   time.Date(2024, 12, 31, 0, 0, 0, 0, time.UTC),
+	})
+	require.NoError(t, err)
+	require.Contains(t, sql, `external_specimen_id COLLATE "C" DESC`)
+}
+
 func TestPatientRegistryRepository_CountMatchingCohort_RejectsInvertedRange(t *testing.T) {
 	db := openPatientRegistryRepositoryTestDB(t)
 	repo := NewPatientRegistryRepository(db, logger.GetLogger())
@@ -219,4 +248,47 @@ type cohortSpecimenSeed struct {
 	ExternalID  string
 	CollectedAt time.Time
 	Obs         []cohortObsSeed
+}
+
+func seedCohortPatient(
+	t *testing.T,
+	repo domainrepos.PatientRegistryRepository,
+	externalID string,
+	specimens []cohortSpecimenSeed,
+) {
+	t.Helper()
+	ctx := context.Background()
+	now := time.Now().UTC()
+
+	patient, err := repo.GetOrCreatePatient(ctx, externalID)
+	require.NoError(t, err)
+	for _, specimenSeed := range specimens {
+		specimenID := uuid.New()
+		specimen := entities.NewSpecimen(entities.NewSpecimenParams{
+			ID:                 specimenID,
+			PatientID:          patient.ID(),
+			ExternalSpecimenID: specimenSeed.ExternalID,
+			CollectedAt:        specimenSeed.CollectedAt,
+			SourceDataset:      "TEST",
+			SourceFile:         "fixture.csv",
+			SourceRecordID:     specimenSeed.ExternalID,
+			SourceRowNumber:    1,
+			Now:                now,
+		})
+		observations := make([]*entities.LabObservation, 0, len(specimenSeed.Obs))
+		for _, obs := range specimenSeed.Obs {
+			observations = append(observations, entities.NewLabObservation(entities.NewLabObservationParams{
+				ID:         uuid.New(),
+				SpecimenID: specimenID,
+				FieldCode:  obs.FieldCode,
+				Value:      obs.Value,
+				Censored:   obs.Censored,
+				RawValue:   obs.Value,
+				RawUnit:    "u",
+				Revision:   1,
+				Now:        now,
+			}))
+		}
+		require.NoError(t, repo.SaveSpecimen(ctx, specimen, observations))
+	}
 }

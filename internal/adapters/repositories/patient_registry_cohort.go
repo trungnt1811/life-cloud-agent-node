@@ -13,7 +13,9 @@ import (
 
 // CountMatchingCohort counts patients whose LATEST_IN_RANGE specimen
 // (collected_at DESC, then external_specimen_id DESC) satisfies every
-// required panel and every condition.
+// required panel and every condition. Conditions compare exact values only:
+// a censored observation ('<0.1' stored as 0.1, censored=true) is a bound,
+// not a measurement, so it never satisfies a condition.
 func (r *patientRegistryRepository) CountMatchingCohort(
 	ctx context.Context,
 	criteria types.CohortCriteria,
@@ -27,6 +29,7 @@ func (r *patientRegistryRepository) CountMatchingCohort(
 
 	sql, args, err := buildCountMatchingCohortSQL(criteria)
 	if err != nil {
+		r.logger.Error("Failed to build cohort query", logger.Err(err))
 		return 0, err
 	}
 
@@ -34,9 +37,6 @@ func (r *patientRegistryRepository) CountMatchingCohort(
 	if err := r.dbWithContext(ctx).Raw(sql, args...).Scan(&count).Error; err != nil {
 		r.logger.Error("Failed to count matching cohort", logger.Err(err))
 		return 0, err
-	}
-	if count < 0 {
-		return 0, errors.New("negative cohort count from database")
 	}
 	return uint64(count), nil
 }
@@ -47,13 +47,15 @@ func buildCountMatchingCohortSQL(criteria types.CohortCriteria) (string, []any, 
 
 	// Specimens in the inclusive calendar-date window; latest per patient by
 	// collected_at then lexical external_specimen_id (decision 0004 /
-	// life-cloud benchmark: ORDER BY day DESC, specimen DESC).
+	// life-cloud benchmark: ORDER BY day DESC, specimen DESC). COLLATE "C"
+	// pins byte order; the column's default collation (en_US.UTF-8, ICU)
+	// would rank 'S-a1' vs 'S-B1' differently and pick another "latest".
 	b.WriteString(`
 WITH ranked AS (
 	SELECT id, patient_id,
 		ROW_NUMBER() OVER (
 			PARTITION BY patient_id
-			ORDER BY collected_at DESC, external_specimen_id DESC
+			ORDER BY collected_at DESC, external_specimen_id COLLATE "C" DESC
 		) AS rn
 	FROM specimens
 	WHERE collected_at >= ?::date AND collected_at <= ?::date
@@ -127,7 +129,7 @@ func requiredPanelSQL(index int, panel types.CohortRequiredPanel) (string, []any
 
 	clause := fmt.Sprintf(`
 AND (
-	SELECT COUNT(DISTINCT o.field_code)::int
+	SELECT COUNT(*)::int
 	FROM lab_observations o
 	WHERE o.specimen_id = ls.specimen_id
 		AND o.field_code IN (%s)%s
@@ -154,6 +156,7 @@ AND EXISTS (
 	FROM lab_observations o
 	WHERE o.specimen_id = ls.specimen_id
 		AND o.field_code = ?
+		AND o.censored = FALSE
 		AND o.value::numeric %s ?::numeric
 )`, op)
 	return clause, []any{code, strings.TrimSpace(condition.NumberValue)}, nil

@@ -616,6 +616,39 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
   `matching_count=0, suppressed=true`. Proof:
   `TestPatientRegistryRepository_CountMatchingCohort_DemoRuleFixture`
   (hand-computed expected count 2) plus wire suppression/mapping tests.
+- 2026-09-19 (Phase 5 post-review fixes): `/code-review` on the Phase 5
+  commit found 7 issues; all fixed.
+  - **Suppression fails closed.** Threshold `0` now means "use the default
+    5" (`constants.DefaultSuppressionThreshold`, shared with `conf`), never
+    "disabled" — a mis-wired Phase 7 caller can no longer leak raw counts
+    of 1-4. A threshold of `1` hides nothing (tests).
+  - **Conditions ignore censored observations.** `'<0.1'` is stored as
+    `0.1, censored=true`; that is a bound, not a measurement, so
+    `conditionSQL` adds `censored = FALSE`. Required panels keep their own
+    `EXACT` / `ALLOW_CENSORED` handling. Chosen over censored-aware
+    operators because it can only under-match, never claim a match the
+    data can't support.
+  - **Byte-order tie-break.** `external_specimen_id COLLATE "C" DESC`
+    pins decision 0004's lexical order; the column's default collation
+    would pick a different "latest" specimen for ids differing in case or
+    punctuation. Guarded by a SQL-text test (the Alpine test container is
+    already bytewise, so a DB test alone can't catch a regression).
+  - **Interrupted ≠ failed.** `ExecuteQueryTaskV1` returns
+    `context.Canceled`/`DeadlineExceeded` from `CountMatchingCohort` as a
+    Go error instead of a terminal `ERROR` result, so Phase 6/7 can resume
+    an interrupted job; the SQL-builder failure is now logged.
+  - **Executor enforces its own preconditions.** It re-runs the pure
+    layers (version, structural, semantic) and maps failures to their
+    `QueryResult` status, so a mis-ordered caller can't get an `OK` count
+    for a v2 / `group_by` / non-decimal task. The whitelist layer needs D5
+    and remains the caller's job (`ValidateQueryTaskV1`).
+  - **Cleanup.** `parseCohortDate` removed in favour of
+    `parseSchemaV1Date`; dropped the redundant `COUNT(DISTINCT)`
+    (`UNIQUE (specimen_id, field_code)` already guarantees uniqueness) and
+    the unreachable `count < 0` guard. Left open: collapsing the
+    per-panel/per-condition correlated subqueries into one aggregate, and
+    the remaining defensive re-checks in the repository, until there is a
+    real registry size to measure against.
 - Promote any phase-specific decision (e.g. checkpoint granularity,
   a specific mapping ambiguity) into `docs/decisions/` as that phase
   starts, per the pattern already used by 0001-0004.
