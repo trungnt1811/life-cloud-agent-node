@@ -15,6 +15,7 @@ import (
 
 	uuid "github.com/google/uuid"
 	entities "github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/entities"
+	types "github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/types"
 	gomock "go.uber.org/mock/gomock"
 )
 
@@ -55,6 +56,21 @@ func (m *MockPatientRegistryRepository) CountLabObservations(ctx context.Context
 func (mr *MockPatientRegistryRepositoryMockRecorder) CountLabObservations(ctx any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountLabObservations", reflect.TypeOf((*MockPatientRegistryRepository)(nil).CountLabObservations), ctx)
+}
+
+// CountMatchingCohort mocks base method.
+func (m *MockPatientRegistryRepository) CountMatchingCohort(ctx context.Context, criteria types.CohortCriteria) (uint64, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CountMatchingCohort", ctx, criteria)
+	ret0, _ := ret[0].(uint64)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CountMatchingCohort indicates an expected call of CountMatchingCohort.
+func (mr *MockPatientRegistryRepositoryMockRecorder) CountMatchingCohort(ctx, criteria any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountMatchingCohort", reflect.TypeOf((*MockPatientRegistryRepository)(nil).CountMatchingCohort), ctx, criteria)
 }
 
 // CountPatients mocks base method.

@@ -29,6 +29,7 @@ func TestNormalizeConfigurationUsesRuntimeDefaults(t *testing.T) {
 	require.Equal(t, defaultDBMaxOpenConns, config.Database.DBMaxOpenConns)
 	require.Equal(t, defaultDBMaxIdleConns, config.Database.DBMaxIdleConns)
 	require.Equal(t, defaultDBConnMaxLifetimeMin, config.Database.DBConnMaxLifetimeInMinute)
+	require.Equal(t, defaultSuppressionThreshold, config.SuppressionThreshold)
 }
 
 func TestDefaultConfigurationMapUsesRuntimeDefaults(t *testing.T) {
@@ -39,4 +40,5 @@ func TestDefaultConfigurationMapUsesRuntimeDefaults(t *testing.T) {
 	require.Equal(t, defaultDBName, defaultConfigurations["DB_NAME"])
 	require.Equal(t, defaultDBPort, defaultConfigurations["DB_PORT"])
 	require.Equal(t, defaultRedisPassword, defaultConfigurations["REDIS_PASSWORD"])
+	require.Equal(t, defaultSuppressionThreshold, defaultConfigurations["SUPPRESSION_THRESHOLD"])
 }

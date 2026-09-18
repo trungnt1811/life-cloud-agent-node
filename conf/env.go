@@ -57,6 +57,12 @@ type Configuration struct {
 	// to mutate which clinical fields this node exposes, and vice versa.
 	AdminBasicAuthUser string `mapstructure:"ADMIN_BASIC_AUTH_USER"`
 	AdminBasicAuthPass string `mapstructure:"ADMIN_BASIC_AUTH_PASS"`
+	// SuppressionThreshold is the node-local small-cell threshold (process
+	// 3.6). When 0 < matching_count < threshold the visible count is zero
+	// and suppressed=true. Default is 5. Zero in NormalizeConfiguration is
+	// treated as unset and replaced by the default; pass an explicit
+	// threshold into ExecuteQueryTaskV1 to disable suppression in tests.
+	SuppressionThreshold uint64 `mapstructure:"SUPPRESSION_THRESHOLD"`
 }
 
 var configuration = NormalizeConfiguration(Configuration{})
@@ -82,6 +88,7 @@ const (
 	defaultDBConnMaxLifetimeMin        = 60
 	defaultCORSAllowedOrigins          = "*"
 	defaultCORSAllowedHeaders          = "Content-Type,Content-Length,Accept-Encoding,X-CSRF-Token,Authorization,accept,origin,Cache-Control,X-Requested-With,X-Request-ID,X-Correlation-ID"
+	defaultSuppressionThreshold uint64 = 5
 )
 
 // NOTE: when adding a new env, add it here and expose only scoped config to modules.
@@ -117,6 +124,7 @@ var defaultConfigurations = map[string]any{
 	"SWAGGER_BASIC_AUTH_PASS":        "",
 	"ADMIN_BASIC_AUTH_USER":          "",
 	"ADMIN_BASIC_AUTH_PASS":          "",
+	"SUPPRESSION_THRESHOLD":          defaultSuppressionThreshold,
 }
 
 // DefaultConfiguration returns the normalized config used when no env is loaded.
@@ -244,6 +252,9 @@ func NormalizeConfiguration(config Configuration) Configuration {
 	}
 	if config.Database.DBConnMaxLifetimeInMinute <= 0 {
 		config.Database.DBConnMaxLifetimeInMinute = defaultDBConnMaxLifetimeMin
+	}
+	if config.SuppressionThreshold == 0 {
+		config.SuppressionThreshold = defaultSuppressionThreshold
 	}
 	return config
 }

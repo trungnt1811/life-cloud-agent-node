@@ -290,14 +290,14 @@ type CohortCriteria struct {
 func (r *patientRegistryRepository) CountMatchingCohort(ctx context.Context, c CohortCriteria) (uint64, error)
 ```
 
-- [ ] SQL selects the latest specimen per patient within `[from, to]`
+- [x] SQL selects the latest specimen per patient within `[from, to]`
       (per `SPECIMEN_POLICY_LATEST_IN_RANGE`), requires every
       `RequiredPanel`'s fields present (EXACT = non-censored value
       required; ALLOW_CENSORED = presence is enough even if censored),
       then applies each `Condition` as a decimal comparison.
-- [ ] Suppression: `0 < count < SUPPRESSION_THRESHOLD` → `matching_count=0,
+- [x] Suppression: `0 < count < SUPPRESSION_THRESHOLD` → `matching_count=0,
       suppressed=true`; otherwise the real count, `suppressed=false`.
-- [ ] Postgres Testcontainers test seeding known fixture rows with a
+- [x] Postgres Testcontainers test seeding known fixture rows with a
       hand-computed expected count (mirrors life-cloud's own benchmark
       verification style, not just a smoke test).
 
@@ -398,7 +398,7 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
 - [x] Phase 2 — Ingestion adapters for VN_A/B/C profiles into D3.
 - [x] Phase 3 — D5 Enabled Query Fields store + admin REST.
 - [x] Phase 4 — Validation layers 2 (whitelist) & 3 (semantic).
-- [ ] Phase 5 — Query execution (3.5) + output suppression (3.6).
+- [x] Phase 5 — Query execution (3.5) + output suppression (3.6).
 - [ ] Phase 6 — D4 Job Progress Checkpoint + resumable execution.
 - [ ] Phase 7 — gRPC client: dial-out, Register/Heartbeat, task handling.
 - [ ] Phase 8 — In-repo stub control center (test support only).
@@ -603,10 +603,22 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
   - **Fail-closed whitelist.** Rows that collide after normalization enable
     a code only if all of them are enabled, so row order can't turn a
     disabled field on.
+- 2026-09-18 (Phase 5): `CountMatchingCohort` on D3 selects
+  `LATEST_IN_RANGE` via `ROW_NUMBER() … ORDER BY collected_at DESC,
+  external_specimen_id DESC` (life-cloud benchmark / decision 0004), then
+  applies required panels (`EXACT` ⇒ present + `censored=false`;
+  `ALLOW_CENSORED` ⇒ present) and measurement conditions as
+  `value::numeric` comparisons. Domain criteria live in
+  `internal/domain/types/cohort.go` (no `gen/` import). Wire
+  `ExecuteQueryTaskV1` maps a validated task → criteria → count →
+  process 3.6 suppression. `SUPPRESSION_THRESHOLD` defaults to `5`
+  (`conf` / `.env.example`); `0 < raw < threshold` yields
+  `matching_count=0, suppressed=true`. Proof:
+  `TestPatientRegistryRepository_CountMatchingCohort_DemoRuleFixture`
+  (hand-computed expected count 2) plus wire suppression/mapping tests.
 - Promote any phase-specific decision (e.g. checkpoint granularity,
-  suppression threshold default, a specific mapping ambiguity) into
-  `docs/decisions/` as that phase starts, per the pattern already used by
-  0001-0004.
+  a specific mapping ambiguity) into `docs/decisions/` as that phase
+  starts, per the pattern already used by 0001-0004.
 
 ## Validation
 
@@ -621,7 +633,8 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
 
 ## Result
 
-Phase 4 complete — four-layer `ValidateQueryTaskV1` (structural,
-whitelist against D5, semantic decimals/dates, version) with typed
-rejection statuses and focused proof. Phase 5 (execution + suppression)
-is next.
+Phase 5 complete — `CountMatchingCohort` (LATEST_IN_RANGE + panels +
+conditions) and `ExecuteQueryTaskV1` with small-cell suppression
+(`SUPPRESSION_THRESHOLD` default 5), proven by a hand-computed Postgres
+fixture (expected raw count 2) and wire unit tests. Phase 6 (D4
+checkpoint + resume; requires decision 0005 first) is next.
