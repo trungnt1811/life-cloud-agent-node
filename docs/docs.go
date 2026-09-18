@@ -17,6 +17,11 @@ const docTemplate = `{
     "paths": {
         "/admin/query-fields": {
             "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
                 "description": "List all schema v1 field codes with this node's local whitelist state",
                 "produces": [
                     "application/json"
@@ -49,6 +54,11 @@ const docTemplate = `{
         },
         "/admin/query-fields/{field_code}": {
             "put": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
                 "description": "Set enabled and updated_by for one schema v1 field_code",
                 "consumes": [
                     "application/json"
@@ -470,6 +480,7 @@ const docTemplate = `{
         "dto.UpdateEnabledQueryFieldRequest": {
             "type": "object",
             "required": [
+                "enabled",
                 "updated_by"
             ],
             "properties": {
@@ -495,6 +506,11 @@ const docTemplate = `{
                 }
             }
         }
+    },
+    "securityDefinitions": {
+        "BasicAuth": {
+            "type": "basic"
+        }
     }
 }`
 
@@ -504,7 +520,7 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "",
 	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "",
+	Title:            "Life Cloud Node Agent API",
 	Description:      "",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,

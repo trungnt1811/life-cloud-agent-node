@@ -10,9 +10,10 @@ type UpdateEnabledQueryFieldInput struct {
 }
 
 // EnabledQueryFieldOutput is the read model returned by enabled-query-field use cases.
+// UpdatedAt is nil when the field has never been persisted on this node.
 type EnabledQueryFieldOutput struct {
 	FieldCode string
 	Enabled   bool
-	UpdatedAt time.Time
+	UpdatedAt *time.Time
 	UpdatedBy string
 }

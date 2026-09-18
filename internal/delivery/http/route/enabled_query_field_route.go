@@ -9,8 +9,9 @@ import (
 )
 
 // AdminAuthOptions configures HTTP Basic Auth for local admin routes.
-// Credentials intentionally reuse SWAGGER_BASIC_AUTH_* for Phase 3; see the
-// active plan decision if a dedicated admin credential set is needed later.
+// Credentials intentionally reuse SWAGGER_BASIC_AUTH_* for Phase 3.
+// Unlike Swagger (which may stay open in non-prod when empty), admin
+// routes are never registered without both username and password.
 type AdminAuthOptions struct {
 	Username string
 	Password string
@@ -27,21 +28,15 @@ func SetupEnabledQueryFieldRoutes(
 		return
 	}
 
-	admin := r.Group("/admin/query-fields")
-	switch {
-	case auth.Username == "" && auth.Password == "":
+	if auth.Username == "" || auth.Password == "" {
 		if log != nil {
-			log.Warn("Admin query-fields routes registered without basic auth credentials")
-		}
-	case auth.Username != "" && auth.Password != "":
-		admin.Use(middleware.HTTPBasicAuth(auth.Username, auth.Password, "admin"))
-	default:
-		if log != nil {
-			log.Warn("Admin query-fields basic auth is misconfigured; routes will not be registered")
+			log.Warn("Admin query-fields routes not registered; both SWAGGER_BASIC_AUTH_USER and SWAGGER_BASIC_AUTH_PASS are required")
 		}
 		return
 	}
 
+	admin := r.Group("/admin/query-fields")
+	admin.Use(middleware.HTTPBasicAuth(auth.Username, auth.Password, "admin"))
 	admin.GET("", handler.ListQueryFields)
 	admin.PUT("/:field_code", handler.UpdateQueryField)
 }

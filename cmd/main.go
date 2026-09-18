@@ -7,6 +7,8 @@ import (
 	"github.com/lifenetwork-ai/life-cloud-agent-node/conf"
 )
 
+// @title Life Cloud Node Agent API
+// @securityDefinitions.basic BasicAuth
 func main() {
 	config, err := conf.LoadConfig()
 	if err != nil {

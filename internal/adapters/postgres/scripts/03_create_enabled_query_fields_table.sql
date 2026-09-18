@@ -1,5 +1,7 @@
 -- Enabled Query Fields (D5): per-node whitelist subset of schema v1.
 -- Seeded disabled so each hospital must explicitly opt in.
+-- Keep this INSERT list identical to internal/domain/queryfields.SchemaV1FieldCodes
+-- (enforced by queryfields.TestMigrationSeedMatchesSchemaV1FieldCodes).
 CREATE TABLE IF NOT EXISTS enabled_query_fields (
     field_code VARCHAR(64) PRIMARY KEY,
     enabled BOOLEAN NOT NULL DEFAULT FALSE,

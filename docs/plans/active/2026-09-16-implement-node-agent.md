@@ -524,13 +524,14 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
   lives in its own file with `-source` mockgen (same as patient
   registry). `ListQueryFields` always returns all 9 schema-v1 codes
   from `internal/domain/queryfields`, merging stored rows so a truncated
-  or partially seeded DB still presents the full dictionary; `PUT`
-  rejects unknown codes and requires `updated_by`. Admin routes reuse
-  `SWAGGER_BASIC_AUTH_USER`/`_PASS` via shared `HTTPBasicAuth` (realm
-  `admin`) — flagged coupling: empty credentials leave admin open in
-  non-prod the same way Swagger does; a dedicated admin credential set
-  is a follow-up if operators need Swagger open while locking field
-  whitelist changes. Migration seeds all 9 codes `enabled=false`.
+  or partially seeded DB still presents the full dictionary; synthetic
+  rows omit `updated_at`. `PUT` rejects unknown codes, requires
+  `updated_by`, and requires explicit `enabled` (`*bool`, no silent
+  disable on omit). Admin routes reuse `SWAGGER_BASIC_AUTH_USER`/`_PASS`
+  via shared `HTTPBasicAuth` (realm `admin`) and are **never** registered
+  without both credentials (stricter than Swagger's empty-open non-prod
+  behavior). Migration seeds all 9 codes `enabled=false`; seed↔Go list
+  drift is guarded by `queryfields.TestMigrationSeedMatchesSchemaV1FieldCodes`.
 - Promote any phase-specific decision (e.g. checkpoint granularity,
   suppression threshold default, a specific mapping ambiguity) into
   `docs/decisions/` as that phase starts, per the pattern already used by

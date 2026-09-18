@@ -29,7 +29,7 @@ func TestEnabledQueryFieldHandlerListSuccess(t *testing.T) {
 		Return([]*contracts.EnabledQueryFieldOutput{{
 			FieldCode: "HB",
 			Enabled:   true,
-			UpdatedAt: now,
+			UpdatedAt: &now,
 			UpdatedBy: "alice",
 		}}, nil)
 
@@ -63,7 +63,7 @@ func TestEnabledQueryFieldHandlerUpdateSuccess(t *testing.T) {
 		Return(&contracts.EnabledQueryFieldOutput{
 			FieldCode: "HB",
 			Enabled:   true,
-			UpdatedAt: now,
+			UpdatedAt: &now,
 			UpdatedBy: "alice",
 		}, nil)
 
@@ -117,6 +117,23 @@ func TestEnabledQueryFieldHandlerDomainError(t *testing.T) {
 	)
 	require.Equal(t, http.StatusBadRequest, status)
 	require.Equal(t, "UNKNOWN_FIELD_CODE", payload["code"])
+}
+
+func TestEnabledQueryFieldHandlerRejectsOmittedEnabled(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	status, payload := performEnabledQueryFieldRequest(
+		t,
+		NewEnabledQueryFieldHandler(mocks.NewMockEnabledQueryFieldUseCase(ctrl), nil),
+		http.MethodPut,
+		"/admin/query-fields/HB",
+		map[string]any{"updated_by": "alice"},
+		"admin",
+		"secret",
+	)
+	require.Equal(t, http.StatusBadRequest, status)
+	require.Equal(t, "INVALID_REQUEST", payload["code"])
 }
 
 func performEnabledQueryFieldRequest(

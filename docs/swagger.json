@@ -1,11 +1,17 @@
 {
     "swagger": "2.0",
     "info": {
+        "title": "Life Cloud Node Agent API",
         "contact": {}
     },
     "paths": {
         "/admin/query-fields": {
             "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
                 "description": "List all schema v1 field codes with this node's local whitelist state",
                 "produces": [
                     "application/json"
@@ -38,6 +44,11 @@
         },
         "/admin/query-fields/{field_code}": {
             "put": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
                 "description": "Set enabled and updated_by for one schema v1 field_code",
                 "consumes": [
                     "application/json"
@@ -459,6 +470,7 @@
         "dto.UpdateEnabledQueryFieldRequest": {
             "type": "object",
             "required": [
+                "enabled",
                 "updated_by"
             ],
             "properties": {
@@ -483,6 +495,11 @@
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "BasicAuth": {
+            "type": "basic"
         }
     }
 }

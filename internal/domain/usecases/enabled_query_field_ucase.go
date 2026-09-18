@@ -73,6 +73,7 @@ func (u *enabledQueryFieldUseCase) ListQueryFields(ctx context.Context) ([]*cont
 			out = append(out, enabledQueryFieldOutputFromEntity(entity))
 			continue
 		}
+		// Never-persisted codes stay disabled with no audit timestamp.
 		out = append(out, &contracts.EnabledQueryFieldOutput{
 			FieldCode: code,
 			Enabled:   false,
@@ -150,10 +151,15 @@ func enabledQueryFieldOutputFromEntity(entity *entities.EnabledQueryField) *cont
 	if entity == nil {
 		return nil
 	}
+	updatedAt := entity.UpdatedAt()
+	var updatedAtPtr *time.Time
+	if !updatedAt.IsZero() {
+		updatedAtPtr = &updatedAt
+	}
 	return &contracts.EnabledQueryFieldOutput{
 		FieldCode: entity.FieldCode(),
 		Enabled:   entity.Enabled(),
-		UpdatedAt: entity.UpdatedAt(),
+		UpdatedAt: updatedAtPtr,
 		UpdatedBy: entity.UpdatedBy(),
 	}
 }

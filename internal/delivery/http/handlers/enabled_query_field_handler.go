@@ -33,6 +33,7 @@ func NewEnabledQueryFieldHandler(useCase interfaces.EnabledQueryFieldUseCase, lo
 // @Description List all schema v1 field codes with this node's local whitelist state
 // @Tags admin
 // @Produce json
+// @Security BasicAuth
 // @Success 200 {object} dto.EnabledQueryFieldListDTO
 // @Failure 401 {object} dto.ErrorDTOResponse
 // @Failure 500 {object} dto.ErrorDTOResponse
@@ -52,6 +53,7 @@ func (h *EnabledQueryFieldHandler) ListQueryFields(c *gin.Context) {
 // @Tags admin
 // @Accept json
 // @Produce json
+// @Security BasicAuth
 // @Param field_code path string true "Schema v1 field code"
 // @Param body body dto.UpdateEnabledQueryFieldRequest true "Enablement update"
 // @Success 200 {object} dto.EnabledQueryFieldDTO

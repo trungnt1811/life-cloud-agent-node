@@ -78,6 +78,7 @@ definitions:
       updated_by:
         type: string
     required:
+    - enabled
     - updated_by
     type: object
   dto.UpdateExampleRequest:
@@ -91,6 +92,7 @@ definitions:
     type: object
 info:
   contact: {}
+  title: Life Cloud Node Agent API
 paths:
   /admin/query-fields:
     get:
@@ -111,6 +113,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.ErrorDTOResponse'
+      security:
+      - BasicAuth: []
       summary: List enabled query fields
       tags:
       - admin
@@ -150,6 +154,8 @@ paths:
           description: Internal Server Error
           schema:
             $ref: '#/definitions/dto.ErrorDTOResponse'
+      security:
+      - BasicAuth: []
       summary: Update an enabled query field
       tags:
       - admin
@@ -317,4 +323,7 @@ paths:
       summary: Update an example
       tags:
       - examples
+securityDefinitions:
+  BasicAuth:
+    type: basic
 swagger: "2.0"

@@ -38,6 +38,9 @@ func TestEnabledQueryFieldUseCase_ListMergesSchemaWithStoredState(t *testing.T) 
 	require.Equal(t, "MCV", out[1].FieldCode)
 	require.False(t, out[1].Enabled)
 	require.Empty(t, out[1].UpdatedBy)
+	require.Nil(t, out[1].UpdatedAt)
+	require.NotNil(t, out[0].UpdatedAt)
+	require.True(t, out[0].UpdatedAt.Equal(now))
 }
 
 func TestEnabledQueryFieldUseCase_UpdateRejectsUnknownField(t *testing.T) {
