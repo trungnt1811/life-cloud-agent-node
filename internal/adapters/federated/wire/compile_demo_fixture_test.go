@@ -107,6 +107,22 @@ func TestQueryTaskV1_RejectsStructuralViolations(t *testing.T) {
 		requireRejectedInvalidQuery(t, err, "time_range.to")
 	})
 
+	t.Run("blank_job_id", func(t *testing.T) {
+		task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+		require.NoError(t, err)
+		task.JobId = " "
+		err = federatedwire.ValidateQueryTaskStructureV1(task)
+		requireRejectedInvalidQuery(t, err, "job_id is required")
+	})
+
+	t.Run("oversized_job_id", func(t *testing.T) {
+		task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+		require.NoError(t, err)
+		task.JobId = strings.Repeat("j", 256)
+		err = federatedwire.ValidateQueryTaskStructureV1(task)
+		requireRejectedInvalidQuery(t, err, "job_id")
+	})
+
 	t.Run("whitespace_only_field_code", func(t *testing.T) {
 		task, err := federatedwire.CompileDemoQueryTaskFromFixture()
 		require.NoError(t, err)

@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"bytes"
 	"context"
 	"testing"
 	"time"
@@ -19,8 +20,72 @@ import (
 // (patients MATCH-A and MATCH-LEXICAL).
 func TestPatientRegistryRepository_CountMatchingCohort_DemoRuleFixture(t *testing.T) {
 	db := openPatientRegistryRepositoryTestDB(t)
-	ctx := context.Background()
 	repo := NewPatientRegistryRepository(db, logger.GetLogger())
+	criteria := seedDemoCohortFixture(t, repo)
+
+	count, err := repo.CountMatchingCohort(context.Background(), criteria)
+	require.NoError(t, err)
+	// Hand-computed: MATCH-A + MATCH-LEXICAL only.
+	require.Equal(t, uint64(2), count)
+}
+
+// Summing every chunk must equal the unchunked count for any chunk size,
+// including 1 (each patient its own chunk) and one larger than the data.
+func TestPatientRegistryRepository_CountMatchingCohortChunk_SumsToUnchunkedCount(t *testing.T) {
+	db := openPatientRegistryRepositoryTestDB(t)
+	repo := NewPatientRegistryRepository(db, logger.GetLogger())
+	ctx := context.Background()
+	criteria := seedDemoCohortFixture(t, repo)
+
+	want, err := repo.CountMatchingCohort(ctx, criteria)
+	require.NoError(t, err)
+	require.Equal(t, uint64(2), want)
+
+	for _, size := range []int{1, 2, 3, 7, 1000} {
+		var total uint64
+		var scanned int
+		after := uuid.Nil
+		for {
+			chunk, err := repo.CountMatchingCohortChunk(ctx, criteria, after, size)
+			require.NoError(t, err)
+			if chunk.PatientsScanned == 0 {
+				require.Equal(t, uuid.Nil, chunk.LastPatientID)
+				break
+			}
+			require.LessOrEqual(t, chunk.PatientsScanned, size)
+			require.Greater(t, bytesCompare(chunk.LastPatientID, after), 0, "cursor must advance")
+			total += chunk.MatchingCount
+			scanned += chunk.PatientsScanned
+			after = chunk.LastPatientID
+		}
+		require.Equal(t, want, total, "chunk size %d", size)
+		// OUT-OF-RANGE has no specimen in the window, so 7 of 8 patients are candidates.
+		require.Equal(t, 7, scanned, "chunk size %d", size)
+	}
+}
+
+func TestPatientRegistryRepository_CountMatchingCohortChunk_RejectsBadInput(t *testing.T) {
+	db := openPatientRegistryRepositoryTestDB(t)
+	repo := NewPatientRegistryRepository(db, logger.GetLogger())
+	day := time.Date(2024, 6, 1, 0, 0, 0, 0, time.UTC)
+
+	_, err := repo.CountMatchingCohortChunk(context.Background(), types.CohortCriteria{From: day, To: day}, uuid.Nil, 0)
+	require.ErrorContains(t, err, "limit")
+
+	_, err = repo.CountMatchingCohortChunk(context.Background(), types.CohortCriteria{
+		From: day.AddDate(0, 0, 1), To: day,
+	}, uuid.Nil, 10)
+	require.ErrorContains(t, err, "from must be")
+}
+
+func bytesCompare(a, b uuid.UUID) int {
+	return bytes.Compare(a[:], b[:])
+}
+
+// seedDemoCohortFixture seeds the hand-computed demo cohort (8 patients, 7 with
+// an in-window specimen) and returns the demo rule's criteria.
+func seedDemoCohortFixture(t *testing.T, repo domainrepos.PatientRegistryRepository) types.CohortCriteria {
+	t.Helper()
 
 	seed := func(externalID string, specimens []cohortSpecimenSeed) {
 		t.Helper()
@@ -161,11 +226,7 @@ func TestPatientRegistryRepository_CountMatchingCohort_DemoRuleFixture(t *testin
 			},
 		},
 	}
-
-	count, err := repo.CountMatchingCohort(ctx, criteria)
-	require.NoError(t, err)
-	// Hand-computed: MATCH-A + MATCH-LEXICAL only.
-	require.Equal(t, uint64(2), count)
+	return criteria
 }
 
 func TestPatientRegistryRepository_CountMatchingCohort_CensoredValuesNeverSatisfyConditions(t *testing.T) {

@@ -64,3 +64,11 @@ const (
 // means "use this default", never "disabled" (a threshold of 1 hides
 // nothing, since only 0 < count < threshold is suppressed).
 const DefaultSuppressionThreshold uint64 = 5
+
+// DefaultJobChunkSize is how many candidate patients one resumable cohort
+// chunk covers (decision 0005). Zero or unset configuration means this.
+const DefaultJobChunkSize = 5000
+
+// JobProgressRetention is how long a finished job's checkpoint (and so its
+// re-servable count) is kept before the next job deletes it (decision 0005).
+const JobProgressRetention = 7 * 24 * time.Hour

@@ -8,8 +8,8 @@ import (
 	"github.com/lifenetwork-ai/life-cloud-agent-node/constants"
 	nodev1 "github.com/lifenetwork-ai/life-cloud-agent-node/gen/lifecloud/node/v1"
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/queryfields"
-	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/repositories"
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/types"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/usecases/interfaces"
 )
 
 // SuppressMatchingCount applies process 3.6 small-cell suppression.
@@ -41,14 +41,14 @@ func SuppressMatchingCount(raw, threshold uint64) (matchingCount uint64, suppres
 func ExecuteQueryTaskV1(
 	ctx context.Context,
 	task *nodev1.QueryTask,
-	repo repositories.PatientRegistryRepository,
+	counter interfaces.CohortCountUseCase,
 	suppressionThreshold uint64,
 ) (*nodev1.QueryResult, error) {
 	if task == nil {
 		return nil, fmt.Errorf("query task is nil")
 	}
-	if repo == nil {
-		return nil, fmt.Errorf("patient registry repository is not configured")
+	if counter == nil {
+		return nil, fmt.Errorf("cohort count use case is not configured")
 	}
 
 	for _, validate := range []func(*nodev1.QueryTask) error{
@@ -77,7 +77,7 @@ func ExecuteQueryTaskV1(
 		}, nil
 	}
 
-	rawCount, err := repo.CountMatchingCohort(ctx, criteria)
+	rawCount, err := counter.CountMatchingCohort(ctx, task.GetJobId(), criteria)
 	if err != nil {
 		if ctx.Err() != nil || errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
 			return nil, err

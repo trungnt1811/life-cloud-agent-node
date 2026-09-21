@@ -63,6 +63,9 @@ type Configuration struct {
 	// or explicitly "0") is replaced by the default, never treated as
 	// "disabled". A threshold of 1 hides nothing, for tests.
 	SuppressionThreshold uint64 `mapstructure:"SUPPRESSION_THRESHOLD"`
+	// JobChunkSize is how many candidate patients one resumable, checkpointed
+	// cohort chunk covers (decision 0005). Below 1 (unset) means the default.
+	JobChunkSize int `mapstructure:"JOB_CHUNK_SIZE"`
 }
 
 var configuration = NormalizeConfiguration(Configuration{})
@@ -89,6 +92,7 @@ const (
 	defaultCORSAllowedOrigins          = "*"
 	defaultCORSAllowedHeaders          = "Content-Type,Content-Length,Accept-Encoding,X-CSRF-Token,Authorization,accept,origin,Cache-Control,X-Requested-With,X-Request-ID,X-Correlation-ID"
 	defaultSuppressionThreshold uint64 = constants.DefaultSuppressionThreshold
+	defaultJobChunkSize                = constants.DefaultJobChunkSize
 )
 
 // NOTE: when adding a new env, add it here and expose only scoped config to modules.
@@ -125,6 +129,7 @@ var defaultConfigurations = map[string]any{
 	"ADMIN_BASIC_AUTH_USER":          "",
 	"ADMIN_BASIC_AUTH_PASS":          "",
 	"SUPPRESSION_THRESHOLD":          defaultSuppressionThreshold,
+	"JOB_CHUNK_SIZE":                 defaultJobChunkSize,
 }
 
 // DefaultConfiguration returns the normalized config used when no env is loaded.
@@ -255,6 +260,9 @@ func NormalizeConfiguration(config Configuration) Configuration {
 	}
 	if config.SuppressionThreshold == 0 {
 		config.SuppressionThreshold = defaultSuppressionThreshold
+	}
+	if config.JobChunkSize < 1 {
+		config.JobChunkSize = defaultJobChunkSize
 	}
 	return config
 }

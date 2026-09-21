@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/google/uuid"
+
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/queryfields"
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/types"
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/platform/logger"
@@ -20,11 +22,8 @@ func (r *patientRegistryRepository) CountMatchingCohort(
 	ctx context.Context,
 	criteria types.CohortCriteria,
 ) (uint64, error) {
-	if criteria.From.IsZero() || criteria.To.IsZero() {
-		return 0, errors.New("cohort time range is required")
-	}
-	if criteria.From.After(criteria.To) {
-		return 0, errors.New("cohort time range from must be <= to")
+	if err := validateCohortWindow(criteria); err != nil {
+		return 0, err
 	}
 
 	sql, args, err := buildCountMatchingCohortSQL(criteria)
@@ -41,22 +40,104 @@ func (r *patientRegistryRepository) CountMatchingCohort(
 	return uint64(count), nil
 }
 
-func buildCountMatchingCohortSQL(criteria types.CohortCriteria) (string, []any, error) {
-	var b strings.Builder
-	args := make([]any, 0, 8+len(criteria.Conditions)*2)
+// CountMatchingCohortChunk is the resumable form of CountMatchingCohort
+// (decision 0005): the same predicate over the next `limit` candidate patients
+// after afterPatientID.
+func (r *patientRegistryRepository) CountMatchingCohortChunk(
+	ctx context.Context,
+	criteria types.CohortCriteria,
+	afterPatientID uuid.UUID,
+	limit int,
+) (types.CohortChunkResult, error) {
+	if err := validateCohortWindow(criteria); err != nil {
+		return types.CohortChunkResult{}, err
+	}
+	if limit < 1 {
+		return types.CohortChunkResult{}, errors.New("cohort chunk limit must be >= 1")
+	}
 
-	// Specimens in the inclusive calendar-date window; latest per patient by
-	// collected_at then lexical external_specimen_id (decision 0004 /
-	// life-cloud benchmark: ORDER BY day DESC, specimen DESC). COLLATE "C"
-	// pins byte order; the column's default collation (en_US.UTF-8, ICU)
-	// would rank 'S-a1' vs 'S-B1' differently and pick another "latest".
-	b.WriteString(`
-WITH ranked AS (
-	SELECT id, patient_id,
-		ROW_NUMBER() OVER (
+	sql, args, err := buildCountMatchingCohortChunkSQL(criteria, afterPatientID, limit)
+	if err != nil {
+		r.logger.Error("Failed to build cohort chunk query", logger.Err(err))
+		return types.CohortChunkResult{}, err
+	}
+
+	var row struct {
+		MatchingCount   int64
+		PatientsScanned int64
+		LastPatientID   *uuid.UUID
+	}
+	if err := r.dbWithContext(ctx).Raw(sql, args...).Scan(&row).Error; err != nil {
+		r.logger.Error("Failed to count matching cohort chunk", logger.Err(err))
+		return types.CohortChunkResult{}, err
+	}
+
+	result := types.CohortChunkResult{
+		MatchingCount:   uint64(row.MatchingCount),
+		PatientsScanned: int(row.PatientsScanned),
+	}
+	if row.LastPatientID != nil {
+		result.LastPatientID = *row.LastPatientID
+	}
+	return result, nil
+}
+
+func validateCohortWindow(criteria types.CohortCriteria) error {
+	if criteria.From.IsZero() || criteria.To.IsZero() {
+		return errors.New("cohort time range is required")
+	}
+	if criteria.From.After(criteria.To) {
+		return errors.New("cohort time range from must be <= to")
+	}
+	return nil
+}
+
+// latestSpecimenPartitionSQL is the LATEST_IN_RANGE ranking shared by the
+// chunked and unchunked queries. Ties on collected_at go to the byte-lexically
+// greatest external_specimen_id (decision 0004 / life-cloud benchmark: ORDER
+// BY day DESC, specimen DESC). COLLATE "C" pins byte order; the column's
+// default collation (en_US.UTF-8, ICU) would rank 'S-a1' vs 'S-B1'
+// differently and pick another "latest".
+const latestSpecimenPartitionSQL = `ROW_NUMBER() OVER (
 			PARTITION BY patient_id
 			ORDER BY collected_at DESC, external_specimen_id COLLATE "C" DESC
-		) AS rn
+		) AS rn`
+
+// cohortFilterSQL renders the required-panel and condition predicates over a
+// `latest ls` row, each starting with AND.
+func cohortFilterSQL(criteria types.CohortCriteria) (string, []any, error) {
+	var b strings.Builder
+	args := make([]any, 0, len(criteria.Conditions)*2+len(criteria.RequiredPanels)*4)
+
+	for i, panel := range criteria.RequiredPanels {
+		clause, panelArgs, err := requiredPanelSQL(i, panel)
+		if err != nil {
+			return "", nil, err
+		}
+		b.WriteString(clause)
+		args = append(args, panelArgs...)
+	}
+	for i, condition := range criteria.Conditions {
+		clause, condArgs, err := conditionSQL(i, condition)
+		if err != nil {
+			return "", nil, err
+		}
+		b.WriteString(clause)
+		args = append(args, condArgs...)
+	}
+	return b.String(), args, nil
+}
+
+func buildCountMatchingCohortSQL(criteria types.CohortCriteria) (string, []any, error) {
+	filter, filterArgs, err := cohortFilterSQL(criteria)
+	if err != nil {
+		return "", nil, err
+	}
+
+	sql := `
+WITH ranked AS (
+	SELECT id, patient_id,
+		` + latestSpecimenPartitionSQL + `
 	FROM specimens
 	WHERE collected_at >= ?::date AND collected_at <= ?::date
 ),
@@ -67,28 +148,62 @@ latest AS (
 )
 SELECT COUNT(*)::bigint
 FROM latest ls
-WHERE TRUE`)
-	args = append(args, criteria.From, criteria.To)
+WHERE TRUE` + filter
+	args := append([]any{criteria.From, criteria.To}, filterArgs...)
+	return sql, args, nil
+}
 
-	for i, panel := range criteria.RequiredPanels {
-		clause, panelArgs, err := requiredPanelSQL(i, panel)
-		if err != nil {
-			return "", nil, err
-		}
-		b.WriteString(clause)
-		args = append(args, panelArgs...)
+// buildCountMatchingCohortChunkSQL counts matches among the next `limit`
+// candidate patients after afterPatientID (uuid.Nil = from the start). The
+// candidate set is chosen first, and specimens are ranked only for those
+// patients, so each patient is judged on all of its in-range specimens and a
+// chunked walk sums to the unchunked count.
+func buildCountMatchingCohortChunkSQL(
+	criteria types.CohortCriteria,
+	afterPatientID uuid.UUID,
+	limit int,
+) (string, []any, error) {
+	filter, filterArgs, err := cohortFilterSQL(criteria)
+	if err != nil {
+		return "", nil, err
 	}
 
-	for i, condition := range criteria.Conditions {
-		clause, condArgs, err := conditionSQL(i, condition)
-		if err != nil {
-			return "", nil, err
-		}
-		b.WriteString(clause)
-		args = append(args, condArgs...)
+	args := []any{criteria.From, criteria.To}
+	after := ""
+	if afterPatientID != uuid.Nil {
+		after = " AND patient_id > ?::uuid"
+		args = append(args, afterPatientID.String())
 	}
+	args = append(args, limit, criteria.From, criteria.To)
 
-	return b.String(), args, nil
+	sql := `
+WITH chunk AS (
+	SELECT DISTINCT patient_id
+	FROM specimens
+	WHERE collected_at >= ?::date AND collected_at <= ?::date` + after + `
+	ORDER BY patient_id
+	LIMIT ?
+),
+ranked AS (
+	SELECT id, patient_id,
+		` + latestSpecimenPartitionSQL + `
+	FROM specimens
+	WHERE collected_at >= ?::date AND collected_at <= ?::date
+		AND patient_id IN (SELECT patient_id FROM chunk)
+),
+latest AS (
+	SELECT id AS specimen_id, patient_id
+	FROM ranked
+	WHERE rn = 1
+)
+SELECT
+	(SELECT COUNT(*) FROM latest ls WHERE TRUE` + filter + `)::bigint AS matching_count,
+	(SELECT COUNT(*) FROM chunk)::bigint AS patients_scanned,
+	(SELECT patient_id FROM chunk ORDER BY patient_id DESC LIMIT 1) AS last_patient_id`
+	// Placeholders appear in text order: chunk window/cursor/limit, ranked
+	// window, then the filter's own arguments inside the first subselect.
+	args = append(args, filterArgs...)
+	return sql, args, nil
 }
 
 func requiredPanelSQL(index int, panel types.CohortRequiredPanel) (string, []any, error) {

@@ -66,9 +66,9 @@ func TestExecuteQueryTaskV1_AppliesSuppression(t *testing.T) {
 	task, err := federatedwire.CompileDemoQueryTaskFromFixture()
 	require.NoError(t, err)
 
-	repo := mocks.NewMockPatientRegistryRepository(ctrl)
+	repo := mocks.NewMockCohortCountUseCase(ctrl)
 	repo.EXPECT().
-		CountMatchingCohort(gomock.Any(), gomock.Any()).
+		CountMatchingCohort(gomock.Any(), "demo-cohort", gomock.Any()).
 		Return(uint64(3), nil)
 
 	result, err := federatedwire.ExecuteQueryTaskV1(context.Background(), task, repo, 5)
@@ -79,14 +79,30 @@ func TestExecuteQueryTaskV1_AppliesSuppression(t *testing.T) {
 	require.Equal(t, task.GetJobId(), result.GetJobId())
 }
 
+func TestExecuteQueryTaskV1_KeysTheCountByJobID(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+	require.NoError(t, err)
+	task.JobId = "job-42"
+	counter := mocks.NewMockCohortCountUseCase(ctrl)
+	counter.EXPECT().CountMatchingCohort(gomock.Any(), "job-42", gomock.Any()).Return(uint64(9), nil)
+
+	result, err := federatedwire.ExecuteQueryTaskV1(context.Background(), task, counter, 5)
+	require.NoError(t, err)
+	require.Equal(t, uint64(9), result.GetMatchingCount())
+	require.Equal(t, "job-42", result.GetJobId())
+}
+
 func TestExecuteQueryTaskV1_ZeroThresholdStillSuppresses(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
 	task, err := federatedwire.CompileDemoQueryTaskFromFixture()
 	require.NoError(t, err)
-	repo := mocks.NewMockPatientRegistryRepository(ctrl)
-	repo.EXPECT().CountMatchingCohort(gomock.Any(), gomock.Any()).Return(uint64(2), nil)
+	repo := mocks.NewMockCohortCountUseCase(ctrl)
+	repo.EXPECT().CountMatchingCohort(gomock.Any(), "demo-cohort", gomock.Any()).Return(uint64(2), nil)
 
 	result, err := federatedwire.ExecuteQueryTaskV1(context.Background(), task, repo, 0)
 	require.NoError(t, err)
@@ -121,6 +137,10 @@ func TestExecuteQueryTaskV1_EnforcesPreconditionsWithoutTouchingRepo(t *testing.
 			},
 			nodev1.QueryResultStatus_QUERY_RESULT_STATUS_REJECTED_INVALID_QUERY,
 		},
+		"missing_job_id": {
+			func(task *nodev1.QueryTask) { task.JobId = "  " },
+			nodev1.QueryResultStatus_QUERY_RESULT_STATUS_REJECTED_INVALID_QUERY,
+		},
 		"bad_date": {
 			func(task *nodev1.QueryTask) { task.TimeRange.From = "2024-1-01" },
 			nodev1.QueryResultStatus_QUERY_RESULT_STATUS_REJECTED_INVALID_QUERY,
@@ -137,7 +157,7 @@ func TestExecuteQueryTaskV1_EnforcesPreconditionsWithoutTouchingRepo(t *testing.
 
 			// No CountMatchingCohort expectation: the repo must not be reached.
 			result, err := federatedwire.ExecuteQueryTaskV1(
-				context.Background(), task, mocks.NewMockPatientRegistryRepository(ctrl), 5,
+				context.Background(), task, mocks.NewMockCohortCountUseCase(ctrl), 5,
 			)
 			require.NoError(t, err)
 			require.Equal(t, tc.status, result.GetStatus())
@@ -157,9 +177,9 @@ func TestExecuteQueryTaskV1_PropagatesContextErrors(t *testing.T) {
 
 			task, err := federatedwire.CompileDemoQueryTaskFromFixture()
 			require.NoError(t, err)
-			repo := mocks.NewMockPatientRegistryRepository(ctrl)
+			repo := mocks.NewMockCohortCountUseCase(ctrl)
 			repo.EXPECT().
-				CountMatchingCohort(gomock.Any(), gomock.Any()).
+				CountMatchingCohort(gomock.Any(), "demo-cohort", gomock.Any()).
 				Return(uint64(0), fmt.Errorf("query: %w", cause))
 
 			result, err := federatedwire.ExecuteQueryTaskV1(context.Background(), task, repo, 5)
@@ -176,9 +196,9 @@ func TestExecuteQueryTaskV1_RepoFailureIsErrorStatus(t *testing.T) {
 	task, err := federatedwire.CompileDemoQueryTaskFromFixture()
 	require.NoError(t, err)
 
-	repo := mocks.NewMockPatientRegistryRepository(ctrl)
+	repo := mocks.NewMockCohortCountUseCase(ctrl)
 	repo.EXPECT().
-		CountMatchingCohort(gomock.Any(), gomock.Any()).
+		CountMatchingCohort(gomock.Any(), "demo-cohort", gomock.Any()).
 		Return(uint64(0), errors.New("db down"))
 
 	result, err := federatedwire.ExecuteQueryTaskV1(context.Background(), task, repo, 5)

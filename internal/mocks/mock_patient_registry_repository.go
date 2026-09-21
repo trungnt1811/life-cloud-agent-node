@@ -73,6 +73,21 @@ func (mr *MockPatientRegistryRepositoryMockRecorder) CountMatchingCohort(ctx, cr
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountMatchingCohort", reflect.TypeOf((*MockPatientRegistryRepository)(nil).CountMatchingCohort), ctx, criteria)
 }
 
+// CountMatchingCohortChunk mocks base method.
+func (m *MockPatientRegistryRepository) CountMatchingCohortChunk(ctx context.Context, criteria types.CohortCriteria, afterPatientID uuid.UUID, limit int) (types.CohortChunkResult, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "CountMatchingCohortChunk", ctx, criteria, afterPatientID, limit)
+	ret0, _ := ret[0].(types.CohortChunkResult)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// CountMatchingCohortChunk indicates an expected call of CountMatchingCohortChunk.
+func (mr *MockPatientRegistryRepositoryMockRecorder) CountMatchingCohortChunk(ctx, criteria, afterPatientID, limit any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CountMatchingCohortChunk", reflect.TypeOf((*MockPatientRegistryRepository)(nil).CountMatchingCohortChunk), ctx, criteria, afterPatientID, limit)
+}
+
 // CountPatients mocks base method.
 func (m *MockPatientRegistryRepository) CountPatients(ctx context.Context) (int, error) {
 	m.ctrl.T.Helper()

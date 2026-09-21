@@ -303,15 +303,15 @@ func (r *patientRegistryRepository) CountMatchingCohort(ctx context.Context, c C
 
 ### Phase 6 — D4: Job Progress Checkpoint + resume
 
-- [ ] **Before writing code:** record
+- [x] **Before writing code:** record
       `docs/decisions/0005-job-checkpoint-granularity.md` — what a
       resumable batch is (e.g. patient-ID range chunks) and how often a
       checkpoint is written. Do not guess this in code first.
-- [ ] Entity + migration for `job_progress` (`job_id`, `last_checkpoint`,
+- [x] Entity + migration for `job_progress` (`job_id`, `last_checkpoint`,
       `updated_at`).
-- [ ] Repository + resume logic wired into Phase 5's execution so it runs
+- [x] Repository + resume logic wired into Phase 5's execution so it runs
       in checkpointable chunks.
-- [ ] Test: interrupt execution mid-chunk, resume, assert the final count
+- [x] Test: interrupt execution mid-chunk, resume, assert the final count
       matches running the same query uninterrupted (no missed or
       double-counted chunk).
 
@@ -399,7 +399,7 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
 - [x] Phase 3 — D5 Enabled Query Fields store + admin REST.
 - [x] Phase 4 — Validation layers 2 (whitelist) & 3 (semantic).
 - [x] Phase 5 — Query execution (3.5) + output suppression (3.6).
-- [ ] Phase 6 — D4 Job Progress Checkpoint + resumable execution.
+- [x] Phase 6 — D4 Job Progress Checkpoint + resumable execution.
 - [ ] Phase 7 — gRPC client: dial-out, Register/Heartbeat, task handling.
 - [ ] Phase 8 — In-repo stub control center (test support only).
 - [ ] Phase 9 — End-to-end integration test across the full chain.
@@ -649,6 +649,30 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
     per-panel/per-condition correlated subqueries into one aggregate, and
     the remaining defensive re-checks in the repository, until there is a
     real registry size to measure against.
+- 2026-09-21 (Phase 6): D4 checkpoint + resumable execution, per decision
+  0005 (patient-ID chunks, checkpoint per chunk, suppression on the final
+  total only, criteria hash, finished rows kept 7 days). `job_progress`
+  table (migration 04) holds `job_id`, `criteria_hash`, `last_patient_id`,
+  `running_count`, `status`, `updated_at`; cursor and count are one upsert.
+  `PatientRegistryRepository.CountMatchingCohortChunk` counts the next N
+  candidate patients after a cursor (candidates are chosen first, then
+  ranked, so each patient is judged on all its in-range specimens).
+  `usecases.NewCohortCountUseCase` runs the chunk loop, resumes a matching
+  checkpoint, restarts on a different `criteria_hash`, serves a `done` job
+  without querying, prunes finished rows older than 7 days (best-effort), and
+  errors instead of looping if a cursor fails to advance.
+  `ExecuteQueryTaskV1` now takes that use case and keys it by `job_id`;
+  structural validation requires a non-empty `job_id` of at most 255
+  characters. `JOB_CHUNK_SIZE` (default 5000) is in `conf` / `.env.example`.
+  `CountMatchingCohort` (unchunked) stays as the oracle the chunk tests
+  compare against. Proof: `TestCohortCount_InterruptedThenResumedEqualsUninterrupted`
+  (real Postgres; third chunk cancelled, resume starts at the checkpoint and
+  re-reads only the unfinished chunks), chunk-sum-equals-unchunked for sizes
+  1/2/3/7/1000, and usecase tests for resume, done, criteria mismatch, empty
+  final chunk, and error paths. Mutation-checked: changing the cursor
+  comparison to `>=` fails both the chunk-sum and the resume tests. Left to
+  Phase 7: wiring the use case and the 30s heartbeat's in-flight job IDs in
+  DI; nothing constructs `NewCohortCountUseCase` outside tests yet.
 - Promote any phase-specific decision (e.g. checkpoint granularity,
   a specific mapping ambiguity) into `docs/decisions/` as that phase
   starts, per the pattern already used by 0001-0004.
@@ -666,8 +690,8 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
 
 ## Result
 
-Phase 5 complete — `CountMatchingCohort` (LATEST_IN_RANGE + panels +
-conditions) and `ExecuteQueryTaskV1` with small-cell suppression
-(`SUPPRESSION_THRESHOLD` default 5), proven by a hand-computed Postgres
-fixture (expected raw count 2) and wire unit tests. Phase 6 (D4
-checkpoint + resume; requires decision 0005 first) is next.
+Phase 6 complete — decision 0005, the `job_progress` table, the chunked
+`CountMatchingCohortChunk`, and a checkpointed `CohortCountUseCase` that
+`ExecuteQueryTaskV1` now uses. An interrupted job resumes from its last
+completed chunk and returns the same count as an uninterrupted run (proven on
+real Postgres). Phase 7 (gRPC client) is next.

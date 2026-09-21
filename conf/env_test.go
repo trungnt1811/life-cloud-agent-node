@@ -30,6 +30,9 @@ func TestNormalizeConfigurationUsesRuntimeDefaults(t *testing.T) {
 	require.Equal(t, defaultDBMaxIdleConns, config.Database.DBMaxIdleConns)
 	require.Equal(t, defaultDBConnMaxLifetimeMin, config.Database.DBConnMaxLifetimeInMinute)
 	require.Equal(t, defaultSuppressionThreshold, config.SuppressionThreshold)
+	require.Equal(t, defaultJobChunkSize, config.JobChunkSize)
+	require.Equal(t, defaultJobChunkSize, NormalizeConfiguration(Configuration{JobChunkSize: -3}).JobChunkSize)
+	require.Equal(t, 50, NormalizeConfiguration(Configuration{JobChunkSize: 50}).JobChunkSize)
 }
 
 func TestDefaultConfigurationMapUsesRuntimeDefaults(t *testing.T) {
@@ -41,4 +44,5 @@ func TestDefaultConfigurationMapUsesRuntimeDefaults(t *testing.T) {
 	require.Equal(t, defaultDBPort, defaultConfigurations["DB_PORT"])
 	require.Equal(t, defaultRedisPassword, defaultConfigurations["REDIS_PASSWORD"])
 	require.Equal(t, defaultSuppressionThreshold, defaultConfigurations["SUPPRESSION_THRESHOLD"])
+	require.Equal(t, defaultJobChunkSize, defaultConfigurations["JOB_CHUNK_SIZE"])
 }

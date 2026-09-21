@@ -13,6 +13,8 @@ import (
 
 const demoQuerySchemaVersion uint32 = 1
 
+const maxJobIDLen = 255
+
 //go:embed testdata/query_definition.json
 var demoQueryDefinitionJSON []byte
 
@@ -93,6 +95,13 @@ func CompileDemoQueryTask(fixture DemoQueryDefinition) *nodev1.QueryTask {
 func ValidateQueryTaskStructureV1(task *nodev1.QueryTask) error {
 	if err := requireTask(task); err != nil {
 		return err
+	}
+	// job_id keys the D4 checkpoint (decision 0005); its column is VARCHAR(255).
+	if strings.TrimSpace(task.GetJobId()) == "" {
+		return rejectedInvalidQuery("job_id is required")
+	}
+	if len(task.GetJobId()) > maxJobIDLen {
+		return rejectedInvalidQuery(fmt.Sprintf("job_id must be at most %d characters", maxJobIDLen))
 	}
 	if task.GetSpecimenPolicy() != nodev1.SpecimenPolicy_SPECIMEN_POLICY_LATEST_IN_RANGE {
 		return rejectedInvalidQuery("specimen_policy must be LATEST_IN_RANGE for schema v1")
