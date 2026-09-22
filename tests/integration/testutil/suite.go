@@ -9,11 +9,18 @@ import (
 	"gorm.io/gorm"
 
 	"github.com/lifenetwork-ai/life-cloud-agent-node/conf"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/federated/client"
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/platform/logger"
 )
 
 // RouterSetupFunc defines the app router bootstrap function used by integration tests.
-type RouterSetupFunc func(ctx context.Context, db *gorm.DB, config *conf.Configuration, log logger.Logger) *gin.Engine
+type RouterSetupFunc func(
+	ctx context.Context,
+	db *gorm.DB,
+	config *conf.Configuration,
+	advisories *client.AdvisoryStore,
+	log logger.Logger,
+) *gin.Engine
 
 // SuiteConfig holds integration suite configuration.
 type SuiteConfig struct {
@@ -40,7 +47,7 @@ func (s *TestSuite) Run(m *testing.M) int {
 	}
 
 	gin.SetMode(gin.TestMode)
-	s.router = s.config.RouterSetup(context.Background(), nil, s.config.Config, NewTestLogger())
+	s.router = s.config.RouterSetup(context.Background(), nil, s.config.Config, client.NewAdvisoryStore(), NewTestLogger())
 	SetRouter(s.router)
 
 	return m.Run()

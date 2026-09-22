@@ -66,6 +66,26 @@ type Configuration struct {
 	// JobChunkSize is how many candidate patients one resumable, checkpointed
 	// cohort chunk covers (decision 0005). Below 1 (unset) means the default.
 	JobChunkSize int `mapstructure:"JOB_CHUNK_SIZE"`
+	// ControlCenterAddress is the control center's gRPC host:port. Blank
+	// disables the federated client worker entirely (no control center to
+	// dial yet is a valid deployment - decision 0001).
+	ControlCenterAddress string `mapstructure:"CONTROL_CENTER_ADDRESS"`
+	// NodeID identifies this node to the control center's registry (D2).
+	NodeID string `mapstructure:"NODE_ID"`
+	// AgentVersion is reported on every (re)connect so the control center's
+	// registry reflects what is actually deployed at this site (decision 0003).
+	AgentVersion string `mapstructure:"AGENT_VERSION"`
+	// ControlCenterInsecure opts out of TLS. Decision 0006: TLS is required by
+	// default; this exists only for local development and the Phase 8 stub.
+	ControlCenterInsecure bool `mapstructure:"CONTROL_CENTER_INSECURE"`
+	// ControlCenterCAFile verifies the control center's certificate against a
+	// private CA instead of the system pool. Blank uses the system pool.
+	ControlCenterCAFile string `mapstructure:"CONTROL_CENTER_CA_FILE"`
+	// ControlCenterClientCertFile/KeyFile present this node's client
+	// certificate (mTLS). Decision 0006: setting exactly one is a startup
+	// error, matching the ADMIN_BASIC_AUTH_USER/PASS pattern.
+	ControlCenterClientCertFile string `mapstructure:"CONTROL_CENTER_CLIENT_CERT_FILE"`
+	ControlCenterClientKeyFile  string `mapstructure:"CONTROL_CENTER_CLIENT_KEY_FILE"`
 }
 
 var configuration = NormalizeConfiguration(Configuration{})
@@ -97,39 +117,46 @@ const (
 
 // NOTE: when adding a new env, add it here and expose only scoped config to modules.
 var defaultConfigurations = map[string]any{
-	"APP_NAME":                       defaultAppName,
-	"APP_PORT":                       defaultAppPort,
-	"APP_REQUEST_TIMEOUT_MS":         constants.DefaultHTTPRequestMs,
-	"CORS_ALLOWED_ORIGINS":           defaultCORSAllowedOrigins,
-	"CORS_ALLOWED_HEADERS":           defaultCORSAllowedHeaders,
-	"ENV_FILE":                       ".env",
-	"ENV":                            defaultEnv,
-	"LOG_LEVEL":                      defaultLogLevel,
-	"CACHE_TYPE":                     constants.CacheTypeInMemory,
-	"REDIS_ADDRESS":                  defaultRedisAddress,
-	"REDIS_PASSWORD":                 defaultRedisPassword,
-	"REDIS_TTL":                      defaultRedisTTL,
-	"REDIS_POOL_SIZE":                defaultRedisPoolSize,
-	"REDIS_MIN_IDLE_CONNS":           defaultRedisMinIdleConns,
-	"REDIS_DIAL_TIMEOUT_MS":          defaultRedisTimeoutMs,
-	"REDIS_READ_TIMEOUT_MS":          defaultRedisTimeoutMs,
-	"REDIS_WRITE_TIMEOUT_MS":         defaultRedisTimeoutMs,
-	"REDIS_POOL_TIMEOUT_MS":          defaultRedisTimeoutMs,
-	"DB_USER":                        defaultDBUser,
-	"DB_PASSWORD":                    defaultDBPassword,
-	"DB_HOST":                        defaultDBHost,
-	"DB_PORT":                        defaultDBPort,
-	"DB_NAME":                        defaultDBName,
-	"DB_MAX_IDLE_CONNS":              defaultDBMaxIdleConns,
-	"DB_MAX_OPEN_CONNS":              defaultDBMaxOpenConns,
-	"DB_CONN_MAX_LIFETIME_IN_MINUTE": defaultDBConnMaxLifetimeMin,
-	"ENABLE_AUTO_MIGRATE":            "false",
-	"SWAGGER_BASIC_AUTH_USER":        "",
-	"SWAGGER_BASIC_AUTH_PASS":        "",
-	"ADMIN_BASIC_AUTH_USER":          "",
-	"ADMIN_BASIC_AUTH_PASS":          "",
-	"SUPPRESSION_THRESHOLD":          defaultSuppressionThreshold,
-	"JOB_CHUNK_SIZE":                 defaultJobChunkSize,
+	"APP_NAME":                        defaultAppName,
+	"APP_PORT":                        defaultAppPort,
+	"APP_REQUEST_TIMEOUT_MS":          constants.DefaultHTTPRequestMs,
+	"CORS_ALLOWED_ORIGINS":            defaultCORSAllowedOrigins,
+	"CORS_ALLOWED_HEADERS":            defaultCORSAllowedHeaders,
+	"ENV_FILE":                        ".env",
+	"ENV":                             defaultEnv,
+	"LOG_LEVEL":                       defaultLogLevel,
+	"CACHE_TYPE":                      constants.CacheTypeInMemory,
+	"REDIS_ADDRESS":                   defaultRedisAddress,
+	"REDIS_PASSWORD":                  defaultRedisPassword,
+	"REDIS_TTL":                       defaultRedisTTL,
+	"REDIS_POOL_SIZE":                 defaultRedisPoolSize,
+	"REDIS_MIN_IDLE_CONNS":            defaultRedisMinIdleConns,
+	"REDIS_DIAL_TIMEOUT_MS":           defaultRedisTimeoutMs,
+	"REDIS_READ_TIMEOUT_MS":           defaultRedisTimeoutMs,
+	"REDIS_WRITE_TIMEOUT_MS":          defaultRedisTimeoutMs,
+	"REDIS_POOL_TIMEOUT_MS":           defaultRedisTimeoutMs,
+	"DB_USER":                         defaultDBUser,
+	"DB_PASSWORD":                     defaultDBPassword,
+	"DB_HOST":                         defaultDBHost,
+	"DB_PORT":                         defaultDBPort,
+	"DB_NAME":                         defaultDBName,
+	"DB_MAX_IDLE_CONNS":               defaultDBMaxIdleConns,
+	"DB_MAX_OPEN_CONNS":               defaultDBMaxOpenConns,
+	"DB_CONN_MAX_LIFETIME_IN_MINUTE":  defaultDBConnMaxLifetimeMin,
+	"ENABLE_AUTO_MIGRATE":             "false",
+	"SWAGGER_BASIC_AUTH_USER":         "",
+	"SWAGGER_BASIC_AUTH_PASS":         "",
+	"ADMIN_BASIC_AUTH_USER":           "",
+	"ADMIN_BASIC_AUTH_PASS":           "",
+	"SUPPRESSION_THRESHOLD":           defaultSuppressionThreshold,
+	"JOB_CHUNK_SIZE":                  defaultJobChunkSize,
+	"CONTROL_CENTER_ADDRESS":          "",
+	"NODE_ID":                         "",
+	"AGENT_VERSION":                   "",
+	"CONTROL_CENTER_INSECURE":         "false",
+	"CONTROL_CENTER_CA_FILE":          "",
+	"CONTROL_CENTER_CLIENT_CERT_FILE": "",
+	"CONTROL_CENTER_CLIENT_KEY_FILE":  "",
 }
 
 // DefaultConfiguration returns the normalized config used when no env is loaded.

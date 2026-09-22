@@ -16,6 +16,15 @@ import (
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/mocks"
 )
 
+// testUUID returns a deterministic, byte-ascending UUID for n = 1, 2, 3, ...
+// so tests asserting the chunk cursor advances don't depend on uuid.New()'s
+// random byte order (which is not guaranteed ascending across two calls).
+func testUUID(n byte) uuid.UUID {
+	var id uuid.UUID
+	id[15] = n
+	return id
+}
+
 func cohortCriteria() types.CohortCriteria {
 	return types.CohortCriteria{
 		From:       time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),
@@ -44,7 +53,7 @@ func newCohortCountFixture(t *testing.T) cohortCountFixture {
 func TestCohortCount_SumsChunksAndCheckpointsEach(t *testing.T) {
 	m := newCohortCountFixture(t)
 	criteria := cohortCriteria()
-	p2, p3 := uuid.New(), uuid.New()
+	p2, p3 := testUUID(1), testUUID(2)
 
 	m.progress.EXPECT().Get(gomock.Any(), "job-1").Return(nil, nil)
 	gomock.InOrder(
@@ -97,7 +106,7 @@ func TestCohortCount_ExactMultipleEndsOnAnEmptyChunk(t *testing.T) {
 func TestCohortCount_ResumesFromCheckpointForSameCriteria(t *testing.T) {
 	m := newCohortCountFixture(t)
 	criteria := cohortCriteria()
-	checkpoint, last := uuid.New(), uuid.New()
+	checkpoint, last := testUUID(1), testUUID(2)
 
 	stored := entities.NewJobProgress("job-1", criteria.Fingerprint(), time.Now())
 	stored.CompleteChunk(checkpoint, 4, time.Now())

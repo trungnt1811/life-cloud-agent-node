@@ -35,6 +35,21 @@ func TestNormalizeConfigurationUsesRuntimeDefaults(t *testing.T) {
 	require.Equal(t, 50, NormalizeConfiguration(Configuration{JobChunkSize: 50}).JobChunkSize)
 }
 
+// The gRPC client fields (decision 0006) are blank/false by default, same as
+// ADMIN_BASIC_AUTH_USER/PASS - "not configured" is a valid deployment
+// (control center not dialed yet), not a value to default away from.
+func TestNormalizeConfigurationLeavesControlCenterFieldsUnset(t *testing.T) {
+	config := NormalizeConfiguration(Configuration{})
+
+	require.Empty(t, config.ControlCenterAddress)
+	require.Empty(t, config.NodeID)
+	require.Empty(t, config.AgentVersion)
+	require.False(t, config.ControlCenterInsecure)
+	require.Empty(t, config.ControlCenterCAFile)
+	require.Empty(t, config.ControlCenterClientCertFile)
+	require.Empty(t, config.ControlCenterClientKeyFile)
+}
+
 func TestDefaultConfigurationMapUsesRuntimeDefaults(t *testing.T) {
 	require.Equal(t, defaultAppName, defaultConfigurations["APP_NAME"])
 	require.Equal(t, defaultAppPort, defaultConfigurations["APP_PORT"])

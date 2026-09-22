@@ -3,11 +3,13 @@ package app
 import (
 	"context"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 
 	"github.com/lifenetwork-ai/life-cloud-agent-node/conf"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/federated/client"
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/postgres"
 	httprouter "github.com/lifenetwork-ai/life-cloud-agent-node/internal/delivery/http/router"
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/di"
@@ -15,6 +17,7 @@ import (
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/platform/logger"
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/runtimeconfig"
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/server"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/workers"
 )
 
 func RunApp(config *conf.Configuration) error {
@@ -41,19 +44,93 @@ func Run(ctx context.Context, config *conf.Configuration) error {
 	}
 
 	appLogger := instances.LoggerInstance()
-	r := SetupRouter(runCtx, db, config, appLogger)
+	advisories := client.NewAdvisoryStore()
+	r := SetupRouter(runCtx, db, config, advisories, appLogger)
+	workerDone := startFederatedClientWorker(runCtx, db, config, advisories, appLogger)
 	httpServer, serverErrC := server.StartHTTP(r, server.HTTPConfig{Port: config.AppPort}, appLogger)
-	return server.WaitForShutdownSignal(runCtx, cancel, httpServer, serverErrC, server.GracefulTimeout(0), appLogger)
+	runErr := server.WaitForShutdownSignal(runCtx, cancel, httpServer, serverErrC, server.GracefulTimeout(0), appLogger)
+
+	// cancel() (called by WaitForShutdownSignal) already told the worker to
+	// stop; give it the same graceful window as the HTTP server so its
+	// in-flight control stream closes cleanly instead of being cut off by
+	// process exit.
+	if workerDone != nil {
+		select {
+		case <-workerDone:
+		case <-time.After(server.GracefulTimeout(0)):
+			appLogger.Warn("Federated client worker did not stop within the graceful shutdown timeout")
+		}
+	}
+	return runErr
 }
 
-// SetupRouter initializes the complete HTTP router for production and integration tests.
-func SetupRouter(ctx context.Context, db *gorm.DB, config *conf.Configuration, appLogger logger.Logger) *gin.Engine {
+// SetupRouter initializes the complete HTTP router for production and
+// integration tests. advisories backs GET /admin/status (decision 0003); a
+// nil store just means the endpoint always reports no advisory received.
+func SetupRouter(
+	ctx context.Context,
+	db *gorm.DB,
+	config *conf.Configuration,
+	advisories *client.AdvisoryStore,
+	appLogger logger.Logger,
+) *gin.Engine {
 	if ctx == nil {
 		ctx = context.Background()
 	}
 	repos := di.InitializeRepos(ctx, db, appLogger, runtimeconfig.ModuleConfigsFromConfiguration(config))
-	useCases := di.InitializeUseCases(repos, appLogger)
-	return httprouter.SetupWithDependencies(useCases, appLogger, httprouter.OptionsFromConfiguration(config))
+	useCases := di.InitializeUseCases(repos, config.JobChunkSize, appLogger)
+	options := httprouter.OptionsFromConfiguration(config)
+	options.Advisories = advisories
+	return httprouter.SetupWithDependencies(useCases, appLogger, options)
+}
+
+// startFederatedClientWorker starts the gRPC control-center client
+// (decision 0001) in the background when CONTROL_CENTER_ADDRESS is
+// configured. It shuts down when ctx is done, alongside the HTTP server. The
+// returned channel closes once the worker has stopped, or is nil when no
+// worker was started. A blank address is a valid deployment (no control
+// center to dial yet) and only logs, matching the admin-routes
+// partial-config pattern elsewhere.
+func startFederatedClientWorker(
+	ctx context.Context,
+	db *gorm.DB,
+	config *conf.Configuration,
+	advisories *client.AdvisoryStore,
+	appLogger logger.Logger,
+) <-chan struct{} {
+	if strings.TrimSpace(config.ControlCenterAddress) == "" {
+		appLogger.Warn("Federated client worker not started; CONTROL_CENTER_ADDRESS is not set")
+		return nil
+	}
+
+	repos := di.InitializeRepos(ctx, db, appLogger, runtimeconfig.ModuleConfigsFromConfiguration(config))
+	useCases := di.InitializeUseCases(repos, config.JobChunkSize, appLogger)
+
+	nodeClient := client.NewNodeClient(client.Config{
+		Address:            config.ControlCenterAddress,
+		NodeID:             config.NodeID,
+		AgentVersion:       config.AgentVersion,
+		QuerySchemaVersion: 1,
+		TLS: client.TLSConfig{
+			Insecure:       config.ControlCenterInsecure,
+			CAFile:         config.ControlCenterCAFile,
+			ClientCertFile: config.ControlCenterClientCertFile,
+			ClientKeyFile:  config.ControlCenterClientKeyFile,
+		},
+	}, client.Dependencies{
+		EnabledQueryFieldRepo: repos.EnabledQueryFieldRepo,
+		CohortCounter:         useCases.CohortCountUseCase,
+		SuppressionThreshold:  config.SuppressionThreshold,
+		Advisories:            advisories,
+	}, appLogger, nil)
+
+	worker := workers.NewFederatedClientWorker(nodeClient, appLogger)
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		worker.Start(ctx)
+	}()
+	return done
 }
 
 // Helper Functions

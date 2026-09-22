@@ -1,4 +1,15 @@
 definitions:
+  dto.AdvisoryDTO:
+    properties:
+      changelog_url:
+        type: string
+      received_at:
+        type: string
+      severity:
+        type: string
+      version:
+        type: string
+    type: object
   dto.CreateExampleRequest:
     properties:
       description:
@@ -70,6 +81,15 @@ definitions:
         type: integer
       total_count:
         type: integer
+    type: object
+  dto.StatusDTO:
+    properties:
+      advisory:
+        $ref: '#/definitions/dto.AdvisoryDTO'
+      agent_version:
+        type: string
+      node_id:
+        type: string
     type: object
   dto.UpdateEnabledQueryFieldRequest:
     properties:
@@ -156,6 +176,28 @@ paths:
       security:
       - BasicAuth: []
       summary: Update an enabled query field
+      tags:
+      - admin
+  /admin/status:
+    get:
+      description: |-
+        Node identity and the latest UpdateAdvisory received from the
+        control center, if any. The node only logs and exposes an
+        advisory; it never auto-applies an update (decision 0003).
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.StatusDTO'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+      security:
+      - BasicAuth: []
+      summary: Get node status
       tags:
       - admin
   /api/v1/examples:

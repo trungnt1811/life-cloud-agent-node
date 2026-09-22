@@ -116,6 +116,37 @@ const docTemplate = `{
                 }
             }
         },
+        "/admin/status": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "description": "Node identity and the latest UpdateAdvisory received from the\ncontrol center, if any. The node only logs and exposes an\nadvisory; it never auto-applies an update (decision 0003).",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "admin"
+                ],
+                "summary": "Get node status",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.StatusDTO"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/examples": {
             "get": {
                 "description": "List examples with pagination",
@@ -366,6 +397,23 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "dto.AdvisoryDTO": {
+            "type": "object",
+            "properties": {
+                "changelog_url": {
+                    "type": "string"
+                },
+                "received_at": {
+                    "type": "string"
+                },
+                "severity": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
         "dto.CreateExampleRequest": {
             "type": "object",
             "required": [
@@ -474,6 +522,20 @@ const docTemplate = `{
                 },
                 "total_count": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.StatusDTO": {
+            "type": "object",
+            "properties": {
+                "advisory": {
+                    "$ref": "#/definitions/dto.AdvisoryDTO"
+                },
+                "agent_version": {
+                    "type": "string"
+                },
+                "node_id": {
+                    "type": "string"
                 }
             }
         },

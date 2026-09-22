@@ -322,19 +322,23 @@ Files: `internal/adapters/federated/client/node_client.go`,
 additions (`CONTROL_CENTER_ADDRESS`, `NODE_ID`, `AGENT_VERSION`), DI wiring
 in `internal/di/wire.go` and `cmd/app/app.go`.
 
-- [ ] Dial-out and open `NodeControl.Connect`'s bidi stream.
-- [ ] Send `Register` on connect and every reconnect
+- [x] **Before writing code:** record
+      `docs/decisions/0006-grpc-client-transport-security.md` — TLS was not
+      decided by 0001/0004; required a decision rather than a default
+      picked while writing the client.
+- [x] Dial-out and open `NodeControl.Connect`'s bidi stream.
+- [x] Send `Register` on connect and every reconnect
       (`node_id`, `agent_version`, `query_schema_version=1`).
-- [ ] Heartbeat every 30s with in-flight job IDs (Fig. 4).
-- [ ] Receive loop: `QueryTask` → `ValidateQueryTaskV1` (Phase 4) →
+- [x] Heartbeat every 30s with in-flight job IDs (Fig. 4).
+- [x] Receive loop: `QueryTask` → `ValidateQueryTaskV1` (Phase 4) →
       execute (Phase 5, checkpointed per Phase 6) → send `QueryResult`;
       `UpdateAdvisory` → persist/expose for `GET /admin/status` (decision
       0003 — log only, never auto-apply).
-- [ ] Reconnect with exponential backoff on stream error/EOF; in-flight
+- [x] Reconnect with exponential backoff on stream error/EOF; in-flight
       job resumes from its Phase 6 checkpoint after reconnect.
-- [ ] Graceful shutdown via the existing `internal/server/shutdown.go`
+- [x] Graceful shutdown via the existing `internal/server/shutdown.go`
       lifecycle hook.
-- [ ] Unit tests for the client's message handling using an in-process
+- [x] Unit tests for the client's message handling using an in-process
       `bufconn` server (doesn't need Phase 8's stub — a minimal inline
       test double is enough here).
 
@@ -400,7 +404,7 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
 - [x] Phase 4 — Validation layers 2 (whitelist) & 3 (semantic).
 - [x] Phase 5 — Query execution (3.5) + output suppression (3.6).
 - [x] Phase 6 — D4 Job Progress Checkpoint + resumable execution.
-- [ ] Phase 7 — gRPC client: dial-out, Register/Heartbeat, task handling.
+- [x] Phase 7 — gRPC client: dial-out, Register/Heartbeat, task handling.
 - [ ] Phase 8 — In-repo stub control center (test support only).
 - [ ] Phase 9 — End-to-end integration test across the full chain.
 
@@ -673,6 +677,38 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
   comparison to `>=` fails both the chunk-sum and the resume tests. Left to
   Phase 7: wiring the use case and the 30s heartbeat's in-flight job IDs in
   DI; nothing constructs `NewCohortCountUseCase` outside tests yet.
+- 2026-09-22 (Phase 7): `docs/decisions/0006-grpc-client-transport-security.md`
+  records the transport-security decision this phase needed first: TLS
+  required by default (system CA pool or `CONTROL_CENTER_CA_FILE`), mTLS
+  auto-enabled when a client cert/key pair is configured, plaintext only via
+  explicit `CONTROL_CENTER_INSECURE=true` (fails fast; mirrors the
+  `ADMIN_BASIC_AUTH_USER/PASS` partial-config pattern for a one-sided
+  cert/key pair). `internal/adapters/federated/client.NodeClient` dials with
+  `grpc.NewClient` plus a documented `waitForReady` polling loop (the modern
+  replacement for the deprecated `grpc.WithBlock`), registers, runs one
+  Send-goroutine and one Recv-goroutine per connection (the concurrency
+  pattern the gRPC stream API requires), heartbeats every 30s with a
+  snapshot of in-flight `job_id`s, executes each `QueryTask` in its own
+  goroutine via `ValidateQueryTaskV1` → `ExecuteQueryTaskV1`, and reconnects
+  with jittered exponential backoff (half-to-full of the doubling interval,
+  capped at `MaxBackoff`) on any stream loss. A `QueryTask` interrupted by a
+  dropped connection sends nothing back - decision 0005's checkpoint means
+  the next delivery of the same `job_id` resumes instead of restarting, so
+  there is nothing to report yet. `UpdateAdvisory` is logged and stored in
+  an `AdvisoryStore`, exposed read-only via `GET /admin/status` (decision
+  0003; same admin Basic Auth as `/admin/query-fields`). The worker is
+  optional: a blank `CONTROL_CENTER_ADDRESS` only logs a warning, since no
+  control center exists yet to dial (decision 0001). `cmd/app.Run` waits for
+  the worker to stop, bounded by the same graceful-shutdown timeout as the
+  HTTP server. Proof: `internal/adapters/federated/client` unit tests
+  against a real in-process `NodeControl` server over `bufconn` (not a
+  hand-rolled substitute) covering register, execute-and-reply,
+  version-gate-without-querying-D3, advisory storage, and
+  reconnect-after-drop; all pass under `-race`. Also fixed a latent flaky
+  test from Phase 6 (`TestCohortCount_ResumesFromCheckpointForSameCriteria`
+  compared two `uuid.New()` values whose byte order isn't guaranteed, which
+  the Phase 6 cursor-advance guard could reject about half the time) by
+  switching to deterministic, ascending test UUIDs.
 - Promote any phase-specific decision (e.g. checkpoint granularity,
   a specific mapping ambiguity) into `docs/decisions/` as that phase
   starts, per the pattern already used by 0001-0004.
@@ -690,8 +726,13 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
 
 ## Result
 
-Phase 6 complete — decision 0005, the `job_progress` table, the chunked
-`CountMatchingCohortChunk`, and a checkpointed `CohortCountUseCase` that
-`ExecuteQueryTaskV1` now uses. An interrupted job resumes from its last
-completed chunk and returns the same count as an uninterrupted run (proven on
-real Postgres). Phase 7 (gRPC client) is next.
+Phase 7 complete — decision 0006 (TLS-by-default transport security), the
+`internal/adapters/federated/client.NodeClient` (dial-out, Register,
+30s Heartbeat with in-flight job IDs, `QueryTask` validate+execute+reply,
+`UpdateAdvisory` logging/storage, jittered-backoff reconnect), the
+`FederatedClientWorker` background worker wired into `cmd/app.Run` with
+graceful shutdown, and `GET /admin/status` are all in place, proven against
+a real in-process `NodeControl` server over `bufconn`. Phase 8 (in-repo stub
+control center, so the client can be exercised against something that
+actually accepts its dial-out instead of only the bufconn unit tests) is
+next.

@@ -19,6 +19,8 @@ import (
 type Repos struct {
 	ExampleRepo           repoInterfaces.ExampleRepository
 	EnabledQueryFieldRepo repoInterfaces.EnabledQueryFieldRepository
+	PatientRegistryRepo   repoInterfaces.PatientRegistryRepository
+	JobProgressRepo       repoInterfaces.JobProgressRepository
 	TransactionManager    repoInterfaces.TransactionManager
 }
 
@@ -37,6 +39,8 @@ func InitializeRepos(ctx context.Context, db *gorm.DB, appLogger logger.Logger, 
 	return &Repos{
 		ExampleRepo:           exampleRepo,
 		EnabledQueryFieldRepo: repositories.NewEnabledQueryFieldRepository(db, appLogger),
+		PatientRegistryRepo:   repositories.NewPatientRegistryRepository(db, appLogger),
+		JobProgressRepo:       repositories.NewJobProgressRepository(db, appLogger),
 		TransactionManager: transactionrepo.NewTransactionManager(db, transactionrepo.TransactionManagerDeps{
 			ExampleRepo: exampleRepo,
 		}),
@@ -47,20 +51,28 @@ func InitializeRepos(ctx context.Context, db *gorm.DB, appLogger logger.Logger, 
 type UseCases struct {
 	ExampleUseCase           interfaces.ExampleUseCase
 	EnabledQueryFieldUseCase interfaces.EnabledQueryFieldUseCase
+	CohortCountUseCase       interfaces.CohortCountUseCase
 }
 
-// InitializeUseCases initializes all use cases.
-func InitializeUseCases(repos *Repos, appLogger logger.Logger) *UseCases {
+// InitializeUseCases initializes all use cases. jobChunkSize is decision
+// 0005's resumable chunk size; below 1 means usecases.NewCohortCountUseCase's
+// own default.
+func InitializeUseCases(repos *Repos, jobChunkSize int, appLogger logger.Logger) *UseCases {
 	var exampleRepo repoInterfaces.ExampleRepository
 	var enabledQueryFieldRepo repoInterfaces.EnabledQueryFieldRepository
+	var patientRegistryRepo repoInterfaces.PatientRegistryRepository
+	var jobProgressRepo repoInterfaces.JobProgressRepository
 	if repos != nil {
 		exampleRepo = repos.ExampleRepo
 		enabledQueryFieldRepo = repos.EnabledQueryFieldRepo
+		patientRegistryRepo = repos.PatientRegistryRepo
+		jobProgressRepo = repos.JobProgressRepo
 	}
 
 	return &UseCases{
 		ExampleUseCase:           usecases.NewExampleUseCase(exampleRepo, transactionManager(repos), appLogger),
 		EnabledQueryFieldUseCase: usecases.NewEnabledQueryFieldUseCase(enabledQueryFieldRepo, appLogger),
+		CohortCountUseCase:       usecases.NewCohortCountUseCase(patientRegistryRepo, jobProgressRepo, jobChunkSize, appLogger),
 	}
 }
 

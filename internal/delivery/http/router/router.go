@@ -11,6 +11,7 @@ import (
 	"github.com/lifenetwork-ai/life-cloud-agent-node/conf"
 	"github.com/lifenetwork-ai/life-cloud-agent-node/constants"
 	_ "github.com/lifenetwork-ai/life-cloud-agent-node/docs"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/federated/client"
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/delivery/http/handlers"
 	middleware "github.com/lifenetwork-ai/life-cloud-agent-node/internal/delivery/http/middleware"
 	routev1 "github.com/lifenetwork-ai/life-cloud-agent-node/internal/delivery/http/route"
@@ -32,6 +33,13 @@ type Options struct {
 	AdminAuthUser string
 	AdminAuthPass string
 	Env           string
+	// NodeID/AgentVersion/Advisories back GET /admin/status (decision 0003).
+	// Advisories is nil when the federated client worker is not running
+	// (e.g. CONTROL_CENTER_ADDRESS unset); the endpoint then always reports
+	// no advisory received.
+	NodeID       string
+	AgentVersion string
+	Advisories   *client.AdvisoryStore
 }
 
 func SetupWithDependencies(useCases *di.UseCases, log logger.Logger, options ...Options) *gin.Engine {
@@ -53,6 +61,8 @@ func OptionsFromConfiguration(config *conf.Configuration) Options {
 		AdminAuthUser:      strings.TrimSpace(valueOrEmpty(config, func(c *conf.Configuration) string { return c.AdminBasicAuthUser })),
 		AdminAuthPass:      strings.TrimSpace(valueOrEmpty(config, func(c *conf.Configuration) string { return c.AdminBasicAuthPass })),
 		Env:                valueOrEmpty(config, func(c *conf.Configuration) string { return c.Env }),
+		NodeID:             strings.TrimSpace(valueOrEmpty(config, func(c *conf.Configuration) string { return c.NodeID })),
+		AgentVersion:       strings.TrimSpace(valueOrEmpty(config, func(c *conf.Configuration) string { return c.AgentVersion })),
 	}
 }
 
@@ -111,12 +121,15 @@ func setupApplicationRoutes(r *gin.Engine, useCases *di.UseCases, log logger.Log
 	}
 	exampleHandler := handlers.NewExampleHandler(useCases.ExampleUseCase, log)
 	enabledQueryFieldHandler := handlers.NewEnabledQueryFieldHandler(useCases.EnabledQueryFieldUseCase, log)
-	routev1.SetupHealthRoutes(r)
-	routev1.SetupExampleRoutes(r, exampleHandler)
-	routev1.SetupEnabledQueryFieldRoutes(r, enabledQueryFieldHandler, routev1.AdminAuthOptions{
+	statusHandler := handlers.NewStatusHandler(options.NodeID, options.AgentVersion, options.Advisories)
+	adminAuth := routev1.AdminAuthOptions{
 		Username: options.AdminAuthUser,
 		Password: options.AdminAuthPass,
-	}, log)
+	}
+	routev1.SetupHealthRoutes(r)
+	routev1.SetupExampleRoutes(r, exampleHandler)
+	routev1.SetupEnabledQueryFieldRoutes(r, enabledQueryFieldHandler, adminAuth, log)
+	routev1.SetupStatusRoutes(r, statusHandler, adminAuth, log)
 }
 
 func registerSwaggerRoute(r *gin.Engine, options Options, log logger.Logger) {
