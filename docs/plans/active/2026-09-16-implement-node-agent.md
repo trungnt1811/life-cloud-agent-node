@@ -347,12 +347,12 @@ in `internal/di/wire.go` and `cmd/app/app.go`.
 Files: `internal/testsupport/controlcenterstub/server.go` implementing
 `nodev1.NodeControlServer`.
 
-- [ ] Accept `Connect`, record `Register`/`Heartbeat`, expose
+- [x] Accept `Connect`, record `Register`/`Heartbeat`, expose
       `SendQueryTask(task)` / `SendUpdateAdvisory(...)` plus channels to
       observe received `QueryResult`s — enough surface to drive Phase 9,
       nothing more.
-- [ ] Serves over `bufconn` or `127.0.0.1:0`, test-only.
-- [ ] Package doc comment states plainly this is test support and must
+- [x] Serves over `bufconn` or `127.0.0.1:0`, test-only.
+- [x] Package doc comment states plainly this is test support and must
       never be imported from `cmd/`; extend
       `internal/testsupport/archtest` so that import is a caught
       violation, not just a convention.
@@ -405,7 +405,7 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
 - [x] Phase 5 — Query execution (3.5) + output suppression (3.6).
 - [x] Phase 6 — D4 Job Progress Checkpoint + resumable execution.
 - [x] Phase 7 — gRPC client: dial-out, Register/Heartbeat, task handling.
-- [ ] Phase 8 — In-repo stub control center (test support only).
+- [x] Phase 8 — In-repo stub control center (test support only).
 - [ ] Phase 9 — End-to-end integration test across the full chain.
 
 ## Decisions
@@ -709,6 +709,26 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
   compared two `uuid.New()` values whose byte order isn't guaranteed, which
   the Phase 6 cursor-advance guard could reject about half the time) by
   switching to deterministic, ascending test UUIDs.
+- 2026-09-22 (Phase 8): `internal/testsupport/controlcenterstub.Server` is a
+  real `nodev1.NodeControlServer` (not a hand-rolled substitute for the
+  client under test) serving over a loopback TCP port
+  (`net.Listen("tcp", "127.0.0.1:0")`), chosen over `bufconn` so Phase 9 can
+  boot the actual `client.NodeClient` against it with its real dialer -
+  `client.TLSConfig{Insecure: true}` is decision 0006's documented opt-out
+  for exactly this case. It supports one connected node at a time (all
+  Phase 9 needs): `Registers()`/`Heartbeats()`/`QueryResults()` channels
+  observe what the node sends, `SendQueryTask`/`SendUpdateAdvisory` push to
+  whichever node is currently connected (blocking until one connects, up to
+  the caller's `ctx`), and `DropConnection` force-closes the active stream
+  to exercise Phase 7's reconnect path. `TestCmdProductionCodeDoesNotImportTestSupport`
+  (`internal/domain/architecture_boundary_test.go`) makes "never import
+  this from `cmd/`" a build-breaking check, not just the package doc
+  comment. Proof: the package's own tests drive it with the generated
+  `nodev1.NodeControlClient` directly (not `client.NodeClient`), covering
+  register/heartbeat recording, task delivery and result recording,
+  advisory delivery, no-connection error, connection drop ending the
+  stream, and a second connection replacing the first - all passing under
+  `-race`.
 - Promote any phase-specific decision (e.g. checkpoint granularity,
   a specific mapping ambiguity) into `docs/decisions/` as that phase
   starts, per the pattern already used by 0001-0004.
@@ -726,13 +746,11 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
 
 ## Result
 
-Phase 7 complete — decision 0006 (TLS-by-default transport security), the
-`internal/adapters/federated/client.NodeClient` (dial-out, Register,
-30s Heartbeat with in-flight job IDs, `QueryTask` validate+execute+reply,
-`UpdateAdvisory` logging/storage, jittered-backoff reconnect), the
-`FederatedClientWorker` background worker wired into `cmd/app.Run` with
-graceful shutdown, and `GET /admin/status` are all in place, proven against
-a real in-process `NodeControl` server over `bufconn`. Phase 8 (in-repo stub
-control center, so the client can be exercised against something that
-actually accepts its dial-out instead of only the bufconn unit tests) is
-next.
+Phase 8 complete — `internal/testsupport/controlcenterstub.Server`, a real
+`NodeControl` gRPC server over a loopback TCP port, gives Phase 9 something
+the actual `client.NodeClient` can dial out to and that can push
+`QueryTask`/`UpdateAdvisory` and drop the connection on command. Guarded
+against ever reaching a production binary by
+`TestCmdProductionCodeDoesNotImportTestSupport`. Phase 9 (end-to-end
+integration test wiring the real client, the stub, and the full app
+together) is next.

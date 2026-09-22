@@ -63,6 +63,20 @@ func TestDeliveryProductionCodeDoesNotImportPersistenceAdapters(t *testing.T) {
 	})
 }
 
+// TestCmdProductionCodeDoesNotImportTestSupport catches the Phase 8 stub
+// control center (internal/testsupport/controlcenterstub) - or any other
+// test-only helper - leaking into a real binary's entrypoint, instead of
+// relying only on its package doc comment saying not to.
+func TestCmdProductionCodeDoesNotImportTestSupport(t *testing.T) {
+	repoRoot := codebaseRoot(t)
+	archtest.AssertProductionImports(t, archtest.ImportPolicy{
+		RootDir: filepath.Join(repoRoot, "cmd"),
+		ForbiddenFirstPartyPrefixes: []string{
+			"internal/testsupport",
+		},
+	})
+}
+
 func TestCodebaseDoesNotUseHandwrittenTestDoubles(t *testing.T) {
 	archtest.AssertNoHandwrittenTestDoubles(t, archtest.TestDoublePolicy{
 		RootDir: codebaseRoot(t),
