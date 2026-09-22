@@ -4,7 +4,7 @@ Date: 2026-09-16
 
 ## Status
 
-Active
+Completed
 
 ## Outcome
 
@@ -361,18 +361,18 @@ Files: `internal/testsupport/controlcenterstub/server.go` implementing
 
 Files: `tests/integration/federated_query_test.go`, added to CI.
 
-- [ ] Boot the Phase 7 client against the Phase 8 stub; seed D3 (Phase
+- [x] Boot the Phase 7 client against the Phase 8 stub; seed D3 (Phase
       1-2 fixtures); enable the needed fields in D5 (Phase 3); send a
       valid `QueryTask`; assert `QueryResult{status: OK, matching_count:
       <expected>}`.
-- [ ] Rejected case: reference a disabled/unknown field → assert
+- [x] Rejected case: reference a disabled/unknown field → assert
       `REJECTED_INVALID_QUERY`.
-- [ ] Dropped-stream case: sever the stub connection mid-task, let the
+- [x] Dropped-stream case: sever the stub connection mid-task, let the
       client reconnect, assert the result still arrives via Phase 6's
       checkpoint resume.
-- [ ] `UpdateAdvisory` case: stub sends an advisory, assert
+- [x] `UpdateAdvisory` case: stub sends an advisory, assert
       `GET /admin/status` reflects it.
-- [ ] Wire into `.github/workflows/ci.yml` (new `make test-integration`
+- [x] Wire into `.github/workflows/ci.yml` (new `make test-integration`
       target or folded into the existing Postgres-repository test job).
 
 ## Risks And Recovery
@@ -406,7 +406,7 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
 - [x] Phase 6 — D4 Job Progress Checkpoint + resumable execution.
 - [x] Phase 7 — gRPC client: dial-out, Register/Heartbeat, task handling.
 - [x] Phase 8 — In-repo stub control center (test support only).
-- [ ] Phase 9 — End-to-end integration test across the full chain.
+- [x] Phase 9 — End-to-end integration test across the full chain.
 
 ## Decisions
 
@@ -729,6 +729,32 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
   advisory delivery, no-connection error, connection drop ending the
   stream, and a second connection replacing the first - all passing under
   `-race`.
+- 2026-09-22 (Phase 9): `tests/integration/federated_query_test.go` wires
+  every earlier phase together for real: a real Postgres D3/D4/D5, the
+  production HTTP router (`app.SetupRouter`) with admin Basic Auth, and a
+  real `client.NodeClient` dialing a Phase 8 stub over loopback TCP - no
+  mocks anywhere in this chain. Valid-query, disabled-field-rejected, and
+  `UpdateAdvisory`-reflected-in-`GET /admin/status` are proven directly.
+  The dropped-stream/resume case needed a way to interrupt a job
+  deterministically without racing wall-clock timing against an async,
+  cross-goroutine network disconnect: a small test-local
+  `dropAfterNthChunk` type wraps the *real* `PatientRegistryRepository`,
+  and on its Nth `CountMatchingCohortChunk` call - after that call's own
+  real DB read has already returned - triggers `stub.DropConnection()`
+  and then blocks on `<-ctx.Done()` before returning. Blocking there
+  guarantees the use case's very next action, `JobProgressRepository.Save`
+  (same `ctx`), sees an already-cancelled context - `database/sql` aborts
+  a `*Context` call immediately when `ctx` is already done, before touching
+  the network - so that chunk's checkpoint write deterministically never
+  happens, without needing to win any timing race. Observed and confirmed
+  live: chunk 2's `Save` fails with `context canceled`, the client logs
+  "interrupted; will resume" and sends nothing, the stream ends, the client
+  reconnects, and resending the identical `QueryTask` resumes from the
+  chunk-1 checkpoint and completes with the correct total
+  (`matching_count: 2`, `job_progress.status = done`). All four cases
+  passed 8/8 consecutive runs and under `-race`. Added `make
+  test-integration` (real Postgres via the same Testcontainers path as
+  `test-postgres-repositories`) and a matching CI step.
 - Promote any phase-specific decision (e.g. checkpoint granularity,
   a specific mapping ambiguity) into `docs/decisions/` as that phase
   starts, per the pattern already used by 0001-0004.
@@ -746,11 +772,25 @@ Files: `tests/integration/federated_query_test.go`, added to CI.
 
 ## Result
 
-Phase 8 complete — `internal/testsupport/controlcenterstub.Server`, a real
-`NodeControl` gRPC server over a loopback TCP port, gives Phase 9 something
-the actual `client.NodeClient` can dial out to and that can push
-`QueryTask`/`UpdateAdvisory` and drop the connection on command. Guarded
-against ever reaching a production binary by
-`TestCmdProductionCodeDoesNotImportTestSupport`. Phase 9 (end-to-end
-integration test wiring the real client, the stub, and the full app
-together) is next.
+All nine phases are complete. `tests/integration/federated_query_test.go`
+(Phase 9) proves the whole chain works together on real infrastructure: a
+real Postgres-backed D3/D4/D5, the production HTTP admin surface, and a real
+gRPC `client.NodeClient` dialing the Phase 8 stub - valid query →
+`matching_count`, a disabled field → `REJECTED_INVALID_QUERY`, a dropped
+connection mid-task → deterministic checkpoint resume with the correct
+total, and an `UpdateAdvisory` → reflected in `GET /admin/status`. Wired
+into CI via `make test-integration`.
+
+This plan's outcome (see `## Outcome` above) is delivered: the node agent
+ingests real hospital exports into D3, dials out and holds a gRPC stream to
+a control center, validates and executes `QueryTask`s with resumable
+checkpointing, returns suppressed aggregate results, exposes local REST
+admin, and is proven end-to-end against an in-repo stub since the real
+control center is a separate, not-yet-built service. What remains
+out-of-scope by design (see `## Scope`): the control center itself,
+per-node dispatch authorization, human-in-the-loop approval, and advisory
+escalation - each already named as a follow-up in its own decision record,
+not silently dropped.
+
+Move this plan to `docs/plans/completed/` now that Phase 9's validation is
+recorded above.

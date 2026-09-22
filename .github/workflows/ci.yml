@@ -53,6 +53,9 @@ jobs:
     - name: Run repository tests on PostgreSQL
       run: make test-postgres-repositories
 
+    - name: Run end-to-end federated query tests
+      run: make test-integration
+
     - name: Run tests
       run: make test
   lint:

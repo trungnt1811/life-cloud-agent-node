@@ -19,7 +19,7 @@ TOOLS_BIN := $(TOOLS_DIR)/bin
 PROTOC := $(TOOLS_BIN)/protoc
 PROTOC_INCLUDE := $(TOOLS_DIR)/include
 
-.PHONY: build clean run test test-coverage lint swagger swagger-check proto proto-tools proto-check template-identity-check migrate ingest mockgen mocks dev-up dev-down docker-db-up docker-db-down test-postgres-repositories test-postgres-repositories-fast
+.PHONY: build clean run test test-coverage lint swagger swagger-check proto proto-tools proto-check template-identity-check migrate ingest mockgen mocks dev-up dev-down docker-db-up docker-db-down test-postgres-repositories test-postgres-repositories-fast test-integration
 
 build:
 	go build -o ./bin/$(APP_BIN) ./cmd/main.go
@@ -41,6 +41,9 @@ test-postgres-repositories:
 
 test-postgres-repositories-fast:
 	TESTCONTAINERS_RYUK_DISABLED=true POSTGRES_REPOSITORY_TEST_IMAGE="$(POSTGRES_REPOSITORY_TEST_IMAGE)" POSTGRES_REPOSITORY_TEST_REUSE_CONTAINER=true POSTGRES_REPOSITORY_TEST_REUSE_SCOPE=package go test ./internal/adapters/repositories/... -count=1
+
+test-integration:
+	POSTGRES_REPOSITORY_TEST_IMAGE="$(POSTGRES_REPOSITORY_TEST_IMAGE)" go test ./tests/integration/... -count=1
 
 test-coverage:
 	go test -coverprofile=coverage.out ./...
