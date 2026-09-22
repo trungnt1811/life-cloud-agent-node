@@ -19,6 +19,11 @@ files after actual product domains, such as `overview.md`, `billing.md`,
   the control center's `NodeControl` gRPC server: connection lifecycle,
   message contracts, validation order, retry/resume semantics, and known v1
   limitations.
+- `deployed-node-instance.md` — connection cover sheet for one specific
+  live node deployment (identity, current D3/D5 state, what the control
+  center team needs to send us to get pointed at). Deployment-specific and
+  will drift from the running instance faster than the other docs here;
+  treat facts in it as "true as of its last edit," not evergreen.
 
 ## Update Rule
 
