@@ -15,6 +15,10 @@ files after actual product domains, such as `overview.md`, `billing.md`,
   gRPC channel and local stores.
 - `query-field-dictionary.md` — schema v1 global `field_code` set and demo
   compile hint (pairs with decision 0004).
+- `node-agent-connection-guide.md` — technical spec for whoever implements
+  the control center's `NodeControl` gRPC server: connection lifecycle,
+  message contracts, validation order, retry/resume semantics, and known v1
+  limitations.
 
 ## Update Rule
 
