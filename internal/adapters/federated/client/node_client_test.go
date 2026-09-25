@@ -354,6 +354,98 @@ func TestNodeClient_ReconnectsAfterStreamDrop(t *testing.T) {
 	require.Equal(t, first.GetNodeId(), second.GetNodeId(), "same node re-registers after reconnect")
 }
 
+func TestNodeClient_ReconnectsWhenExecutionIsInterruptedOnLiveStream(t *testing.T) {
+	server := newRecordingServer()
+	dial := startTestServer(t, server)
+	config := testConfig()
+	task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+	require.NoError(t, err)
+	task.JobId = "job-interrupted"
+
+	ctrl := gomock.NewController(t)
+	counter := mocks.NewMockCohortCountUseCase(ctrl)
+	gomock.InOrder(
+		counter.EXPECT().CountMatchingCohort(gomock.Any(), task.JobId, gomock.Any()).Return(uint64(0), context.DeadlineExceeded),
+		counter.EXPECT().CountMatchingCohort(gomock.Any(), task.JobId, gomock.Any()).Return(uint64(7), nil),
+	)
+	nc := client.NewNodeClient(config, client.Dependencies{
+		EnabledQueryFieldRepo: allEnabledFieldsRepoExpectation(ctrl),
+		CohortCounter:         counter,
+		SuppressionThreshold:  1,
+	}, nil, dial)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	go func() { _ = nc.Run(ctx) }()
+
+	requireRegister(t, server)
+	server.toSend <- &nodev1.CenterToNode{Payload: &nodev1.CenterToNode_QueryTask{QueryTask: task}}
+	requireRegister(t, server)
+	server.toSend <- &nodev1.CenterToNode{Payload: &nodev1.CenterToNode_QueryTask{QueryTask: task}}
+	select {
+	case result := <-server.results:
+		require.Equal(t, task.JobId, result.GetJobId())
+		require.EqualValues(t, 7, result.GetMatchingCount())
+	case <-time.After(2 * time.Second):
+		t.Fatal("resumed job did not return a result")
+	}
+}
+
+func TestNodeClient_LogsExecutionFailureLocally(t *testing.T) {
+	server := newRecordingServer()
+	dial := startTestServer(t, server)
+	task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+	require.NoError(t, err)
+	task.JobId = "job-failed"
+
+	ctrl := gomock.NewController(t)
+	counter := mocks.NewMockCohortCountUseCase(ctrl)
+	counter.EXPECT().CountMatchingCohort(gomock.Any(), task.JobId, gomock.Any()).Return(uint64(0), errors.New("cursor did not advance"))
+	log := mocks.NewMockLogger(ctrl)
+	log.EXPECT().Error("Query task execution failed", gomock.Any(), gomock.Any())
+	nc := client.NewNodeClient(testConfig(), client.Dependencies{
+		EnabledQueryFieldRepo: allEnabledFieldsRepoExpectation(ctrl), CohortCounter: counter,
+	}, log, dial)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	go func() { _ = nc.Run(ctx) }()
+	requireRegister(t, server)
+	server.toSend <- &nodev1.CenterToNode{Payload: &nodev1.CenterToNode_QueryTask{QueryTask: task}}
+	select {
+	case result := <-server.results:
+		require.Equal(t, nodev1.QueryResultStatus_QUERY_RESULT_STATUS_ERROR, result.GetStatus())
+		require.Equal(t, "query execution failed", result.GetReason())
+	case <-time.After(2 * time.Second):
+		t.Fatal("failed job did not return an error result")
+	}
+}
+
+func TestNodeClient_ReturnsErrorWhenExecutorIsMissing(t *testing.T) {
+	server := newRecordingServer()
+	dial := startTestServer(t, server)
+	task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+	require.NoError(t, err)
+	task.JobId = "job-missing-executor"
+
+	ctrl := gomock.NewController(t)
+	log := mocks.NewMockLogger(ctrl)
+	log.EXPECT().Error("Query task execution failed", gomock.Any(), gomock.Any())
+	nc := client.NewNodeClient(testConfig(), client.Dependencies{
+		EnabledQueryFieldRepo: allEnabledFieldsRepoExpectation(ctrl),
+	}, log, dial)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	go func() { _ = nc.Run(ctx) }()
+	requireRegister(t, server)
+	server.toSend <- &nodev1.CenterToNode{Payload: &nodev1.CenterToNode_QueryTask{QueryTask: task}}
+	select {
+	case result := <-server.results:
+		require.Equal(t, nodev1.QueryResultStatus_QUERY_RESULT_STATUS_ERROR, result.GetStatus())
+		require.Equal(t, "query execution failed", result.GetReason())
+	case <-time.After(2 * time.Second):
+		t.Fatal("missing executor did not return an error result")
+	}
+}
+
 func requireRegister(t *testing.T, server *recordingNodeControlServer) *nodev1.Register {
 	t.Helper()
 	select {

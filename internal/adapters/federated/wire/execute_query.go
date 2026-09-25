@@ -35,9 +35,9 @@ func SuppressMatchingCount(raw, threshold uint64) (matchingCount uint64, suppres
 // their QueryResult status. The whitelist layer needs D5, so the caller must
 // still run ValidateQueryTaskV1 first (Phase 7).
 //
-// A canceled or expired ctx is returned as a Go error, not a terminal ERROR
-// result, so the caller can tell an interrupted job (resumable, Phase 6)
-// from a failed one.
+// A canceled or expired ctx returns a Go error without a result so the caller
+// can retry the checkpointed job. Other execution errors return a generic wire
+// ERROR result and the underlying Go error for node-local diagnostics.
 func ExecuteQueryTaskV1(
 	ctx context.Context,
 	task *nodev1.QueryTask,
@@ -86,7 +86,7 @@ func ExecuteQueryTaskV1(
 			JobId:  task.GetJobId(),
 			Status: nodev1.QueryResultStatus_QUERY_RESULT_STATUS_ERROR,
 			Reason: "query execution failed",
-		}, nil
+		}, err
 	}
 
 	matching, suppressed := SuppressMatchingCount(rawCount, suppressionThreshold)

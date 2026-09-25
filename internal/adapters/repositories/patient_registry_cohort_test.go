@@ -279,6 +279,25 @@ func TestPatientRegistryRepository_CountMatchingCohort_TieBreakUsesByteOrder(t *
 	require.Equal(t, uint64(1), count, "byte-order latest is S-a1 (MCV 70), which matches")
 }
 
+func TestPatientRegistryRepository_CountMatchingCohortChunk_TieBreakUsesByteOrder(t *testing.T) {
+	db := openPatientRegistryRepositoryTestDB(t)
+	repo := NewPatientRegistryRepository(db, logger.GetLogger())
+	day := time.Date(2024, 6, 1, 0, 0, 0, 0, time.UTC)
+	seedCohortPatient(t, repo, "TIE-CHUNK", []cohortSpecimenSeed{
+		{ExternalID: "S-a1", CollectedAt: day, Obs: []cohortObsSeed{{FieldCode: "MCV", Value: "70"}}},
+		{ExternalID: "S-B1", CollectedAt: day, Obs: []cohortObsSeed{{FieldCode: "MCV", Value: "90"}}},
+	})
+
+	chunk, err := repo.CountMatchingCohortChunk(context.Background(), types.CohortCriteria{
+		From: day, To: day,
+		Conditions: []types.CohortCondition{{FieldCode: "MCV", Op: types.ComparisonOpLT, NumberValue: "80"}},
+	}, uuid.Nil, 1)
+	require.NoError(t, err)
+	require.Equal(t, uint64(1), chunk.MatchingCount)
+	require.Equal(t, 1, chunk.PatientsScanned)
+	require.NotEqual(t, uuid.Nil, chunk.LastPatientID)
+}
+
 func TestBuildCountMatchingCohortSQL_PinsByteOrderTieBreak(t *testing.T) {
 	sql, _, err := buildCountMatchingCohortSQL(types.CohortCriteria{
 		From: time.Date(2024, 1, 1, 0, 0, 0, 0, time.UTC),

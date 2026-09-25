@@ -38,7 +38,9 @@ cross-repository mTLS integration test against the production agent binary.
   `Register` is only a self-asserted claim.
 - With TLS enabled, an invalid CA file or client key pair stops application
   startup before it opens the local database or serves HTTP. Network outages
-  after startup are retried with backoff.
+  after startup are retried with backoff. A fatal client error after startup
+  stops the application and shuts down its HTTP server; inspect the node log
+  for the cause.
 - There is no other wire-level authentication (no API key or bearer token
   field in the proto). If you need stronger node authentication than mTLS
   provides, that is a protocol change, not a configuration one.
@@ -53,10 +55,10 @@ cross-repository mTLS integration test against the production agent binary.
    open (§4.2) and expects none in return.
 4. You send `QueryTask` (§5) and `UpdateAdvisory` (§6) messages whenever you
    have them; there's no rate limit on your side implemented by the node.
-5. If the underlying connection drops for any reason (network blip, your
-   server restarting, an explicit close), the node's `stream.Recv()` errors
-   out, the node abandons that connection, waits (see §7 for the backoff
-   shape), reconnects, and sends a **fresh `Register`**. Treat a new
+5. If the underlying connection drops (network blip, your server restarting,
+   an explicit close), or a task is interrupted while the stream is still
+   open, the node abandons that stream, waits (see §7 for the backoff shape),
+   reconnects, and sends a **fresh `Register`**. Treat a new
    `Register` from a `node_id` you already had as "this node reconnected,"
    not as a second node.
 6. The node does not send any kind of graceful "goodbye" message before
@@ -165,7 +167,7 @@ field for the raw count — a node will never send it, by design.
 | `OK` | `matching_count` is valid. | N/A — done. |
 | `REJECTED_INVALID_QUERY` | The task failed structural, whitelist, or semantic validation (`reason` says which field/rule). | Only after fixing the task; resending the identical task gets the identical rejection. |
 | `UNSUPPORTED_VERSION` | `query_schema_version` isn't `1`. | Only after sending a version this node's `Register` advertised. |
-| `ERROR` | Internal node-side failure (e.g. its database is unreachable). | Safe to retry; not the node's fault. |
+| `ERROR` | Internal node-side failure (e.g. its database is unreachable). The wire reason is generic; inspect the node log with the `job_id` for the underlying error. | Safe to retry after the underlying failure is resolved. |
 
 ### 5.4 Validation order
 
@@ -183,10 +185,12 @@ from an `UNSUPPORTED_VERSION` response — the node didn't look that far.
 ### 5.5 No response is not a final answer — resume semantics
 
 **This is the one behavior most likely to surprise a new integrator.** If
-the node's connection to you drops while it is still executing a task (for
-a large cohort, execution is internally chunked and checkpointed — decision
-0005), the node sends **nothing** for that attempt: not `ERROR`, not a
-partial count. It reconnects and waits for you to ask again.
+the node's connection to you drops or local execution is interrupted while
+it is still executing a task (for a large cohort, execution is internally
+chunked and checkpointed — decision 0005), the node sends **nothing** for
+that attempt: not `ERROR`, not a partial count. It reconnects and waits for
+you to ask again. Other execution failures return `ERROR` on the current
+stream and are logged on the node.
 
 The correct pattern on your side:
 

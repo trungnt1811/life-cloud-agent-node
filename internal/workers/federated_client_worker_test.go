@@ -36,3 +36,9 @@ func TestFederatedClientWorker_StartReturnsOnFatalClientError(t *testing.T) {
 		t.Fatal("Start did not return after a fatal client configuration error")
 	}
 }
+
+func TestFederatedClientWorker_RunReturnsFatalClientError(t *testing.T) {
+	nodeClient := client.NewNodeClient(client.Config{}, client.Dependencies{}, nil, nil)
+	worker := workers.NewFederatedClientWorker(nodeClient, nil)
+	require.ErrorContains(t, worker.Run(context.Background()), "control center address is required")
+}

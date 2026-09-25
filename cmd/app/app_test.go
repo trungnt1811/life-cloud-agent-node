@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"errors"
 	"path/filepath"
 	"testing"
 
@@ -9,6 +10,20 @@ import (
 
 	"github.com/lifenetwork-ai/life-cloud-agent-node/conf"
 )
+
+func TestMergeAppErrorChannelsPropagatesWorkerFailure(t *testing.T) {
+	workerErrors := make(chan error, 1)
+	workerErrors <- errors.New("client credentials changed")
+	merged := mergeAppErrorChannels(context.Background(), make(chan error), workerErrors)
+	require.ErrorContains(t, <-merged, "federated client worker: client credentials changed")
+}
+
+func TestMergeAppErrorChannelsIdentifiesHTTPFailure(t *testing.T) {
+	serverErrors := make(chan error, 1)
+	serverErrors <- errors.New("listen failed")
+	merged := mergeAppErrorChannels(context.Background(), serverErrors, nil)
+	require.ErrorContains(t, <-merged, "http server: listen failed")
+}
 
 func TestRunRejectsInvalidFederatedTLSBeforeOpeningDatabase(t *testing.T) {
 	config := conf.DefaultConfiguration()

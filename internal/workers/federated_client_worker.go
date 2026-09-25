@@ -31,9 +31,14 @@ func (w *FederatedClientWorker) Name() string {
 // startup misconfiguration (decision 0006); transient connection failures are
 // retried internally and never surface here.
 func (w *FederatedClientWorker) Start(ctx context.Context) {
-	if err := w.nodeClient.Run(ctx); err != nil {
+	if err := w.Run(ctx); err != nil {
 		w.logger.Error("Federated client worker stopped", logger.Err(err))
 	}
+}
+
+// Run returns fatal client errors to callers that own the application lifecycle.
+func (w *FederatedClientWorker) Run(ctx context.Context) error {
+	return w.nodeClient.Run(ctx)
 }
 
 var _ types.Worker = (*FederatedClientWorker)(nil)

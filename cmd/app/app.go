@@ -58,9 +58,10 @@ func Run(ctx context.Context, config *conf.Configuration) error {
 	appLogger := instances.LoggerInstance()
 	advisories := client.NewAdvisoryStore()
 	r := SetupRouter(runCtx, db, config, advisories, appLogger)
-	workerDone := startFederatedClientWorker(runCtx, db, config, advisories, appLogger)
+	workerDone, workerErrC := startFederatedClientWorker(runCtx, db, config, advisories, appLogger)
 	httpServer, serverErrC := server.StartHTTP(r, server.HTTPConfig{Port: config.AppPort}, appLogger)
-	runErr := server.WaitForShutdownSignal(runCtx, cancel, httpServer, serverErrC, server.GracefulTimeout(0), appLogger)
+	runErr := server.WaitForShutdownSignal(runCtx, cancel, httpServer,
+		mergeAppErrorChannels(runCtx, serverErrC, workerErrC), server.GracefulTimeout(0), appLogger)
 
 	// cancel() (called by WaitForShutdownSignal) already told the worker to
 	// stop; give it the same graceful window as the HTTP server so its
@@ -109,10 +110,10 @@ func startFederatedClientWorker(
 	config *conf.Configuration,
 	advisories *client.AdvisoryStore,
 	appLogger logger.Logger,
-) <-chan struct{} {
+) (<-chan struct{}, <-chan error) {
 	if strings.TrimSpace(config.ControlCenterAddress) == "" {
 		appLogger.Warn("Federated client worker not started; CONTROL_CENTER_ADDRESS is not set")
-		return nil
+		return nil, nil
 	}
 
 	repos := di.InitializeRepos(ctx, db, appLogger, runtimeconfig.ModuleConfigsFromConfiguration(config))
@@ -127,11 +128,34 @@ func startFederatedClientWorker(
 
 	worker := workers.NewFederatedClientWorker(nodeClient, appLogger)
 	done := make(chan struct{})
+	errC := make(chan error, 1)
 	go func() {
 		defer close(done)
-		worker.Start(ctx)
+		if err := worker.Run(ctx); err != nil {
+			errC <- err
+		} else if ctx.Err() == nil {
+			errC <- fmt.Errorf("federated client stopped unexpectedly")
+		}
 	}()
-	return done
+	return done, errC
+}
+
+func mergeAppErrorChannels(ctx context.Context, serverErrC, workerErrC <-chan error) <-chan error {
+	out := make(chan error, 1)
+	go func() {
+		select {
+		case err := <-serverErrC:
+			if err != nil {
+				out <- fmt.Errorf("http server: %w", err)
+			} else {
+				out <- nil
+			}
+		case err := <-workerErrC:
+			out <- fmt.Errorf("federated client worker: %w", err)
+		case <-ctx.Done():
+		}
+	}()
+	return out
 }
 
 func federatedClientConfig(config *conf.Configuration) client.Config {

@@ -155,9 +155,9 @@ WHERE TRUE` + filter
 
 // buildCountMatchingCohortChunkSQL counts matches among the next `limit`
 // candidate patients after afterPatientID (uuid.Nil = from the start). The
-// candidate set is chosen first, and specimens are ranked only for those
-// patients, so each patient is judged on all of its in-range specimens and a
-// chunked walk sums to the unchunked count.
+// candidate set is chosen first, then the latest in-range specimen is looked
+// up for each patient. Every patient is judged against the same specimen as
+// the unchunked query, so a chunked walk sums to the unchunked count.
 func buildCountMatchingCohortChunkSQL(
 	criteria types.CohortCriteria,
 	afterPatientID uuid.UUID,
@@ -184,24 +184,24 @@ WITH chunk AS (
 	ORDER BY patient_id
 	LIMIT ?
 ),
-ranked AS (
-	SELECT id, patient_id,
-		` + latestSpecimenPartitionSQL + `
-	FROM specimens
-	WHERE collected_at >= ?::date AND collected_at <= ?::date
-		AND patient_id IN (SELECT patient_id FROM chunk)
-),
 latest AS (
-	SELECT id AS specimen_id, patient_id
-	FROM ranked
-	WHERE rn = 1
+	SELECT s.id AS specimen_id, c.patient_id
+	FROM chunk c
+	CROSS JOIN LATERAL (
+		SELECT id
+		FROM specimens s
+		WHERE s.patient_id = c.patient_id
+			AND s.collected_at >= ?::date AND s.collected_at <= ?::date
+		ORDER BY s.collected_at DESC, s.external_specimen_id COLLATE "C" DESC
+		LIMIT 1
+	) s
 )
 SELECT
 	(SELECT COUNT(*) FROM latest ls WHERE TRUE` + filter + `)::bigint AS matching_count,
 	(SELECT COUNT(*) FROM chunk)::bigint AS patients_scanned,
 	(SELECT patient_id FROM chunk ORDER BY patient_id DESC LIMIT 1) AS last_patient_id`
-	// Placeholders appear in text order: chunk window/cursor/limit, ranked
-	// window, then the filter's own arguments inside the first subselect.
+	// Placeholders appear in text order: chunk window/cursor/limit, latest
+	// specimen window, then the filter's arguments inside the first subselect.
 	args = append(args, filterArgs...)
 	return sql, args, nil
 }

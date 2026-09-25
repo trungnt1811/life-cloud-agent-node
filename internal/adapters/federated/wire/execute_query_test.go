@@ -202,7 +202,7 @@ func TestExecuteQueryTaskV1_RepoFailureIsErrorStatus(t *testing.T) {
 		Return(uint64(0), errors.New("db down"))
 
 	result, err := federatedwire.ExecuteQueryTaskV1(context.Background(), task, repo, 5)
-	require.NoError(t, err)
+	require.ErrorContains(t, err, "db down")
 	require.Equal(t, nodev1.QueryResultStatus_QUERY_RESULT_STATUS_ERROR, result.GetStatus())
 	require.Contains(t, result.GetReason(), "execution failed")
 }

@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -42,15 +43,14 @@ func WaitForShutdownSignal(
 	signal.Notify(sigC, syscall.SIGTERM, syscall.SIGINT)
 	defer signal.Stop(sigC)
 
+	var componentErr error
 	select {
 	case sig := <-sigC:
 		log.Info("Received shutdown signal", logger.String("signal", sig.String()))
 	case err := <-serverErrC:
-		cancel()
 		if err != nil {
-			return fmt.Errorf("http server stopped unexpectedly: %w", err)
+			componentErr = fmt.Errorf("application component stopped unexpectedly: %w", err)
 		}
-		return nil
 	case <-ctx.Done():
 		log.Info("Application context canceled; shutting down", logger.Err(ctx.Err()))
 	}
@@ -58,13 +58,13 @@ func WaitForShutdownSignal(
 	log.Debug("Shutting down gracefully")
 	cancel()
 	if server == nil {
-		return nil
+		return componentErr
 	}
 
 	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), GracefulTimeout(gracefulShutdownTimeout))
 	defer shutdownCancel()
 	if err := server.Shutdown(shutdownCtx); err != nil {
-		return fmt.Errorf("shutdown http server: %w", err)
+		return errors.Join(componentErr, fmt.Errorf("shutdown http server: %w", err))
 	}
-	return nil
+	return componentErr
 }

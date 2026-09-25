@@ -229,12 +229,13 @@ func (c *NodeClient) runConnection(ctx context.Context, conn *grpc.ClientConn) e
 		if err != nil {
 			return err
 		}
-		c.handleCenterMessage(connCtx, msg, sendCh, inflight, &taskWG)
+		c.handleCenterMessage(connCtx, cancel, msg, sendCh, inflight, &taskWG)
 	}
 }
 
 func (c *NodeClient) handleCenterMessage(
 	connCtx context.Context,
+	cancel context.CancelFunc,
 	msg *nodev1.CenterToNode,
 	sendCh chan<- *nodev1.NodeToCenter,
 	inflight *inflightJobs,
@@ -254,6 +255,11 @@ func (c *NodeClient) handleCenterMessage(
 			defer inflight.remove(jobID)
 			result := c.handleQueryTask(connCtx, task)
 			if result == nil {
+				if connCtx.Err() == nil {
+					// A lower-layer interruption left this stream alive. Force a
+					// reconnect so the control plane resends the checkpointed job.
+					cancel()
+				}
 				return
 			}
 			select {
@@ -292,9 +298,18 @@ func (c *NodeClient) handleQueryTask(ctx context.Context, task *nodev1.QueryTask
 
 	result, err := federatedwire.ExecuteQueryTaskV1(ctx, task, c.deps.CohortCounter, c.deps.SuppressionThreshold)
 	if err != nil {
-		c.logger.Warn("Query task execution interrupted; will resume on retry",
-			logger.String("job_id", task.GetJobId()), logger.Err(err))
-		return nil
+		if result == nil {
+			if ctx.Err() != nil || errors.Is(err, context.Canceled) || errors.Is(err, context.DeadlineExceeded) {
+				c.logger.Warn("Query task execution interrupted; reconnecting for retry",
+					logger.String("job_id", task.GetJobId()), logger.Err(err))
+				return nil
+			}
+			result = &nodev1.QueryResult{
+				JobId: task.GetJobId(), Status: nodev1.QueryResultStatus_QUERY_RESULT_STATUS_ERROR,
+				Reason: "query execution failed",
+			}
+		}
+		c.logger.Error("Query task execution failed", logger.String("job_id", task.GetJobId()), logger.Err(err))
 	}
 	return result
 }
