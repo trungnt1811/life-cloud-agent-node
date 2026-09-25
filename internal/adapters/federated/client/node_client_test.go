@@ -18,6 +18,7 @@ import (
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/federated/client"
 	federatedwire "github.com/lifenetwork-ai/life-cloud-agent-node/internal/adapters/federated/wire"
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/entities"
+	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/domain/types"
 	"github.com/lifenetwork-ai/life-cloud-agent-node/internal/mocks"
 )
 
@@ -203,6 +204,63 @@ func TestNodeClient_ExecutesQueryTaskAndSendsResult(t *testing.T) {
 	case <-time.After(2 * time.Second):
 		t.Fatal("timed out waiting for QueryResult")
 	}
+}
+
+func TestNodeClient_DuplicateTaskDoesNotExecuteConcurrently(t *testing.T) {
+	server := newRecordingServer()
+	dial := startTestServer(t, server)
+	task, err := federatedwire.CompileDemoQueryTaskFromFixture()
+	require.NoError(t, err)
+	task.JobId = "job-duplicate"
+
+	ctrl := gomock.NewController(t)
+	counter := mocks.NewMockCohortCountUseCase(ctrl)
+	started := make(chan struct{}, 2)
+	release := make(chan struct{})
+	defer close(release)
+	var calls atomic.Int32
+	counter.EXPECT().CountMatchingCohort(gomock.Any(), "job-duplicate", gomock.Any()).
+		DoAndReturn(func(_ context.Context, _ string, _ types.CohortCriteria) (uint64, error) {
+			if calls.Add(1) == 1 {
+				started <- struct{}{}
+				<-release
+			} else {
+				started <- struct{}{}
+			}
+			return 2, nil
+		}).AnyTimes()
+
+	nc := client.NewNodeClient(testConfig(), client.Dependencies{
+		EnabledQueryFieldRepo: allEnabledFieldsRepoExpectation(ctrl),
+		CohortCounter:         counter,
+		SuppressionThreshold:  1,
+	}, nil, dial)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	go func() { _ = nc.Run(ctx) }()
+
+	<-server.registers
+	message := &nodev1.CenterToNode{Payload: &nodev1.CenterToNode_QueryTask{QueryTask: task}}
+	server.toSend <- message
+	select {
+	case <-started:
+	case <-time.After(2 * time.Second):
+		t.Fatal("first task did not start")
+	}
+	server.toSend <- message
+	select {
+	case <-started:
+		t.Fatal("duplicate task started while first execution was in flight")
+	case <-time.After(200 * time.Millisecond):
+	}
+	release <- struct{}{}
+	select {
+	case result := <-server.results:
+		require.Equal(t, uint64(2), result.GetMatchingCount())
+	case <-time.After(2 * time.Second):
+		t.Fatal("first task did not return a result")
+	}
+	require.EqualValues(t, 1, calls.Load())
 }
 
 func TestNodeClient_RejectsUnknownVersionWithoutQueryingD3(t *testing.T) {

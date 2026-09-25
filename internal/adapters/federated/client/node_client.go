@@ -77,6 +77,27 @@ func (c Config) normalized() Config {
 	return c
 }
 
+// Validate checks fatal client configuration before the application starts
+// serving HTTP. Reachability is retried by Run and is not checked here.
+func (c Config) Validate() error {
+	_, err := c.transportCredentials()
+	return err
+}
+
+func (c Config) transportCredentials() (credentials.TransportCredentials, error) {
+	if strings.TrimSpace(c.Address) == "" {
+		return nil, errors.New("control center address is required")
+	}
+	if strings.TrimSpace(c.NodeID) == "" {
+		return nil, errors.New("node_id is required")
+	}
+	creds, err := c.TLS.Credentials()
+	if err != nil {
+		return nil, fmt.Errorf("control center transport credentials: %w", err)
+	}
+	return creds, nil
+}
+
 // Dialer creates a ClientConn for address. Overridable in tests (bufconn).
 type Dialer func(address string, creds credentials.TransportCredentials) (*grpc.ClientConn, error)
 
@@ -120,16 +141,9 @@ func NewNodeClient(config Config, deps Dependencies, log logger.Logger, dial Dia
 // misconfiguration (decision 0006: bad TLS setup fails loudly at start,
 // never falls back to plaintext).
 func (c *NodeClient) Run(ctx context.Context) error {
-	if strings.TrimSpace(c.config.Address) == "" {
-		return errors.New("control center address is required")
-	}
-	if strings.TrimSpace(c.config.NodeID) == "" {
-		return errors.New("node_id is required")
-	}
-
-	creds, err := c.config.TLS.Credentials()
+	creds, err := c.config.transportCredentials()
 	if err != nil {
-		return fmt.Errorf("control center transport credentials: %w", err)
+		return err
 	}
 
 	backoff := c.config.InitialBackoff
@@ -230,7 +244,10 @@ func (c *NodeClient) handleCenterMessage(
 	case *nodev1.CenterToNode_QueryTask:
 		task := payload.QueryTask
 		jobID := task.GetJobId()
-		inflight.add(jobID)
+		if !inflight.add(jobID) {
+			c.logger.Warn("Duplicate in-flight query task ignored", logger.String("job_id", jobID))
+			return
+		}
 		taskWG.Add(1)
 		go func() {
 			defer taskWG.Done()

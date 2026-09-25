@@ -19,8 +19,8 @@ expected to follow.
 - Each node agent owns its local store (patient, diagnosis, lab, transfusion,
   chelation records ingested from that hospital's own systems) and answers
   queries against it locally.
-- This repository builds one node agent. The coordinator is a separate,
-  not-yet-built service.
+- This repository builds one node agent. The coordinator is the separate
+  `life-cloud-control-plane` service.
 
 ## Protocol Split
 
@@ -41,9 +41,9 @@ diagrams, and data flow dictionary, and
 
 ## Current Status
 
-Template bootstrap is complete (see `docs/plans/completed/`). Architecture,
-query/update behavior, and the gRPC wire contract / schema v1 are decided
-(`docs/decisions/0001`–`0004`). The `.proto` contract and generated Go stubs
-are checked in (`api/proto/`, `gen/`); no gRPC server or federated query
-domain model is implemented yet. The example CRUD code is still the
-template's placeholder domain.
+The schema-v1 gRPC client, local cohort counter, resumable job checkpoints,
+small-cell suppression, and control-plane integration are implemented. The
+`.proto` contract and generated Go stubs are checked in (`api/proto/`,
+`gen/`). The example CRUD code remains a template placeholder. The control
+plane's production multi-instance rollout still needs target-environment
+sign-off; see its implementation plan for that separate deployment gate.

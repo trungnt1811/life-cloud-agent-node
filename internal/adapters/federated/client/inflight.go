@@ -13,10 +13,15 @@ func newInflightJobs() *inflightJobs {
 	return &inflightJobs{ids: make(map[string]struct{})}
 }
 
-func (s *inflightJobs) add(jobID string) {
+// add returns false when the job is already executing on this connection.
+func (s *inflightJobs) add(jobID string) bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if _, exists := s.ids[jobID]; exists {
+		return false
+	}
 	s.ids[jobID] = struct{}{}
+	return true
 }
 
 func (s *inflightJobs) remove(jobID string) {

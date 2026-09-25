@@ -61,3 +61,21 @@ func TestDefaultConfigurationMapUsesRuntimeDefaults(t *testing.T) {
 	require.Equal(t, defaultSuppressionThreshold, defaultConfigurations["SUPPRESSION_THRESHOLD"])
 	require.Equal(t, defaultJobChunkSize, defaultConfigurations["JOB_CHUNK_SIZE"])
 }
+
+func TestProductionFederatedClientRequiresMTLS(t *testing.T) {
+	config := DefaultConfiguration()
+	config.Env = "production"
+	config.ControlCenterAddress = "control-plane:9090"
+	config.ControlCenterInsecure = true
+	require.ErrorContains(t, ValidateConfiguration(config), "CONTROL_CENTER_INSECURE")
+	config.ControlCenterAddress = ""
+	require.ErrorContains(t, ValidateConfiguration(config), "CONTROL_CENTER_INSECURE")
+	config.ControlCenterAddress = "control-plane:9090"
+
+	config.ControlCenterInsecure = false
+	require.ErrorContains(t, ValidateConfiguration(config), "CONTROL_CENTER_CLIENT_CERT_FILE")
+
+	config.ControlCenterClientCertFile = "node.pem"
+	config.ControlCenterClientKeyFile = "node-key.pem"
+	require.NoError(t, ValidateConfiguration(config))
+}

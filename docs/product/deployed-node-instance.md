@@ -1,6 +1,6 @@
 # Deployed Node Instance: Connecting the Control Center
 
-Audience: engineers standing up the control center, once it exists. This
+Audience: engineers connecting a node to the control plane. This
 document is the connection cover sheet for one already-deployed, live node
 instance. For the general wire protocol every node implements — message
 contracts, validation order, retry/resume semantics — see
@@ -9,17 +9,17 @@ contracts, validation order, retry/resume semantics — see
 
 ## 1. Who connects to whom (read this first)
 
-**The node dials out to the control center. The control center never dials
-the node** (decision 0001). This instance currently has no control center to
-call, so its gRPC client is idle — nothing is listening for you to connect
-to on the node's side, and there is nothing to "connect to the node" in the
-usual client-server sense.
+**The node dials out to the control plane. The control plane never dials
+the node** (decision 0001). This instance's connection state and configuration
+must be verified with its operator; the deployment details below are a
+historical snapshot, not live status. Nothing listens for federated gRPC
+traffic on the node's side.
 
 To bring this node online against your control center:
 
-1. You stand up your `NodeControl` gRPC server (implementing the service in
-   `api/proto/lifecloud/node/v1/node_control.proto`) at a publicly reachable
-   address.
+1. Run the control plane's `NodeControl` gRPC server (implementing the service
+   in `api/proto/lifecloud/node/v1/node_control.proto`) at an address reachable
+   by the node.
 2. You give the node operator that address, plus TLS details (§3).
 3. The operator sets `CONTROL_CENTER_ADDRESS` (and TLS config, if needed) in
    this instance's environment and restarts the `app` container. The node
@@ -48,11 +48,11 @@ having your server ready to accept its connection.
   - A certificate from a public CA (nothing else to configure on our side), or
   - A certificate from a private CA — send us the CA certificate so we can
     set `CONTROL_CENTER_CA_FILE`.
-- **mTLS (optional but recommended for anything beyond a demo).** If you
-  want cryptographic proof of which node is connecting (rather than trusting
-  the self-asserted `node_id` string — see the connection guide's §2/§8 on
-  this gap), issue us a client certificate/key pair and we'll configure
-  `CONTROL_CENTER_CLIENT_CERT_FILE` / `CONTROL_CENTER_CLIENT_KEY_FILE`.
+- **mTLS (required in production).** Issue a client certificate/key pair and
+  register the certificate fingerprint for this node in the control plane.
+  Configure `CONTROL_CENTER_CLIENT_CERT_FILE` and
+  `CONTROL_CENTER_CLIENT_KEY_FILE` on the node. Development environments may
+  omit mTLS; see the connection guide's §2 for that boundary.
 
 Once you have that, tell the node operator; the config change and restart
 take under a minute, and the node will register on the next connection

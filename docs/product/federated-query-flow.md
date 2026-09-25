@@ -2,13 +2,13 @@
 
 Data flow diagrams (level 0, 1 & 2), the async query sequence, the node
 update/release flow, and the data flow dictionary for the Life Cloud node
-agent and its (not-yet-built) control center. This is the reviewed shape
+agent and its control plane. This is the reviewed shape
 `docs/decisions/0001`–`0003` describe in prose; the normative wire contract
 is decision 0004 (`.proto` implementation follows that decision).
 
 Each hospital runs one node agent against its own local data; no
-patient-level record ever leaves the node. A central control center (not
-yet built) accepts cohort queries, fans them out to every online node over a
+patient-level record ever leaves the node. The `life-cloud-control-plane`
+service accepts cohort queries, fans them out to eligible online nodes over a
 long-lived, node-initiated gRPC stream, and returns only the aggregated,
 suppressed results.
 
@@ -46,7 +46,7 @@ flowchart TB
   HIS["Hospital Systems<br/>(HIS / LIS / Blood bank / Pharmacy)"]
   OPERATOR["Node Operator<br/>(hospital or Life Cloud site admin)"]
 
-  subgraph CC["Control Center — not yet built"]
+  subgraph CC["Control Plane"]
     direction TB
     P1(("1.0<br/>Manage Federated<br/>Query"))
     P2(("2.0<br/>Track Node<br/>Connections"))

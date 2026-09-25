@@ -14,14 +14,13 @@ and architecture guards.
 
 ## Current Status
 
-Template bootstrap is complete (module, app, and database identity match this
-repository). Architecture and the gRPC wire contract / query schema v1 are
-decided (`docs/decisions/0001`–`0004`). The `.proto` source and generated Go
-stubs live under `api/proto/` and `gen/`; regenerate with `make proto`. No
-gRPC server or federated query runtime exists yet — the
-`internal/domain/.../example*` CRUD code is still the template's placeholder
-domain, not the thalassemia data model. See `docs/plans/` for active and
-completed work.
+The agent dials the sibling `life-cloud-control-plane` service over a
+long-lived gRPC stream. It validates schema-v1 cohort tasks, counts against its
+local patient registry with resumable checkpoints, and returns protected
+counts. The control plane handles registration, dispatch, results, and
+aggregation. The `.proto` source and generated Go stubs live under
+`api/proto/` and `gen/`; regenerate with `make proto`. The `example*` CRUD
+code remains a template placeholder. See `docs/plans/` for completed work.
 
 ## Features
 
@@ -29,8 +28,8 @@ completed work.
   adapters
 - **REST (Gin)**: node-local HTTP surface for health checks, admin, and
   Swagger/OpenAPI docs
-- **gRPC (planned)**: the federated query channel between the central
-  coordinator and this node agent; not yet implemented (decision 0001)
+- **gRPC**: node-initiated federated query stream to the control plane, with
+  TLS by default and client-certificate mTLS for production connections
 - **Database**: PostgreSQL with GORM ORM and migrations
 - **Caching**: Redis integration with configurable TTL
 - **Configuration**: environment-based configuration with Viper and

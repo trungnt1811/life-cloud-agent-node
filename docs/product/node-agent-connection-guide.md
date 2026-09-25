@@ -1,14 +1,13 @@
 # Node Agent Connection Guide
 
-Audience: engineers implementing the control center's `NodeControl` gRPC
-server. This is the normative behavior of the node agent implemented in this
-repository (`life-cloud-agent-node`) as of the commit that added this
-document — not aspirational or partially-built behavior. Every claim below
-is backed by tested code; file references point at the source of truth.
+Audience: engineers operating or extending the control plane's `NodeControl`
+gRPC server. This describes behavior implemented in the node agent
+(`life-cloud-agent-node`). Code and tests cited below provide the current
+source of truth.
 
-This repository implements only the **node** side. The control center is a
-separate, not-yet-built service (decision 0001) — this document is what that
-service needs to implement to interoperate with a real node.
+This repository implements only the **node** side. The sibling
+`life-cloud-control-plane` repository implements the server and runs a
+cross-repository mTLS integration test against the production agent binary.
 
 ## 1. Summary
 
@@ -30,14 +29,16 @@ service needs to implement to interoperate with a real node.
   node operator configures one. There is a node-local opt-out
   (`CONTROL_CENTER_INSECURE=true`) for local development only; do not expect
   production nodes to use it.
-- **mTLS is supported but optional.** If a node operator configures a client
-  certificate, the node presents it during the TLS handshake. Your server
-  can verify it if you want cryptographic node identity. If you don't
-  configure mTLS verification, the only node identity you get is the
-  self-asserted `node_id` string in `Register` (see §4) — **it is not
-  cryptographically bound to the connection unless you verify the mTLS
-  client certificate**. Treat an unverified `node_id` as a claim, not a
-  proof, until your side issues and checks node certificates.
+- **mTLS is required for production connections.** When `ENV=production` or
+  `prod` and `CONTROL_CENTER_ADDRESS` is set, the node requires both client
+  certificate and key files and rejects `CONTROL_CENTER_INSECURE=true`.
+  The control plane's production gRPC gateway also requires and verifies the
+  client certificate against the registered node fingerprint. Development
+  setups can omit mTLS. Without certificate verification, `node_id` in
+  `Register` is only a self-asserted claim.
+- With TLS enabled, an invalid CA file or client key pair stops application
+  startup before it opens the local database or serves HTTP. Network outages
+  after startup are retried with backoff.
 - There is no other wire-level authentication (no API key or bearer token
   field in the proto). If you need stronger node authentication than mTLS
   provides, that is a protocol change, not a configuration one.
@@ -207,6 +208,10 @@ The correct pattern on your side:
    instead of erroring — treat `job_id` as globally unique per query, not
    per node.
 
+If the same `job_id` arrives again while its task is already executing on the
+same stream, the node ignores that duplicate. The first execution sends one
+result. Resend after reconnect if that result was lost, as described above.
+
 ### 5.6 Worked example
 
 A happy path, in message order:
@@ -279,8 +284,9 @@ logic around them rather than assuming they'll silently disappear:
   entirely node-local (each hospital's own `enabled_query_fields`); the only
   way to learn it today is to send a task and observe
   `REJECTED_INVALID_QUERY`, or have the node operator tell you out of band.
-- **`node_id` is self-asserted** unless you independently verify the mTLS
-  client certificate (§2).
+- **`node_id` needs certificate binding.** The production control plane
+  verifies the registered client-certificate fingerprint; a development
+  server without that check receives only a self-asserted ID (§2).
 - **No `UpdateAdvisory` acknowledgment** (§6).
 - **One active connection per node is assumed.** The node does not
   coordinate multiple simultaneous streams from the same process; don't

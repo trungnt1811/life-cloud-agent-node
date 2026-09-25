@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -25,6 +26,17 @@ func RunApp(config *conf.Configuration) error {
 }
 
 func Run(ctx context.Context, config *conf.Configuration) error {
+	if config == nil {
+		return fmt.Errorf("configuration cannot be nil")
+	}
+	if err := conf.ValidateConfiguration(*config); err != nil {
+		return err
+	}
+	if strings.TrimSpace(config.ControlCenterAddress) != "" {
+		if err := federatedClientConfig(config).Validate(); err != nil {
+			return err
+		}
+	}
 	if ctx == nil {
 		ctx = context.Background()
 	}
@@ -106,18 +118,7 @@ func startFederatedClientWorker(
 	repos := di.InitializeRepos(ctx, db, appLogger, runtimeconfig.ModuleConfigsFromConfiguration(config))
 	useCases := di.InitializeUseCases(repos, config.JobChunkSize, appLogger)
 
-	nodeClient := client.NewNodeClient(client.Config{
-		Address:            config.ControlCenterAddress,
-		NodeID:             config.NodeID,
-		AgentVersion:       config.AgentVersion,
-		QuerySchemaVersion: 1,
-		TLS: client.TLSConfig{
-			Insecure:       config.ControlCenterInsecure,
-			CAFile:         config.ControlCenterCAFile,
-			ClientCertFile: config.ControlCenterClientCertFile,
-			ClientKeyFile:  config.ControlCenterClientKeyFile,
-		},
-	}, client.Dependencies{
+	nodeClient := client.NewNodeClient(federatedClientConfig(config), client.Dependencies{
 		EnabledQueryFieldRepo: repos.EnabledQueryFieldRepo,
 		CohortCounter:         useCases.CohortCountUseCase,
 		SuppressionThreshold:  config.SuppressionThreshold,
@@ -131,6 +132,21 @@ func startFederatedClientWorker(
 		worker.Start(ctx)
 	}()
 	return done
+}
+
+func federatedClientConfig(config *conf.Configuration) client.Config {
+	return client.Config{
+		Address:            config.ControlCenterAddress,
+		NodeID:             config.NodeID,
+		AgentVersion:       config.AgentVersion,
+		QuerySchemaVersion: 1,
+		TLS: client.TLSConfig{
+			Insecure:       config.ControlCenterInsecure,
+			CAFile:         config.ControlCenterCAFile,
+			ClientCertFile: config.ControlCenterClientCertFile,
+			ClientKeyFile:  config.ControlCenterClientKeyFile,
+		},
+	}
 }
 
 // Helper Functions

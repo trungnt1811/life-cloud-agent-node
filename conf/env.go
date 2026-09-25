@@ -1,6 +1,7 @@
 package conf
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"strings"
@@ -193,9 +194,38 @@ func LoadConfigFromEnvFile(envFile string) (*Configuration, error) {
 		return nil, err
 	}
 	loaded = NormalizeConfiguration(loaded)
+	if err := ValidateConfiguration(loaded); err != nil {
+		return nil, err
+	}
 	configuration = loaded
 	log.Println("Configuration loaded successfully")
 	return &configuration, nil
+}
+
+func ValidateConfiguration(config Configuration) error {
+	config = NormalizeConfiguration(config)
+	if !isProductionEnv(config.Env) {
+		return nil
+	}
+	if config.ControlCenterInsecure {
+		return fmt.Errorf("CONTROL_CENTER_INSECURE must be false in production")
+	}
+	if strings.TrimSpace(config.ControlCenterAddress) == "" {
+		return nil
+	}
+	if strings.TrimSpace(config.ControlCenterClientCertFile) == "" || strings.TrimSpace(config.ControlCenterClientKeyFile) == "" {
+		return fmt.Errorf("CONTROL_CENTER_CLIENT_CERT_FILE and CONTROL_CENTER_CLIENT_KEY_FILE are required in production")
+	}
+	return nil
+}
+
+func isProductionEnv(env string) bool {
+	switch strings.ToLower(strings.TrimSpace(env)) {
+	case "prod", "production":
+		return true
+	default:
+		return false
+	}
 }
 
 // NormalizeConfiguration applies cross-field defaults after env unmarshalling.
