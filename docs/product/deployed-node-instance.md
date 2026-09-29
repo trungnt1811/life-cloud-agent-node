@@ -37,7 +37,7 @@ having your server ready to accept its connection.
 | `agent_version` | Tracks the exact deployed commit (currently `965e9d2`); bump on every redeploy per decision 0003. |
 | `query_schema_version` | `1` (only version this build understands). |
 | Host | A shared Ubuntu 24.04 server behind Cloudflare; the node process itself is not internet-reachable on any inbound port — only its local admin/health HTTP API is, at `https://life-cloud-agent.daihuongwedding.online`, and only for a human operator (Basic Auth), never for the control center. |
-| Local D3 state | Empty patient registry as of this writing — no hospital export has been ingested into this instance yet. A query sent today would correctly report `matching_count: 0`, not because anything is broken, but because there is no data. |
+| Local D3 state | Empty patient registry as of this writing — no hospital export has been ingested into this instance yet. A query sent today would correctly report `matching_count: 0`, not because anything is broken, but because there is no data. To load one demo site, follow `docs/runbooks/seed-demo-hospital-data.md`. |
 | D5 whitelist | All 9 schema-v1 fields are enabled (`HB, MCV, MCH, RBC, MCHC, RDW, HBA0, HBA2, HBF`) — this instance will not reject a schema-v1 query on whitelist grounds. |
 
 ## 3. What we need from you before we can point this node at you

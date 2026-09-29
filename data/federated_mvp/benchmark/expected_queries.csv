@@ -1,0 +1,10 @@
+site,cohort,patients,complete_cbc,matches_rule,matches_with_hplc
+VN_A,all,6213,6076,1090,1089
+VN_A,research_derived,6201,6068,1085,1085
+VN_A,synthetic_scenarios,12,8,5,4
+VN_B,all,2959,2913,813,812
+VN_B,research_derived,2947,2905,808,808
+VN_B,synthetic_scenarios,12,8,5,4
+VN_C,all,3895,3701,805,804
+VN_C,research_derived,3883,3693,800,800
+VN_C,synthetic_scenarios,12,8,5,4

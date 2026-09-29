@@ -1,0 +1,577 @@
+pid,visit_id,sample_id,ts,ts_format,ver,state,source_dataset,source_file,source_row_number,source_record_id,result_id,test_code,result,uom
+0000026,E0000026,S0000026,20240226,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,82,82,S0000026:HB:v1,0301,115,g/L
+0000026,E0000026,S0000026,20240226,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,82,82,S0000026:MCV:v1,0304,67.7,fL
+0000026,E0000026,S0000026,20240226,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,82,82,S0000026:MCH:v1,0305,18.5,pg
+0000026,E0000026,S0000026,20240226,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,82,82,S0000026:RBC:v1,0302,6.2,10^12/L
+0000026,E0000026,S0000026,20240226,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,82,82,S0000026:MCHC:v1,0306,27.4,g/dL
+0000026,E0000026,S0000026,20240226,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,82,82,S0000026:RDW:v1,0307,14.1,%
+0000026,E0000026,S0000026,20240226,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,82,82,S0000026:HBA0:v1,H01,0.856,fraction
+0000026,E0000026,S0000026,20240226,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,82,82,S0000026:HBA2:v1,H02,0.048,fraction
+0000026,E0000026,S0000026,20240226,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,82,82,S0000026:HBF:v1,H03,0.003,fraction
+0000046,E0000046,S0000046,20240316,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,164,164,S0000046:HB:v1,0301,166,g/L
+0000046,E0000046,S0000046,20240316,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,164,164,S0000046:MCV:v1,0304,80.7,fL
+0000046,E0000046,S0000046,20240316,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,164,164,S0000046:MCH:v1,0305,28.3,pg
+0000046,E0000046,S0000046,20240316,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,164,164,S0000046:RBC:v1,0302,5.86,10^12/L
+0000046,E0000046,S0000046,20240316,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,164,164,S0000046:MCHC:v1,0306,35.1,g/dL
+0000046,E0000046,S0000046,20240316,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,164,164,S0000046:RDW:v1,0307,14.2,%
+0000046,E0000046,S0000046,20240316,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,164,164,S0000046:HBA0:v1,H01,0.856,fraction
+0000046,E0000046,S0000046,20240316,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,164,164,S0000046:HBA2:v1,H02,0.032,fraction
+0000046,E0000046,S0000046,20240316,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,164,164,S0000046:HBF:v1,H03,0.003,fraction
+0000117,E0000117,S0000117,20240824,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,410,410,S0000117:HB:v1,0301,105,g/L
+0000117,E0000117,S0000117,20240824,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,410,410,S0000117:MCV:v1,0304,78.7,fL
+0000117,E0000117,S0000117,20240824,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,410,410,S0000117:MCH:v1,0305,27.3,pg
+0000117,E0000117,S0000117,20240824,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,410,410,S0000117:RBC:v1,0302,3.85,10^12/L
+0000117,E0000117,S0000117,20240824,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,410,410,S0000117:MCHC:v1,0306,34.7,g/dL
+0000117,E0000117,S0000117,20240824,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,410,410,S0000117:RDW:v1,0307,18.5,%
+0000117,E0000117,S0000117,20240824,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,410,410,S0000117:HBA0:v1,H01,0.564,fraction
+0000117,E0000117,S0000117,20240824,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,410,410,S0000117:HBA2:v1,H02,0.023,fraction
+0000117,E0000117,S0000117,20240824,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,410,410,S0000117:HBF:v1,H03,0.007,fraction
+ 0000179 ,E0000179,S0000179,20240108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,697,697,S0000179:HB:v1,0301,110,g/L
+ 0000179 ,E0000179,S0000179,20240108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,697,697,S0000179:MCV:v1,0304,84.7,fL
+ 0000179 ,E0000179,S0000179,20240108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,697,697,S0000179:MCH:v1,0305,25.6,pg
+ 0000179 ,E0000179,S0000179,20240108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,697,697,S0000179:RBC:v1,0302,4.3,10^12/L
+ 0000179 ,E0000179,S0000179,20240108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,697,697,S0000179:MCHC:v1,0306,30.2,g/dL
+ 0000179 ,E0000179,S0000179,20240108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,697,697,S0000179:RDW:v1,0307,11.5,%
+ 0000179 ,E0000179,S0000179,20240108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,697,697,S0000179:HBA0:v1,H01,0.639,fraction
+ 0000179 ,E0000179,S0000179,20240108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,697,697,S0000179:HBA2:v1,H02,0.265,fraction
+ 0000179 ,E0000179,S0000179,20240108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,697,697,S0000179:HBF:v1,H03,0.01,fraction
+0000235,E0000235,S0000235,20240701,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,902,902,S0000235:HB:v1,0301,128,g/L
+0000235,E0000235,S0000235,20240701,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,902,902,S0000235:MCV:v1,0304,85.4,fL
+0000235,E0000235,S0000235,20240701,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,902,902,S0000235:MCH:v1,0305,30.7,pg
+0000235,E0000235,S0000235,20240701,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,902,902,S0000235:RBC:v1,0302,4.17,10^12/L
+0000235,E0000235,S0000235,20240701,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,902,902,S0000235:MCHC:v1,0306,36,g/dL
+0000235,E0000235,S0000235,20240701,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,902,902,S0000235:RDW:v1,0307,14.5,%
+0000235,E0000235,S0000235,20240701,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,902,902,S0000235:HBA0:v1,H01,0.895,fraction
+0000235,E0000235,S0000235,20240701,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,902,902,S0000235:HBA2:v1,H02,0.031,fraction
+0000235,E0000235,S0000235,20240701,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,902,902,S0000235:HBF:v1,H03,0.002,fraction
+0000279,E0000279,S0000279,20240228,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1066,1066,S0000279:HB:v1,0301,107,g/L
+0000279,E0000279,S0000279,20240228,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1066,1066,S0000279:MCV:v1,0304,73.3,fL
+0000279,E0000279,S0000279,20240228,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1066,1066,S0000279:MCH:v1,0305,26.5,pg
+0000279,E0000279,S0000279,20240228,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1066,1066,S0000279:RBC:v1,0302,4.04,10^12/L
+0000279,E0000279,S0000279,20240228,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1066,1066,S0000279:MCHC:v1,0306,36.1,g/dL
+0000279,E0000279,S0000279,20240228,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1066,1066,S0000279:RDW:v1,0307,16,%
+0000279,E0000279,S0000279,20240228,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1066,1066,S0000279:HBA0:v1,H01,0.625,fraction
+0000279,E0000279,S0000279,20240228,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1066,1066,S0000279:HBA2:v1,H02,0.296,fraction
+0000279,E0000279,S0000279,20240228,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1066,1066,S0000279:HBF:v1,H03,0.011,fraction
+0000369,E0000369,S0000369,20240525,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1517,1517,S0000369:HB:v1,0301,125,g/L
+0000369,E0000369,S0000369,20240525,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1517,1517,S0000369:MCV:v1,0304,89.2,fL
+0000369,E0000369,S0000369,20240525,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1517,1517,S0000369:MCH:v1,0305,32.2,pg
+0000369,E0000369,S0000369,20240525,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1517,1517,S0000369:RBC:v1,0302,3.88,10^12/L
+0000369,E0000369,S0000369,20240525,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1517,1517,S0000369:MCHC:v1,0306,36.1,g/dL
+0000369,E0000369,S0000369,20240525,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1517,1517,S0000369:RDW:v1,0307,12.6,%
+0000369,E0000369,S0000369,20240525,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1517,1517,S0000369:HBA0:v1,H01,0.872,fraction
+0000369,E0000369,S0000369,20240525,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1517,1517,S0000369:HBA2:v1,H02,0.029,fraction
+0000369,E0000369,S0000369,20240525,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1517,1517,S0000369:HBF:v1,H03,0.003,fraction
+0000406,E0000406,S0000406,20241223,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1681,1681,S0000406:HB:v1,0301,120,g/L
+0000406,E0000406,S0000406,20241223,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1681,1681,S0000406:MCV:v1,0304,91.8,fL
+0000406,E0000406,S0000406,20241223,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1681,1681,S0000406:MCH:v1,0305,25.8,pg
+0000406,E0000406,S0000406,20241223,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1681,1681,S0000406:RBC:v1,0302,4.66,10^12/L
+0000406,E0000406,S0000406,20241223,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1681,1681,S0000406:MCHC:v1,0306,27.9,g/dL
+0000406,E0000406,S0000406,20241223,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1681,1681,S0000406:RDW:v1,0307,11.5,%
+0000406,E0000406,S0000406,20241223,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1681,1681,S0000406:HBA0:v1,H01,0.876,fraction
+0000406,E0000406,S0000406,20241223,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1681,1681,S0000406:HBA2:v1,H02,0.033,fraction
+0000406,E0000406,S0000406,20241223,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1681,1681,S0000406:HBF:v1,H03,0.006,fraction
+0000428,E0000428,S0000428,20241221,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1763,1763,S0000428:HB:v1,0301,120,g/L
+0000428,E0000428,S0000428,20241221,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1763,1763,S0000428:MCV:v1,0304,84,fL
+0000428,E0000428,S0000428,20241221,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1763,1763,S0000428:MCH:v1,0305,28.7,pg
+0000428,E0000428,S0000428,20241221,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1763,1763,S0000428:RBC:v1,0302,4.18,10^12/L
+0000428,E0000428,S0000428,20241221,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1763,1763,S0000428:MCHC:v1,0306,34.2,g/dL
+0000428,E0000428,S0000428,20241221,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1763,1763,S0000428:RDW:v1,0307,12.7,%
+0000428,E0000428,S0000428,20241221,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1763,1763,S0000428:HBA0:v1,H01,0.622,fraction
+0000428,E0000428,S0000428,20241221,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1763,1763,S0000428:HBA2:v1,H02,0.291,fraction
+0000428,E0000428,S0000428,20241221,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1763,1763,S0000428:HBF:v1,H03,0.004,fraction
+0000451,E0000451,S0000451,20240710,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1845,1845,S0000451:HB:v1,0301,114,g/L
+0000451,E0000451,S0000451,20240710,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1845,1845,S0000451:MCV:v1,0304,95,fL
+0000451,E0000451,S0000451,20240710,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1845,1845,S0000451:MCH:v1,0305,33.7,pg
+0000451,E0000451,S0000451,20240710,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1845,1845,S0000451:RBC:v1,0302,3.38,10^12/L
+0000451,E0000451,S0000451,20240710,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1845,1845,S0000451:MCHC:v1,0306,35.5,g/dL
+0000451,E0000451,S0000451,20240710,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1845,1845,S0000451:RDW:v1,0307,13.9,%
+0000451,E0000451,S0000451,20240710,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1845,1845,S0000451:HBA0:v1,H01,0.878,fraction
+0000451,E0000451,S0000451,20240710,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1845,1845,S0000451:HBA2:v1,H02,0.03,fraction
+0000451,E0000451,S0000451,20240710,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,1845,1845,S0000451:HBF:v1,H03,0.003,fraction
+0000484,E0000484,S0000484,20241202,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2009,2009,S0000484:HB:v1,0301,131,g/L
+0000484,E0000484,S0000484,20241202,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2009,2009,S0000484:MCV:v1,0304,84.1,fL
+0000484,E0000484,S0000484,20241202,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2009,2009,S0000484:MCH:v1,0305,30.1,pg
+0000484,E0000484,S0000484,20241202,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2009,2009,S0000484:RBC:v1,0302,4.35,10^12/L
+0000484,E0000484,S0000484,20241202,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2009,2009,S0000484:MCHC:v1,0306,35.8,g/dL
+0000484,E0000484,S0000484,20241202,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2009,2009,S0000484:RDW:v1,0307,14.2,%
+0000484,E0000484,S0000484,20241202,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2009,2009,S0000484:HBA0:v1,H01,0.88,fraction
+0000484,E0000484,S0000484,20241202,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2009,2009,S0000484:HBA2:v1,H02,0.03,fraction
+0000484,E0000484,S0000484,20241202,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2009,2009,S0000484:HBF:v1,H03,0.002,fraction
+0000614,E0000614,S0000614,20240118,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2583,2583,S0000614:HB:v1,0301,95,g/L
+0000614,E0000614,S0000614,20240118,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2583,2583,S0000614:MCV:v1,0304,65.4,fL
+0000614,E0000614,S0000614,20240118,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2583,2583,S0000614:MCH:v1,0305,17.8,pg
+0000614,E0000614,S0000614,20240118,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2583,2583,S0000614:RBC:v1,0302,5.35,10^12/L
+0000614,E0000614,S0000614,20240118,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2583,2583,S0000614:MCHC:v1,0306,27.1,g/dL
+0000614,E0000614,S0000614,20240118,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2583,2583,S0000614:RDW:v1,0307,20.4,%
+0000614,E0000614,S0000614,20240118,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2583,2583,S0000614:HBA0:v1,H01,0.864,fraction
+0000614,E0000614,S0000614,20240118,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2583,2583,S0000614:HBA2:v1,H02,0.028,fraction
+0000614,E0000614,S0000614,20240118,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2583,2583,S0000614:HBF:v1,H03,0.014,fraction
+0000618,E0000618,S0000618,20240917,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2624,2624,S0000618:HB:v1,0301,118,g/L
+0000618,E0000618,S0000618,20240917,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2624,2624,S0000618:MCV:v1,0304,85.5,fL
+0000618,E0000618,S0000618,20240917,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2624,2624,S0000618:MCH:v1,0305,30.5,pg
+0000618,E0000618,S0000618,20240917,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2624,2624,S0000618:RBC:v1,0302,3.87,10^12/L
+0000618,E0000618,S0000618,20240917,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2624,2624,S0000618:MCHC:v1,0306,35.6,g/dL
+0000618,E0000618,S0000618,20240917,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2624,2624,S0000618:RDW:v1,0307,14.5,%
+0000618,E0000618,S0000618,20240917,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2624,2624,S0000618:HBA0:v1,H01,0.866,fraction
+0000618,E0000618,S0000618,20240917,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2624,2624,S0000618:HBA2:v1,H02,0.03,fraction
+0000618,E0000618,S0000618,20240917,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2624,2624,S0000618:HBF:v1,H03,0.008,fraction
+0000714,E0000714,S0000714,20241121,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2993,2993,S0000714:HB:v1,0301,72,g/L
+0000714,E0000714,S0000714,20241121,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2993,2993,S0000714:MCV:v1,0304,61.3,fL
+0000714,E0000714,S0000714,20241121,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2993,2993,S0000714:MCH:v1,0305,16.2,pg
+0000714,E0000714,S0000714,20241121,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2993,2993,S0000714:RBC:v1,0302,4.44,10^12/L
+0000714,E0000714,S0000714,20241121,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2993,2993,S0000714:MCHC:v1,0306,26.5,g/dL
+0000714,E0000714,S0000714,20241121,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2993,2993,S0000714:RDW:v1,0307,25.2,%
+0000714,E0000714,S0000714,20241121,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2993,2993,S0000714:HBA0:v1,H01,0.857,fraction
+0000714,E0000714,S0000714,20241121,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2993,2993,S0000714:HBA2:v1,H02,0.054,fraction
+0000714,E0000714,S0000714,20241121,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,2993,2993,S0000714:HBF:v1,H03,0.01,fraction
+0000768,E0000768,S0000768,20240227,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3280,3280,S0000768:HB:v1,0301,101,g/L
+0000768,E0000768,S0000768,20240227,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3280,3280,S0000768:MCV:v1,0304,71,fL
+0000768,E0000768,S0000768,20240227,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3280,3280,S0000768:MCH:v1,0305,21.9,pg
+0000768,E0000768,S0000768,20240227,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3280,3280,S0000768:RBC:v1,0302,4.62,10^12/L
+0000768,E0000768,S0000768,20240227,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3280,3280,S0000768:MCHC:v1,0306,30.8,g/dL
+0000768,E0000768,S0000768,20240227,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3280,3280,S0000768:RDW:v1,0307,16.1,%
+0000768,E0000768,S0000768,20240227,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3280,3280,S0000768:HBA0:v1,H01,0.845,fraction
+0000768,E0000768,S0000768,20240227,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3280,3280,S0000768:HBA2:v1,H02,0.061,fraction
+0000768,E0000768,S0000768,20240227,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3280,3280,S0000768:HBF:v1,H03,0.003,fraction
+0000812,E0000812,S0000812,20240708,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3444,3444,S0000812:HB:v1,0301,115,g/L
+0000812,E0000812,S0000812,20240708,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3444,3444,S0000812:MCV:v1,0304,93.1,fL
+0000812,E0000812,S0000812,20240708,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3444,3444,S0000812:MCH:v1,0305,26.9,pg
+0000812,E0000812,S0000812,20240708,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3444,3444,S0000812:RBC:v1,0302,4.27,10^12/L
+0000812,E0000812,S0000812,20240708,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3444,3444,S0000812:MCHC:v1,0306,28.7,g/dL
+0000812,E0000812,S0000812,20240708,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3444,3444,S0000812:RDW:v1,0307,15.9,%
+0000812,E0000812,S0000812,20240708,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3444,3444,S0000812:HBA0:v1,H01,0.876,fraction
+0000812,E0000812,S0000812,20240708,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3444,3444,S0000812:HBA2:v1,H02,0.035,fraction
+0000812,E0000812,S0000812,20240708,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3444,3444,S0000812:HBF:v1,H03,0.009,fraction
+ 0000821 ,E0000821,S0000821,20240207,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3485,3485,S0000821:HB:v1,0301,133,g/L
+ 0000821 ,E0000821,S0000821,20240207,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3485,3485,S0000821:MCV:v1,0304,89.5,fL
+ 0000821 ,E0000821,S0000821,20240207,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3485,3485,S0000821:MCH:v1,0305,26.9,pg
+ 0000821 ,E0000821,S0000821,20240207,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3485,3485,S0000821:RBC:v1,0302,4.94,10^12/L
+ 0000821 ,E0000821,S0000821,20240207,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3485,3485,S0000821:MCHC:v1,0306,30.1,g/dL
+ 0000821 ,E0000821,S0000821,20240207,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3485,3485,S0000821:RDW:v1,0307,15.4,%
+ 0000821 ,E0000821,S0000821,20240207,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3485,3485,S0000821:HBA0:v1,H01,0.876,fraction
+ 0000821 ,E0000821,S0000821,20240207,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3485,3485,S0000821:HBA2:v1,H02,0.033,fraction
+ 0000821 ,E0000821,S0000821,20240207,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3485,3485,S0000821:HBF:v1,H03,0.007,fraction
+0000833,E0000833,S0000833,20240616,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3526,3526,S0000833:HB:v1,0301,154,g/L
+0000833,E0000833,S0000833,20240616,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3526,3526,S0000833:MCV:v1,0304,101.7,fL
+0000833,E0000833,S0000833,20240616,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3526,3526,S0000833:MCH:v1,0305,30.7,pg
+0000833,E0000833,S0000833,20240616,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3526,3526,S0000833:RBC:v1,0302,5.18,10^12/L
+0000833,E0000833,S0000833,20240616,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3526,3526,S0000833:MCHC:v1,0306,30.2,g/dL
+0000833,E0000833,S0000833,20240616,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3526,3526,S0000833:RDW:v1,0307,13.1,%
+0000833,E0000833,S0000833,20240616,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3526,3526,S0000833:HBA0:v1,H01,0.87,fraction
+0000833,E0000833,S0000833,20240616,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3526,3526,S0000833:HBA2:v1,H02,0.031,fraction
+0000833,E0000833,S0000833,20240616,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,3526,3526,S0000833:HBF:v1,H03,0.004,fraction
+0000951,E0000951,S0000951,20240829,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4018,4018,S0000951:HB:v1,0301,127,g/L
+0000951,E0000951,S0000951,20240829,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4018,4018,S0000951:MCV:v1,0304,84.1,fL
+0000951,E0000951,S0000951,20240829,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4018,4018,S0000951:MCH:v1,0305,26.3,pg
+0000951,E0000951,S0000951,20240829,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4018,4018,S0000951:RBC:v1,0302,4.83,10^12/L
+0000951,E0000951,S0000951,20240829,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4018,4018,S0000951:MCHC:v1,0306,31.3,g/dL
+0000951,E0000951,S0000951,20240829,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4018,4018,S0000951:RDW:v1,0307,13.6,%
+0000951,E0000951,S0000951,20240829,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4018,4018,S0000951:HBA0:v1,H01,0.866,fraction
+0000951,E0000951,S0000951,20240829,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4018,4018,S0000951:HBA2:v1,H02,0.028,fraction
+0000951,E0000951,S0000951,20240829,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4018,4018,S0000951:HBF:v1,H03,0.002,fraction
+0001098,E0001098,S0001098,20240218,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4633,4633,S0001098:HB:v1,0301,111,g/L
+0001098,E0001098,S0001098,20240218,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4633,4633,S0001098:MCV:v1,0304,73.9,fL
+0001098,E0001098,S0001098,20240218,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4633,4633,S0001098:MCH:v1,0305,21.3,pg
+0001098,E0001098,S0001098,20240218,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4633,4633,S0001098:RBC:v1,0302,5.22,10^12/L
+0001098,E0001098,S0001098,20240218,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4633,4633,S0001098:MCHC:v1,0306,28.8,g/dL
+0001098,E0001098,S0001098,20240218,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4633,4633,S0001098:RDW:v1,0307,15.3,%
+0001098,E0001098,S0001098,20240218,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4633,4633,S0001098:HBA0:v1,H01,0.871,fraction
+0001098,E0001098,S0001098,20240218,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4633,4633,S0001098:HBA2:v1,H02,0.026,fraction
+0001098,E0001098,S0001098,20240218,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4633,4633,S0001098:HBF:v1,H03,0.003,fraction
+0001108,E0001108,S0001108,20240925,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4674,4674,S0001108:HB:v1,0301,102,g/L
+0001108,E0001108,S0001108,20240925,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4674,4674,S0001108:MCV:v1,0304,69.8,fL
+0001108,E0001108,S0001108,20240925,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4674,4674,S0001108:MCH:v1,0305,20.8,pg
+0001108,E0001108,S0001108,20240925,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4674,4674,S0001108:RBC:v1,0302,5.06,10^12/L
+0001108,E0001108,S0001108,20240925,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4674,4674,S0001108:MCHC:v1,0306,28.6,g/dL
+0001108,E0001108,S0001108,20240925,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4674,4674,S0001108:RDW:v1,0307,14.4,%
+0001108,E0001108,S0001108,20240925,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4674,4674,S0001108:HBA0:v1,H01,0.881,fraction
+0001108,E0001108,S0001108,20240925,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4674,4674,S0001108:HBA2:v1,H02,0.027,fraction
+0001108,E0001108,S0001108,20240925,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4674,4674,S0001108:HBF:v1,H03,0.002,fraction
+0001135,E0001135,S0001135,20240607,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4797,4797,S0001135:HB:v1,0301,161,g/L
+0001135,E0001135,S0001135,20240607,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4797,4797,S0001135:MCV:v1,0304,90.4,fL
+0001135,E0001135,S0001135,20240607,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4797,4797,S0001135:MCH:v1,0305,32.7,pg
+0001135,E0001135,S0001135,20240607,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4797,4797,S0001135:RBC:v1,0302,4.92,10^12/L
+0001135,E0001135,S0001135,20240607,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4797,4797,S0001135:MCHC:v1,0306,36.2,g/dL
+0001135,E0001135,S0001135,20240607,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4797,4797,S0001135:RDW:v1,0307,15.4,%
+0001135,E0001135,S0001135,20240607,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4797,4797,S0001135:HBA0:v1,H01,0.88,fraction
+0001135,E0001135,S0001135,20240607,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4797,4797,S0001135:HBA2:v1,H02,0.033,fraction
+0001135,E0001135,S0001135,20240607,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4797,4797,S0001135:HBF:v1,H03,0.003,fraction
+0001146,E0001146,S0001146,20241021,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4838,4838,S0001146:HB:v1,0301,126,g/L
+0001146,E0001146,S0001146,20241021,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4838,4838,S0001146:MCV:v1,0304,82.1,fL
+0001146,E0001146,S0001146,20241021,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4838,4838,S0001146:MCH:v1,0305,29.3,pg
+0001146,E0001146,S0001146,20241021,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4838,4838,S0001146:RBC:v1,0302,4.3,10^12/L
+0001146,E0001146,S0001146,20241021,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4838,4838,S0001146:MCHC:v1,0306,34.1,g/dL
+0001146,E0001146,S0001146,20241021,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4838,4838,S0001146:RDW:v1,0307,13.3,%
+0001146,E0001146,S0001146,20241021,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4838,4838,S0001146:HBA0:v1,H01,0.872,fraction
+0001146,E0001146,S0001146,20241021,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4838,4838,S0001146:HBA2:v1,H02,0.029,fraction
+0001146,E0001146,S0001146,20241021,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4838,4838,S0001146:HBF:v1,H03,0.007,fraction
+0001173,E0001173,S0001173,20240906,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4961,4961,S0001173:HB:v1,0301,113,g/L
+0001173,E0001173,S0001173,20240906,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4961,4961,S0001173:MCV:v1,0304,85.8,fL
+0001173,E0001173,S0001173,20240906,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4961,4961,S0001173:MCH:v1,0305,32,pg
+0001173,E0001173,S0001173,20240906,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4961,4961,S0001173:RBC:v1,0302,3.53,10^12/L
+0001173,E0001173,S0001173,20240906,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4961,4961,S0001173:MCHC:v1,0306,37.3,g/dL
+0001173,E0001173,S0001173,20240906,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4961,4961,S0001173:RDW:v1,0307,14.3,%
+0001173,E0001173,S0001173,20240906,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4961,4961,S0001173:HBA0:v1,H01,0.884,fraction
+0001173,E0001173,S0001173,20240906,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4961,4961,S0001173:HBA2:v1,H02,0.033,fraction
+0001173,E0001173,S0001173,20240906,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,4961,4961,S0001173:HBF:v1,H03,0.003,fraction
+ 0001307 ,E0001307,S0001307,20241210,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,5576,5576,S0001307:HB:v1,0301,168,g/L
+ 0001307 ,E0001307,S0001307,20241210,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,5576,5576,S0001307:MCV:v1,0304,98.8,fL
+ 0001307 ,E0001307,S0001307,20241210,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,5576,5576,S0001307:MCH:v1,0305,38.9,pg
+ 0001307 ,E0001307,S0001307,20241210,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,5576,5576,S0001307:RBC:v1,0302,4.32,10^12/L
+ 0001307 ,E0001307,S0001307,20241210,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,5576,5576,S0001307:MCHC:v1,0306,39.3,g/dL
+ 0001307 ,E0001307,S0001307,20241210,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,5576,5576,S0001307:RDW:v1,0307,13.3,%
+ 0001307 ,E0001307,S0001307,20241210,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,5576,5576,S0001307:HBA0:v1,H01,0.869,fraction
+ 0001307 ,E0001307,S0001307,20241210,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,5576,5576,S0001307:HBA2:v1,H02,0.028,fraction
+ 0001307 ,E0001307,S0001307,20241210,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,5576,5576,S0001307:HBF:v1,H03,0.004,fraction
+0001403,E0001403,S0001403,20240401,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,5986,5986,S0001403:HB:v1,0301,121,g/L
+0001403,E0001403,S0001403,20240401,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,5986,5986,S0001403:MCV:v1,0304,82.1,fL
+0001403,E0001403,S0001403,20240401,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,5986,5986,S0001403:MCH:v1,0305,26.4,pg
+0001403,E0001403,S0001403,20240401,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,5986,5986,S0001403:RBC:v1,0302,4.58,10^12/L
+0001403,E0001403,S0001403,20240401,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,5986,5986,S0001403:MCHC:v1,0306,32.2,g/dL
+0001403,E0001403,S0001403,20240401,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,5986,5986,S0001403:RDW:v1,0307,13.8,%
+0001403,E0001403,S0001403,20240401,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,5986,5986,S0001403:HBA0:v1,H01,0.657,fraction
+0001403,E0001403,S0001403,20240401,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,5986,5986,S0001403:HBA2:v1,H02,0.275,fraction
+0001403,E0001403,S0001403,20240401,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,5986,5986,S0001403:HBF:v1,H03,0.003,fraction
+0001454,E0001454,S0001454,20241112,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6191,6191,S0001454:HB:v1,0301,128,g/L
+0001454,E0001454,S0001454,20241112,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6191,6191,S0001454:MCV:v1,0304,76.5,fL
+0001454,E0001454,S0001454,20241112,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6191,6191,S0001454:MCH:v1,0305,25.9,pg
+0001454,E0001454,S0001454,20241112,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6191,6191,S0001454:RBC:v1,0302,4.94,10^12/L
+0001454,E0001454,S0001454,20241112,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6191,6191,S0001454:MCHC:v1,0306,33.9,g/dL
+0001454,E0001454,S0001454,20241112,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6191,6191,S0001454:RDW:v1,0307,16.5,%
+0001454,E0001454,S0001454,20241112,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6191,6191,S0001454:HBA0:v1,H01,0.624,fraction
+0001454,E0001454,S0001454,20241112,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6191,6191,S0001454:HBA2:v1,H02,0.279,fraction
+0001454,E0001454,S0001454,20241112,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6191,6191,S0001454:HBF:v1,H03,0.004,fraction
+ 0001465 ,E0001465,S0001465,20240204,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6273,6273,S0001465:HB:v1,0301,120,g/L
+ 0001465 ,E0001465,S0001465,20240204,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6273,6273,S0001465:MCV:v1,0304,82.9,fL
+ 0001465 ,E0001465,S0001465,20240204,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6273,6273,S0001465:MCH:v1,0305,26.3,pg
+ 0001465 ,E0001465,S0001465,20240204,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6273,6273,S0001465:RBC:v1,0302,4.57,10^12/L
+ 0001465 ,E0001465,S0001465,20240204,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6273,6273,S0001465:MCHC:v1,0306,31.7,g/dL
+ 0001465 ,E0001465,S0001465,20240204,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6273,6273,S0001465:RDW:v1,0307,13,%
+ 0001465 ,E0001465,S0001465,20240204,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6273,6273,S0001465:HBA0:v1,H01,0.87,fraction
+ 0001465 ,E0001465,S0001465,20240204,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6273,6273,S0001465:HBA2:v1,H02,0.03,fraction
+ 0001465 ,E0001465,S0001465,20240204,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6273,6273,S0001465:HBF:v1,H03,0.004,fraction
+0001511,E0001511,S0001511,20240326,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6478,6478,S0001511:HB:v1,0301,110,g/L
+0001511,E0001511,S0001511,20240326,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6478,6478,S0001511:MCV:v1,0304,88.3,fL
+0001511,E0001511,S0001511,20240326,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6478,6478,S0001511:MCH:v1,0305,32.2,pg
+0001511,E0001511,S0001511,20240326,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6478,6478,S0001511:RBC:v1,0302,3.42,10^12/L
+0001511,E0001511,S0001511,20240326,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6478,6478,S0001511:MCHC:v1,0306,36.4,g/dL
+0001511,E0001511,S0001511,20240326,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6478,6478,S0001511:RDW:v1,0307,12.9,%
+0001511,E0001511,S0001511,20240326,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6478,6478,S0001511:HBA0:v1,H01,0.884,fraction
+0001511,E0001511,S0001511,20240326,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6478,6478,S0001511:HBA2:v1,H02,0.027,fraction
+0001511,E0001511,S0001511,20240326,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6478,6478,S0001511:HBF:v1,H03,0.002,fraction
+0001521,E0001521,S0001521,20240712,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6519,6519,S0001521:HB:v1,0301,94,g/L
+0001521,E0001521,S0001521,20240712,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6519,6519,S0001521:MCV:v1,0304,76.9,fL
+0001521,E0001521,S0001521,20240712,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6519,6519,S0001521:MCH:v1,0305,20.3,pg
+0001521,E0001521,S0001521,20240712,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6519,6519,S0001521:RBC:v1,0302,4.63,10^12/L
+0001521,E0001521,S0001521,20240712,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6519,6519,S0001521:MCHC:v1,0306,26.4,g/dL
+0001521,E0001521,S0001521,20240712,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6519,6519,S0001521:RDW:v1,0307,13.9,%
+0001521,E0001521,S0001521,20240712,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6519,6519,S0001521:HBA0:v1,H01,0.861,fraction
+0001521,E0001521,S0001521,20240712,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6519,6519,S0001521:HBA2:v1,H02,0.051,fraction
+0001521,E0001521,S0001521,20240712,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6519,6519,S0001521:HBF:v1,H03,0.007,fraction
+0001573,E0001573,S0001573,20240521,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6724,6724,S0001573:HB:v1,0301,110,g/L
+0001573,E0001573,S0001573,20240521,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6724,6724,S0001573:MCV:v1,0304,82.8,fL
+0001573,E0001573,S0001573,20240521,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6724,6724,S0001573:MCH:v1,0305,25.6,pg
+0001573,E0001573,S0001573,20240521,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6724,6724,S0001573:RBC:v1,0302,4.3,10^12/L
+0001573,E0001573,S0001573,20240521,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6724,6724,S0001573:MCHC:v1,0306,30.9,g/dL
+0001573,E0001573,S0001573,20240521,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6724,6724,S0001573:RDW:v1,0307,15.6,%
+0001573,E0001573,S0001573,20240521,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6724,6724,S0001573:HBA0:v1,H01,0.848,fraction
+0001573,E0001573,S0001573,20240521,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6724,6724,S0001573:HBA2:v1,H02,0.036,fraction
+0001573,E0001573,S0001573,20240521,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,6724,6724,S0001573:HBF:v1,H03,0.014,fraction
+0001641,E0001641,S0001641,20241126,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7052,7052,S0001641:HB:v1,0301,95,g/L
+0001641,E0001641,S0001641,20241126,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7052,7052,S0001641:MCV:v1,0304,89.7,fL
+0001641,E0001641,S0001641,20241126,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7052,7052,S0001641:MCH:v1,0305,25.8,pg
+0001641,E0001641,S0001641,20241126,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7052,7052,S0001641:RBC:v1,0302,3.68,10^12/L
+0001641,E0001641,S0001641,20241126,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7052,7052,S0001641:MCHC:v1,0306,28.8,g/dL
+0001641,E0001641,S0001641,20241126,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7052,7052,S0001641:RDW:v1,0307,11.9,%
+0001641,E0001641,S0001641,20241126,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7052,7052,S0001641:HBA0:v1,H01,0.878,fraction
+0001641,E0001641,S0001641,20241126,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7052,7052,S0001641:HBA2:v1,H02,0.029,fraction
+0001641,E0001641,S0001641,20241126,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7052,7052,S0001641:HBF:v1,H03,0.003,fraction
+0001702,E0001702,S0001702,20241018,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7298,7298,S0001702:HB:v1,0301,135,g/L
+0001702,E0001702,S0001702,20241018,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7298,7298,S0001702:MCV:v1,0304,85.9,fL
+0001702,E0001702,S0001702,20241018,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7298,7298,S0001702:MCH:v1,0305,26.4,pg
+0001702,E0001702,S0001702,20241018,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7298,7298,S0001702:RBC:v1,0302,5.12,10^12/L
+0001702,E0001702,S0001702,20241018,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7298,7298,S0001702:MCHC:v1,0306,30.7,g/dL
+0001702,E0001702,S0001702,20241018,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7298,7298,S0001702:RDW:v1,0307,14,%
+0001702,E0001702,S0001702,20241018,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7298,7298,S0001702:HBA0:v1,H01,0.867,fraction
+0001702,E0001702,S0001702,20241018,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7298,7298,S0001702:HBA2:v1,H02,0.031,fraction
+0001702,E0001702,S0001702,20241018,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7298,7298,S0001702:HBF:v1,H03,0.003,fraction
+0001735,E0001735,S0001735,20240226,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7462,7462,S0001735:HB:v1,0301,116,g/L
+0001735,E0001735,S0001735,20240226,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7462,7462,S0001735:MCV:v1,0304,85.6,fL
+0001735,E0001735,S0001735,20240226,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7462,7462,S0001735:MCH:v1,0305,26.9,pg
+0001735,E0001735,S0001735,20240226,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7462,7462,S0001735:RBC:v1,0302,4.31,10^12/L
+0001735,E0001735,S0001735,20240226,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7462,7462,S0001735:MCHC:v1,0306,29.4,g/dL
+0001735,E0001735,S0001735,20240226,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7462,7462,S0001735:RDW:v1,0307,12.7,%
+0001735,E0001735,S0001735,20240226,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7462,7462,S0001735:HBA0:v1,H01,0.876,fraction
+0001735,E0001735,S0001735,20240226,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7462,7462,S0001735:HBA2:v1,H02,0.023,fraction
+0001735,E0001735,S0001735,20240226,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7462,7462,S0001735:HBF:v1,H03,0.014,fraction
+0001757,E0001757,S0001757,20241208,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7544,7544,S0001757:HB:v1,0301,103,g/L
+0001757,E0001757,S0001757,20241208,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7544,7544,S0001757:MCV:v1,0304,93.1,fL
+0001757,E0001757,S0001757,20241208,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7544,7544,S0001757:MCH:v1,0305,26.3,pg
+0001757,E0001757,S0001757,20241208,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7544,7544,S0001757:RBC:v1,0302,3.92,10^12/L
+0001757,E0001757,S0001757,20241208,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7544,7544,S0001757:MCHC:v1,0306,28.2,g/dL
+0001757,E0001757,S0001757,20241208,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7544,7544,S0001757:RDW:v1,0307,14.5,%
+0001757,E0001757,S0001757,20241208,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7544,7544,S0001757:HBA0:v1,H01,0.856,fraction
+0001757,E0001757,S0001757,20241208,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7544,7544,S0001757:HBA2:v1,H02,0.034,fraction
+0001757,E0001757,S0001757,20241208,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7544,7544,S0001757:HBF:v1,H03,0.01,fraction
+ 0001787 ,E0001787,S0001787,20240301,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7667,7667,S0001787:HB:v1,0301,107,g/L
+ 0001787 ,E0001787,S0001787,20240301,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7667,7667,S0001787:MCV:v1,0304,78.5,fL
+ 0001787 ,E0001787,S0001787,20240301,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7667,7667,S0001787:MCH:v1,0305,23.5,pg
+ 0001787 ,E0001787,S0001787,20240301,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7667,7667,S0001787:RBC:v1,0302,4.56,10^12/L
+ 0001787 ,E0001787,S0001787,20240301,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7667,7667,S0001787:MCHC:v1,0306,29.9,g/dL
+ 0001787 ,E0001787,S0001787,20240301,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7667,7667,S0001787:RDW:v1,0307,13,%
+ 0001787 ,E0001787,S0001787,20240301,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7667,7667,S0001787:HBA0:v1,H01,0.868,fraction
+ 0001787 ,E0001787,S0001787,20240301,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7667,7667,S0001787:HBA2:v1,H02,0.023,fraction
+ 0001787 ,E0001787,S0001787,20240301,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7667,7667,S0001787:HBF:v1,H03,0.016,fraction
+0001799,E0001799,S0001799,20240607,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7708,7708,S0001799:HB:v1,0301,98,g/L
+0001799,E0001799,S0001799,20240607,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7708,7708,S0001799:MCV:v1,0304,77.5,fL
+0001799,E0001799,S0001799,20240607,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7708,7708,S0001799:MCH:v1,0305,25.3,pg
+0001799,E0001799,S0001799,20240607,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7708,7708,S0001799:RBC:v1,0302,3.87,10^12/L
+0001799,E0001799,S0001799,20240607,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7708,7708,S0001799:MCHC:v1,0306,32.7,g/dL
+0001799,E0001799,S0001799,20240607,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7708,7708,S0001799:RDW:v1,0307,19.6,%
+0001799,E0001799,S0001799,20240607,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7708,7708,S0001799:HBA0:v1,H01,0.883,fraction
+0001799,E0001799,S0001799,20240607,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7708,7708,S0001799:HBA2:v1,H02,0.027,fraction
+0001799,E0001799,S0001799,20240607,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7708,7708,S0001799:HBF:v1,H03,0.006,fraction
+0001844,E0001844,S0001844,20240424,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7913,7913,S0001844:HB:v1,0301,88,g/L
+0001844,E0001844,S0001844,20240424,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7913,7913,S0001844:MCV:v1,0304,76,fL
+0001844,E0001844,S0001844,20240424,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7913,7913,S0001844:MCH:v1,0305,25.1,pg
+0001844,E0001844,S0001844,20240424,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7913,7913,S0001844:RBC:v1,0302,3.5,10^12/L
+0001844,E0001844,S0001844,20240424,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7913,7913,S0001844:MCHC:v1,0306,33.1,g/dL
+0001844,E0001844,S0001844,20240424,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7913,7913,S0001844:RDW:v1,0307,15.9,%
+0001844,E0001844,S0001844,20240424,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7913,7913,S0001844:HBA0:v1,H01,0.883,fraction
+0001844,E0001844,S0001844,20240424,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7913,7913,S0001844:HBA2:v1,H02,0.031,fraction
+0001844,E0001844,S0001844,20240424,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7913,7913,S0001844:HBF:v1,H03,0.006,fraction
+0001858,E0001858,S0001858,20241215,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7954,7954,S0001858:HB:v1,0301,80,g/L
+0001858,E0001858,S0001858,20241215,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7954,7954,S0001858:MCV:v1,0304,61.8,fL
+0001858,E0001858,S0001858,20241215,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7954,7954,S0001858:MCH:v1,0305,19.5,pg
+0001858,E0001858,S0001858,20241215,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7954,7954,S0001858:RBC:v1,0302,4.11,10^12/L
+0001858,E0001858,S0001858,20241215,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7954,7954,S0001858:MCHC:v1,0306,31.5,g/dL
+0001858,E0001858,S0001858,20241215,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7954,7954,S0001858:RDW:v1,0307,15.4,%
+0001858,E0001858,S0001858,20241215,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7954,7954,S0001858:HBA0:v1,H01,0.865,fraction
+0001858,E0001858,S0001858,20241215,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7954,7954,S0001858:HBA2:v1,H02,0.025,fraction
+0001858,E0001858,S0001858,20241215,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,7954,7954,S0001858:HBF:v1,H03,0.003,fraction
+0001895,E0001895,S0001895,20241026,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8118,8118,S0001895:HB:v1,0301,117,g/L
+0001895,E0001895,S0001895,20241026,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8118,8118,S0001895:MCV:v1,0304,92.4,fL
+0001895,E0001895,S0001895,20241026,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8118,8118,S0001895:MCH:v1,0305,30.8,pg
+0001895,E0001895,S0001895,20241026,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8118,8118,S0001895:RBC:v1,0302,3.8,10^12/L
+0001895,E0001895,S0001895,20241026,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8118,8118,S0001895:MCHC:v1,0306,33.3,g/dL
+0001895,E0001895,S0001895,20241026,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8118,8118,S0001895:RDW:v1,0307,14.5,%
+0001895,E0001895,S0001895,20241026,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8118,8118,S0001895:HBA0:v1,H01,0.882,fraction
+0001895,E0001895,S0001895,20241026,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8118,8118,S0001895:HBA2:v1,H02,0.026,fraction
+0001895,E0001895,S0001895,20241026,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8118,8118,S0001895:HBF:v1,H03,0.005,fraction
+ 0001944 ,E0001944,S0001944,20240426,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8364,8364,S0001944:HB:v1,0301,115,g/L
+ 0001944 ,E0001944,S0001944,20240426,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8364,8364,S0001944:MCV:v1,0304,88,fL
+ 0001944 ,E0001944,S0001944,20240426,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8364,8364,S0001944:MCH:v1,0305,30.6,pg
+ 0001944 ,E0001944,S0001944,20240426,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8364,8364,S0001944:RBC:v1,0302,3.76,10^12/L
+ 0001944 ,E0001944,S0001944,20240426,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8364,8364,S0001944:MCHC:v1,0306,34.7,g/dL
+ 0001944 ,E0001944,S0001944,20240426,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8364,8364,S0001944:RDW:v1,0307,13.7,%
+ 0001944 ,E0001944,S0001944,20240426,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8364,8364,S0001944:HBA0:v1,H01,0.879,fraction
+ 0001944 ,E0001944,S0001944,20240426,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8364,8364,S0001944:HBA2:v1,H02,0.03,fraction
+ 0001944 ,E0001944,S0001944,20240426,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8364,8364,S0001944:HBF:v1,H03,0.003,fraction
+0001954,E0001954,S0001954,20240127,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8405,8405,S0001954:HB:v1,0301,106,g/L
+0001954,E0001954,S0001954,20240127,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8405,8405,S0001954:MCV:v1,0304,75.9,fL
+0001954,E0001954,S0001954,20240127,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8405,8405,S0001954:MCH:v1,0305,22.4,pg
+0001954,E0001954,S0001954,20240127,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8405,8405,S0001954:RBC:v1,0302,4.73,10^12/L
+0001954,E0001954,S0001954,20240127,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8405,8405,S0001954:MCHC:v1,0306,29.5,g/dL
+0001954,E0001954,S0001954,20240127,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8405,8405,S0001954:RDW:v1,0307,15.5,%
+0001954,E0001954,S0001954,20240127,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8405,8405,S0001954:HBA0:v1,H01,0.879,fraction
+0001954,E0001954,S0001954,20240127,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8405,8405,S0001954:HBA2:v1,H02,0.028,fraction
+0001954,E0001954,S0001954,20240127,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8405,8405,S0001954:HBF:v1,H03,0.003,fraction
+0001995,E0001995,S0001995,20241003,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8610,8610,S0001995:HB:v1,0301,108,g/L
+0001995,E0001995,S0001995,20241003,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8610,8610,S0001995:MCV:v1,0304,83.9,fL
+0001995,E0001995,S0001995,20241003,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8610,8610,S0001995:MCH:v1,0305,27.2,pg
+0001995,E0001995,S0001995,20241003,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8610,8610,S0001995:RBC:v1,0302,3.97,10^12/L
+0001995,E0001995,S0001995,20241003,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8610,8610,S0001995:MCHC:v1,0306,32.4,g/dL
+0001995,E0001995,S0001995,20241003,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8610,8610,S0001995:RDW:v1,0307,14.2,%
+0001995,E0001995,S0001995,20241003,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8610,8610,S0001995:HBA0:v1,H01,0.885,fraction
+0001995,E0001995,S0001995,20241003,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8610,8610,S0001995:HBA2:v1,H02,0.032,fraction
+0001995,E0001995,S0001995,20241003,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8610,8610,S0001995:HBF:v1,H03,0.005,fraction
+0002072,E0002072,S0002072,20240813,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8979,8979,S0002072:HB:v1,0301,105,g/L
+0002072,E0002072,S0002072,20240813,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8979,8979,S0002072:MCV:v1,0304,84,fL
+0002072,E0002072,S0002072,20240813,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8979,8979,S0002072:MCH:v1,0305,26.3,pg
+0002072,E0002072,S0002072,20240813,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8979,8979,S0002072:RBC:v1,0302,3.99,10^12/L
+0002072,E0002072,S0002072,20240813,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8979,8979,S0002072:MCHC:v1,0306,31.3,g/dL
+0002072,E0002072,S0002072,20240813,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8979,8979,S0002072:RDW:v1,0307,11.2,%
+0002072,E0002072,S0002072,20240813,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8979,8979,S0002072:HBA0:v1,H01,0.896,fraction
+0002072,E0002072,S0002072,20240813,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8979,8979,S0002072:HBA2:v1,H02,0.023,fraction
+0002072,E0002072,S0002072,20240813,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,8979,8979,S0002072:HBF:v1,H03,0.012,fraction
+ 0002087 ,E0002087,S0002087,20240512,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9061,9061,S0002087:HB:v1,0301,74,g/L
+ 0002087 ,E0002087,S0002087,20240512,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9061,9061,S0002087:MCV:v1,0304,63.2,fL
+ 0002087 ,E0002087,S0002087,20240512,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9061,9061,S0002087:MCH:v1,0305,20.3,pg
+ 0002087 ,E0002087,S0002087,20240512,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9061,9061,S0002087:RBC:v1,0302,3.64,10^12/L
+ 0002087 ,E0002087,S0002087,20240512,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9061,9061,S0002087:MCHC:v1,0306,32.2,g/dL
+ 0002087 ,E0002087,S0002087,20240512,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9061,9061,S0002087:RDW:v1,0307,17.5,%
+ 0002087 ,E0002087,S0002087,20240512,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9061,9061,S0002087:HBA0:v1,H01,0.838,fraction
+ 0002087 ,E0002087,S0002087,20240512,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9061,9061,S0002087:HBA2:v1,H02,0.065,fraction
+ 0002087 ,E0002087,S0002087,20240512,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9061,9061,S0002087:HBF:v1,H03,0.018,fraction
+0002114,E0002114,S0002114,20240202,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9184,9184,S0002114:HB:v1,0301,105,g/L
+0002114,E0002114,S0002114,20240202,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9184,9184,S0002114:MCV:v1,0304,91.6,fL
+0002114,E0002114,S0002114,20240202,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9184,9184,S0002114:MCH:v1,0305,27.5,pg
+0002114,E0002114,S0002114,20240202,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9184,9184,S0002114:RBC:v1,0302,3.82,10^12/L
+0002114,E0002114,S0002114,20240202,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9184,9184,S0002114:MCHC:v1,0306,30,g/dL
+0002114,E0002114,S0002114,20240202,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9184,9184,S0002114:RDW:v1,0307,11.6,%
+0002114,E0002114,S0002114,20240202,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9184,9184,S0002114:HBA0:v1,H01,0.88,fraction
+0002114,E0002114,S0002114,20240202,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9184,9184,S0002114:HBA2:v1,H02,0.029,fraction
+0002114,E0002114,S0002114,20240202,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9184,9184,S0002114:HBF:v1,H03,0.003,fraction
+0002139,E0002139,S0002139,20240529,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9307,9307,S0002139:HB:v1,0301,145,g/L
+0002139,E0002139,S0002139,20240529,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9307,9307,S0002139:MCV:v1,0304,87.2,fL
+0002139,E0002139,S0002139,20240529,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9307,9307,S0002139:MCH:v1,0305,31.9,pg
+0002139,E0002139,S0002139,20240529,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9307,9307,S0002139:RBC:v1,0302,4.54,10^12/L
+0002139,E0002139,S0002139,20240529,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9307,9307,S0002139:MCHC:v1,0306,36.6,g/dL
+0002139,E0002139,S0002139,20240529,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9307,9307,S0002139:RDW:v1,0307,13.9,%
+0002139,E0002139,S0002139,20240529,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9307,9307,S0002139:HBA0:v1,H01,0.864,fraction
+0002139,E0002139,S0002139,20240529,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9307,9307,S0002139:HBA2:v1,H02,0.032,fraction
+0002139,E0002139,S0002139,20240529,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9307,9307,S0002139:HBF:v1,H03,0.002,fraction
+0002167,E0002167,S0002167,20240207,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9430,9430,S0002167:HB:v1,0301,148,g/L
+0002167,E0002167,S0002167,20240207,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9430,9430,S0002167:MCV:v1,0304,94.6,fL
+0002167,E0002167,S0002167,20240207,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9430,9430,S0002167:MCH:v1,0305,33.4,pg
+0002167,E0002167,S0002167,20240207,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9430,9430,S0002167:RBC:v1,0302,4.43,10^12/L
+0002167,E0002167,S0002167,20240207,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9430,9430,S0002167:MCHC:v1,0306,35.3,g/dL
+0002167,E0002167,S0002167,20240207,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9430,9430,S0002167:RDW:v1,0307,13.9,%
+0002167,E0002167,S0002167,20240207,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9430,9430,S0002167:HBA0:v1,H01,0.884,fraction
+0002167,E0002167,S0002167,20240207,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9430,9430,S0002167:HBA2:v1,H02,0.029,fraction
+0002167,E0002167,S0002167,20240207,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9430,9430,S0002167:HBF:v1,H03,0.003,fraction
+0002229,E0002229,S0002229,20241101,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9799,9799,S0002229:HB:v1,0301,102,g/L
+0002229,E0002229,S0002229,20241101,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9799,9799,S0002229:MCV:v1,0304,64.6,fL
+0002229,E0002229,S0002229,20241101,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9799,9799,S0002229:MCH:v1,0305,18.8,pg
+0002229,E0002229,S0002229,20241101,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9799,9799,S0002229:RBC:v1,0302,5.43,10^12/L
+0002229,E0002229,S0002229,20241101,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9799,9799,S0002229:MCHC:v1,0306,29.1,g/dL
+0002229,E0002229,S0002229,20241101,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9799,9799,S0002229:RDW:v1,0307,17.8,%
+0002229,E0002229,S0002229,20241101,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9799,9799,S0002229:HBA0:v1,H01,0.827,fraction
+0002229,E0002229,S0002229,20241101,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9799,9799,S0002229:HBA2:v1,H02,0.044,fraction
+0002229,E0002229,S0002229,20241101,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9799,9799,S0002229:HBF:v1,H03,0.018,fraction
+0002278,E0002278,S0002278,20240424,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9963,9963,S0002278:HB:v1,0301,128,g/L
+0002278,E0002278,S0002278,20240424,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9963,9963,S0002278:MCV:v1,0304,83.3,fL
+0002278,E0002278,S0002278,20240424,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9963,9963,S0002278:MCH:v1,0305,25.8,pg
+0002278,E0002278,S0002278,20240424,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9963,9963,S0002278:RBC:v1,0302,4.97,10^12/L
+0002278,E0002278,S0002278,20240424,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9963,9963,S0002278:MCHC:v1,0306,30.9,g/dL
+0002278,E0002278,S0002278,20240424,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9963,9963,S0002278:RDW:v1,0307,13.9,%
+0002278,E0002278,S0002278,20240424,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9963,9963,S0002278:HBA0:v1,H01,0.875,fraction
+0002278,E0002278,S0002278,20240424,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9963,9963,S0002278:HBA2:v1,H02,0.028,fraction
+0002278,E0002278,S0002278,20240424,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,9963,9963,S0002278:HBF:v1,H03,0.004,fraction
+0002327,E0002327,S0002327,20240309,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10209,10209,S0002327:HB:v1,0301,138,g/L
+0002327,E0002327,S0002327,20240309,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10209,10209,S0002327:MCV:v1,0304,85.9,fL
+0002327,E0002327,S0002327,20240309,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10209,10209,S0002327:MCH:v1,0305,27.4,pg
+0002327,E0002327,S0002327,20240309,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10209,10209,S0002327:RBC:v1,0302,5.03,10^12/L
+0002327,E0002327,S0002327,20240309,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10209,10209,S0002327:MCHC:v1,0306,31.9,g/dL
+0002327,E0002327,S0002327,20240309,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10209,10209,S0002327:RDW:v1,0307,14.8,%
+0002327,E0002327,S0002327,20240309,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10209,10209,S0002327:HBA0:v1,H01,0.881,fraction
+0002327,E0002327,S0002327,20240309,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10209,10209,S0002327:HBA2:v1,H02,0.031,fraction
+0002327,E0002327,S0002327,20240309,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10209,10209,S0002327:HBF:v1,H03,0.002,fraction
+0002383,E0002383,S0002383,20240830,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10496,10496,S0002383:HB:v1,0301,107,g/L
+0002383,E0002383,S0002383,20240830,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10496,10496,S0002383:MCV:v1,0304,88.3,fL
+0002383,E0002383,S0002383,20240830,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10496,10496,S0002383:MCH:v1,0305,30.7,pg
+0002383,E0002383,S0002383,20240830,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10496,10496,S0002383:RBC:v1,0302,3.49,10^12/L
+0002383,E0002383,S0002383,20240830,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10496,10496,S0002383:MCHC:v1,0306,34.7,g/dL
+0002383,E0002383,S0002383,20240830,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10496,10496,S0002383:RDW:v1,0307,12.7,%
+0002383,E0002383,S0002383,20240830,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10496,10496,S0002383:HBA0:v1,H01,0.879,fraction
+0002383,E0002383,S0002383,20240830,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10496,10496,S0002383:HBA2:v1,H02,0.027,fraction
+0002383,E0002383,S0002383,20240830,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10496,10496,S0002383:HBF:v1,H03,0.009,fraction
+0002410,E0002410,S0002410,20240128,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10619,10619,S0002410:HB:v1,0301,86,g/L
+0002410,E0002410,S0002410,20240128,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10619,10619,S0002410:MCV:v1,0304,82.6,fL
+0002410,E0002410,S0002410,20240128,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10619,10619,S0002410:MCH:v1,0305,24.6,pg
+0002410,E0002410,S0002410,20240128,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10619,10619,S0002410:RBC:v1,0302,3.5,10^12/L
+0002410,E0002410,S0002410,20240128,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10619,10619,S0002410:MCHC:v1,0306,29.8,g/dL
+0002410,E0002410,S0002410,20240128,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10619,10619,S0002410:RDW:v1,0307,15,%
+0002410,E0002410,S0002410,20240128,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10619,10619,S0002410:HBA0:v1,H01,0.876,fraction
+0002410,E0002410,S0002410,20240128,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10619,10619,S0002410:HBA2:v1,H02,0.03,fraction
+0002410,E0002410,S0002410,20240128,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10619,10619,S0002410:HBF:v1,H03,0.003,fraction
+0002418,E0002418,S0002418,20240309,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10660,10660,S0002418:HB:v1,0301,101,g/L
+0002418,E0002418,S0002418,20240309,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10660,10660,S0002418:MCV:v1,0304,63.5,fL
+0002418,E0002418,S0002418,20240309,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10660,10660,S0002418:MCH:v1,0305,21.3,pg
+0002418,E0002418,S0002418,20240309,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10660,10660,S0002418:RBC:v1,0302,4.74,10^12/L
+0002418,E0002418,S0002418,20240309,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10660,10660,S0002418:MCHC:v1,0306,33.6,g/dL
+0002418,E0002418,S0002418,20240309,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10660,10660,S0002418:RDW:v1,0307,17.3,%
+0002418,E0002418,S0002418,20240309,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10660,10660,S0002418:HBA0:v1,H01,0.867,fraction
+0002418,E0002418,S0002418,20240309,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10660,10660,S0002418:HBA2:v1,H02,0.049,fraction
+0002418,E0002418,S0002418,20240309,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10660,10660,S0002418:HBF:v1,H03,0.004,fraction
+0002459,E0002459,S0002459,20240417,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10824,10824,S0002459:HB:v1,0301,93,g/L
+0002459,E0002459,S0002459,20240417,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10824,10824,S0002459:MCV:v1,0304,60.9,fL
+0002459,E0002459,S0002459,20240417,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10824,10824,S0002459:MCH:v1,0305,18.6,pg
+0002459,E0002459,S0002459,20240417,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10824,10824,S0002459:RBC:v1,0302,4.99,10^12/L
+0002459,E0002459,S0002459,20240417,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10824,10824,S0002459:MCHC:v1,0306,30.6,g/dL
+0002459,E0002459,S0002459,20240417,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10824,10824,S0002459:RDW:v1,0307,16.4,%
+0002459,E0002459,S0002459,20240417,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10824,10824,S0002459:HBA0:v1,H01,0.076,fraction
+0002459,E0002459,S0002459,20240417,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10824,10824,S0002459:HBA2:v1,H02,0.857,fraction
+0002459,E0002459,S0002459,20240417,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10824,10824,S0002459:HBF:v1,H03,0.045,fraction
+0002480,E0002480,S0002480,20240124,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10906,10906,S0002480:HB:v1,0301,115,g/L
+0002480,E0002480,S0002480,20240124,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10906,10906,S0002480:MCV:v1,0304,79.9,fL
+0002480,E0002480,S0002480,20240124,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10906,10906,S0002480:MCH:v1,0305,26.9,pg
+0002480,E0002480,S0002480,20240124,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10906,10906,S0002480:RBC:v1,0302,4.27,10^12/L
+0002480,E0002480,S0002480,20240124,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10906,10906,S0002480:MCHC:v1,0306,33.7,g/dL
+0002480,E0002480,S0002480,20240124,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10906,10906,S0002480:RDW:v1,0307,14.8,%
+0002480,E0002480,S0002480,20240124,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10906,10906,S0002480:HBA0:v1,H01,0.877,fraction
+0002480,E0002480,S0002480,20240124,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10906,10906,S0002480:HBA2:v1,H02,0.02,fraction
+0002480,E0002480,S0002480,20240124,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,10906,10906,S0002480:HBF:v1,H03,0.006,fraction
+0002626,E0002626,S0002626,20241105,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11521,11521,S0002626:HB:v1,0301,132,g/L
+0002626,E0002626,S0002626,20241105,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11521,11521,S0002626:MCV:v1,0304,84.7,fL
+0002626,E0002626,S0002626,20241105,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11521,11521,S0002626:MCH:v1,0305,31.7,pg
+0002626,E0002626,S0002626,20241105,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11521,11521,S0002626:RBC:v1,0302,4.17,10^12/L
+0002626,E0002626,S0002626,20241105,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11521,11521,S0002626:MCHC:v1,0306,37.4,g/dL
+0002626,E0002626,S0002626,20241105,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11521,11521,S0002626:RDW:v1,0307,13.9,%
+0002626,E0002626,S0002626,20241105,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11521,11521,S0002626:HBA0:v1,H01,0.533,fraction
+0002626,E0002626,S0002626,20241105,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11521,11521,S0002626:HBA2:v1,H02,0.021,fraction
+0002626,E0002626,S0002626,20241105,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11521,11521,S0002626:HBF:v1,H03,0.01,fraction
+0002690,E0002690,S0002690,20240413,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11808,11808,S0002690:HB:v1,0301,115,g/L
+0002690,E0002690,S0002690,20240413,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11808,11808,S0002690:MCV:v1,0304,79.9,fL
+0002690,E0002690,S0002690,20240413,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11808,11808,S0002690:MCH:v1,0305,25.7,pg
+0002690,E0002690,S0002690,20240413,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11808,11808,S0002690:RBC:v1,0302,4.47,10^12/L
+0002690,E0002690,S0002690,20240413,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11808,11808,S0002690:MCHC:v1,0306,32.2,g/dL
+0002690,E0002690,S0002690,20240413,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11808,11808,S0002690:RDW:v1,0307,14.7,%
+0002690,E0002690,S0002690,20240413,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11808,11808,S0002690:HBA0:v1,H01,0.874,fraction
+0002690,E0002690,S0002690,20240413,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11808,11808,S0002690:HBA2:v1,H02,0.028,fraction
+0002690,E0002690,S0002690,20240413,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11808,11808,S0002690:HBF:v1,H03,0.004,fraction
+0002709,E0002709,S0002709,20241108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11890,11890,S0002709:HB:v1,0301,116,g/L
+0002709,E0002709,S0002709,20241108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11890,11890,S0002709:MCV:v1,0304,90.7,fL
+0002709,E0002709,S0002709,20241108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11890,11890,S0002709:MCH:v1,0305,31.7,pg
+0002709,E0002709,S0002709,20241108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11890,11890,S0002709:RBC:v1,0302,3.66,10^12/L
+0002709,E0002709,S0002709,20241108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11890,11890,S0002709:MCHC:v1,0306,34.9,g/dL
+0002709,E0002709,S0002709,20241108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11890,11890,S0002709:RDW:v1,0307,13.4,%
+0002709,E0002709,S0002709,20241108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11890,11890,S0002709:HBA0:v1,H01,0.868,fraction
+0002709,E0002709,S0002709,20241108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11890,11890,S0002709:HBA2:v1,H02,0.032,fraction
+0002709,E0002709,S0002709,20241108,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,11890,11890,S0002709:HBF:v1,H03,0.006,fraction
+0002736,E0002736,S0002736,20240507,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12013,12013,S0002736:HB:v1,0301,105,g/L
+0002736,E0002736,S0002736,20240507,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12013,12013,S0002736:MCV:v1,0304,91.5,fL
+0002736,E0002736,S0002736,20240507,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12013,12013,S0002736:MCH:v1,0305,27.9,pg
+0002736,E0002736,S0002736,20240507,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12013,12013,S0002736:RBC:v1,0302,3.77,10^12/L
+0002736,E0002736,S0002736,20240507,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12013,12013,S0002736:MCHC:v1,0306,30.4,g/dL
+0002736,E0002736,S0002736,20240507,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12013,12013,S0002736:RDW:v1,0307,12,%
+0002736,E0002736,S0002736,20240507,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12013,12013,S0002736:HBA0:v1,H01,0.879,fraction
+0002736,E0002736,S0002736,20240507,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12013,12013,S0002736:HBA2:v1,H02,0.031,fraction
+0002736,E0002736,S0002736,20240507,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12013,12013,S0002736:HBF:v1,H03,0.005,fraction
+0002744,E0002744,S0002744,20241225,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12054,12054,S0002744:HB:v1,0301,116,g/L
+0002744,E0002744,S0002744,20241225,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12054,12054,S0002744:MCV:v1,0304,83.3,fL
+0002744,E0002744,S0002744,20241225,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12054,12054,S0002744:MCH:v1,0305,29.4,pg
+0002744,E0002744,S0002744,20241225,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12054,12054,S0002744:RBC:v1,0302,3.95,10^12/L
+0002744,E0002744,S0002744,20241225,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12054,12054,S0002744:MCHC:v1,0306,35.3,g/dL
+0002744,E0002744,S0002744,20241225,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12054,12054,S0002744:RDW:v1,0307,15.7,%
+0002744,E0002744,S0002744,20241225,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12054,12054,S0002744:HBA0:v1,H01,0.871,fraction
+0002744,E0002744,S0002744,20241225,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12054,12054,S0002744:HBA2:v1,H02,0.031,fraction
+0002744,E0002744,S0002744,20241225,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12054,12054,S0002744:HBF:v1,H03,0.004,fraction
+0002923,E0002923,S0002923,20240630,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12915,12915,S0002923:HB:v1,0301,143,g/L
+0002923,E0002923,S0002923,20240630,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12915,12915,S0002923:MCV:v1,0304,84.3,fL
+0002923,E0002923,S0002923,20240630,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12915,12915,S0002923:MCH:v1,0305,30.8,pg
+0002923,E0002923,S0002923,20240630,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12915,12915,S0002923:RBC:v1,0302,4.65,10^12/L
+0002923,E0002923,S0002923,20240630,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12915,12915,S0002923:MCHC:v1,0306,36.5,g/dL
+0002923,E0002923,S0002923,20240630,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12915,12915,S0002923:RDW:v1,0307,15.2,%
+0002923,E0002923,S0002923,20240630,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12915,12915,S0002923:HBA0:v1,H01,0.868,fraction
+0002923,E0002923,S0002923,20240630,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12915,12915,S0002923:HBA2:v1,H02,0.029,fraction
+0002923,E0002923,S0002923,20240630,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12915,12915,S0002923:HBF:v1,H03,0.002,fraction
+0002940,E0002940,S0002940,20240208,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12997,12997,S0002940:HB:v1,0301,87,g/L
+0002940,E0002940,S0002940,20240208,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12997,12997,S0002940:MCV:v1,0304,81.4,fL
+0002940,E0002940,S0002940,20240208,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12997,12997,S0002940:MCH:v1,0305,27.4,pg
+0002940,E0002940,S0002940,20240208,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12997,12997,S0002940:RBC:v1,0302,3.18,10^12/L
+0002940,E0002940,S0002940,20240208,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12997,12997,S0002940:MCHC:v1,0306,33.6,g/dL
+0002940,E0002940,S0002940,20240208,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12997,12997,S0002940:RDW:v1,0307,16.1,%
+0002940,E0002940,S0002940,20240208,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12997,12997,S0002940:HBA0:v1,H01,0.889,fraction
+0002940,E0002940,S0002940,20240208,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12997,12997,S0002940:HBA2:v1,H02,0.027,fraction
+0002940,E0002940,S0002940,20240208,%Y%m%d,1,final,kaggle_hplc_screening,kaggle_hplc_screening/HPLC data.csv,12997,12997,S0002940:HBF:v1,H03,0.004,fraction
+9000004,E9000004,S9000004,20240615,%Y%m%d,1,final,synthetic_scenarios,synthetic_scenarios_v2,4,CASE04,S9000004:HB:v1,0301,108,g/L
+9000004,E9000004,S9000004,20240615,%Y%m%d,1,final,synthetic_scenarios,synthetic_scenarios_v2,4,CASE04,S9000004:MCV:v1,0304,70,fL
+9000004,E9000004,S9000004,20240615,%Y%m%d,1,final,synthetic_scenarios,synthetic_scenarios_v2,4,CASE04,S9000004:MCH:v1,0305,22,pg
+9000004,E9000004,S9000004,20240615,%Y%m%d,1,final,synthetic_scenarios,synthetic_scenarios_v2,4,CASE04,S9000004:RBC:v1,0302,5.12,10^12/L
+9000004,E9000004,S9000004,20240615,%Y%m%d,1,final,synthetic_scenarios,synthetic_scenarios_v2,4,CASE04,S9000004:MCHC:v1,0306,32,g/dL
+9000004,E9000004,S9000004,20240615,%Y%m%d,1,final,synthetic_scenarios,synthetic_scenarios_v2,4,CASE04,S9000004:RDW:v1,0307,14,%
+9000004,E9000004,S9000004,20240615,%Y%m%d,1,final,synthetic_scenarios,synthetic_scenarios_v2,4,CASE04,S9000004:HBA0:v1,H01,0.9,fraction
+9000004,E9000004,S9000004,20240615,%Y%m%d,1,final,synthetic_scenarios,synthetic_scenarios_v2,4,CASE04,S9000004:HBA2:v1,H02,0.026,fraction
+9000004,E9000004,S9000004,20240615,%Y%m%d,1,final,synthetic_scenarios,synthetic_scenarios_v2,4,CASE04,S9000004:HBF:v1,H03,0.0011,fraction

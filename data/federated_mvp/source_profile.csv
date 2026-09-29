@@ -1,0 +1,10 @@
+test,source_column,assumed_unit,source_rows,minimum,maximum
+HB,HB,g/dL,13031,1.1,41.1
+MCV,MCV,fL,13031,8.3,114.5
+MCH,MCH,pg,13031,10.3,78.8
+RBC,RBC,10^12/L,13031,0.86,9.43
+MCHC,MCHC,g/dL,13031,16,316
+RDW,RDWcv,%,13031,9.9,42.3
+HBA0,HbA0,%,13031,2.2,93.4
+HBA2,HbA2,%,13031,1.4,96.2
+HBF,HbF,%,13031,0,93.6

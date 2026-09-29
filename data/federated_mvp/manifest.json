@@ -1,0 +1,55 @@
+{
+  "version": "federated-data-v2",
+  "seed": 20260910,
+  "source_rows_available": 13031,
+  "source_rows_selected": 13031,
+  "synthetic_scenario_patients": 36,
+  "patients": 13067,
+  "raw_observations": 119259,
+  "expected_measurements": 117190,
+  "disposition_counts": {
+    "accept": 117217,
+    "duplicate": 1602,
+    "quarantine": 440
+  },
+  "source_sha256": "51a5729c9864a5292c134fb911e199d628fb4812e19367c8cc503363b009daee",
+  "source_url": "https://www.kaggle.com/datasets/abhraghoshcmc/hplc-based-thalassemia-screening-data",
+  "nodes": [
+    {
+      "site": "VN_A",
+      "layout": "wide",
+      "patients": 6213,
+      "export_rows": 6290,
+      "observations": 56610
+    },
+    {
+      "site": "VN_B",
+      "layout": "long",
+      "patients": 2959,
+      "export_rows": 27225,
+      "observations": 27225
+    },
+    {
+      "site": "VN_C",
+      "layout": "wide",
+      "patients": 3895,
+      "export_rows": 3936,
+      "observations": 35424
+    }
+  ],
+  "data_kind": "Research-derived simulation, not real Vietnamese hospital records",
+  "synthetic_fields": [
+    "site",
+    "patient_id",
+    "encounter_id",
+    "specimen_id",
+    "date",
+    "scenario"
+  ],
+  "excluded_sources": {
+    "alpha_files": "Overlapping laboratory rows with different phenotype labels; not independent cohorts.",
+    "bangladesh": "Treatment cohort reserved for a separate query scenario.",
+    "mri": "Iron-overload extension outside the CBC/HPLC scenario.",
+    "mimic": "Not a thalassemia-specific screening cohort."
+  }
+}

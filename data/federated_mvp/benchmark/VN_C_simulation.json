@@ -1,0 +1,10 @@
+{
+  "site": "VN_C",
+  "seed": 20260910,
+  "fault_intervals": {
+    "missing_mch": 31,
+    "missing_mcv_unit": 83,
+    "unreadable_hb": 117,
+    "reexport": 97
+  }
+}

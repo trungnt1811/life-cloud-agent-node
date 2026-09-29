@@ -1,0 +1,110 @@
+{
+  "site": "VN_A",
+  "fictional_site": true,
+  "layout": "wide",
+  "source_system": "HIS_CBC_EXPORT",
+  "delimiter": ",",
+  "encoding": "utf-8",
+  "decimal_separator": ".",
+  "date_format": "%Y-%m-%d",
+  "columns": {
+    "patient_id": "MRN",
+    "encounter_id": "EncounterNo",
+    "specimen_id": "SpecimenNo",
+    "date": "Collected",
+    "date_format": "DateFormat",
+    "revision": "Revision",
+    "status": "Status"
+  },
+  "tests": {
+    "HGB": {
+      "code": "HB",
+      "export_unit": "g/dL",
+      "export_factor": "1",
+      "canonical_unit": "g/dL",
+      "accepted_units": {
+        "g/dL": "1"
+      }
+    },
+    "MCV": {
+      "code": "MCV",
+      "export_unit": "fL",
+      "export_factor": "1",
+      "canonical_unit": "fL",
+      "accepted_units": {
+        "fL": "1"
+      }
+    },
+    "MCH": {
+      "code": "MCH",
+      "export_unit": "pg",
+      "export_factor": "1",
+      "canonical_unit": "pg",
+      "accepted_units": {
+        "pg": "1"
+      }
+    },
+    "RBC": {
+      "code": "RBC",
+      "export_unit": "10^12/L",
+      "export_factor": "1",
+      "canonical_unit": "10^12/L",
+      "accepted_units": {
+        "10^12/L": "1"
+      }
+    },
+    "MCHC": {
+      "code": "MCHC",
+      "export_unit": "g/dL",
+      "export_factor": "1",
+      "canonical_unit": "g/dL",
+      "accepted_units": {
+        "g/dL": "1"
+      }
+    },
+    "RDW_CV": {
+      "code": "RDW",
+      "export_unit": "%",
+      "export_factor": "1",
+      "canonical_unit": "%",
+      "accepted_units": {
+        "%": "1"
+      }
+    },
+    "HbA0": {
+      "code": "HBA0",
+      "export_unit": "%",
+      "export_factor": "1",
+      "canonical_unit": "%",
+      "accepted_units": {
+        "%": "1"
+      }
+    },
+    "HbA2": {
+      "code": "HBA2",
+      "export_unit": "%",
+      "export_factor": "1",
+      "canonical_unit": "%",
+      "accepted_units": {
+        "%": "1"
+      }
+    },
+    "HbF": {
+      "code": "HBF",
+      "export_unit": "%",
+      "export_factor": "1",
+      "canonical_unit": "%",
+      "accepted_units": {
+        "%": "1"
+      }
+    }
+  },
+  "identity_rule": "Strip outer whitespace; join patient_id to registry.local_patient_id within this site only.",
+  "revision_rule": "After re-export deduplication, latest final revision per specimen and test wins.",
+  "date_rule": "Use declared DateFormat/ts_format/KieuNgay. Blank format is unknown and requires review.",
+  "unit_assumption": "Canonical source units follow the demo dictionary; source units were not independently clinically validated.",
+  "files": [
+    "results.csv",
+    "reexport.csv"
+  ]
+}

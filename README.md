@@ -113,6 +113,14 @@ code remains a template placeholder. See `docs/plans/` for completed work.
    make run
    ```
 
+### Seeding Demo Hospital Data
+
+`data/federated_mvp/` ships simulated exports for three demo hospitals
+(`VN_A`, `VN_B`, `VN_C`). To load one site into a node and verify it against
+the benchmark answers, follow
+[docs/runbooks/seed-demo-hospital-data.md](docs/runbooks/seed-demo-hospital-data.md).
+Seed exactly one site per node database.
+
 ## Development
 
 ### Available Make Commands

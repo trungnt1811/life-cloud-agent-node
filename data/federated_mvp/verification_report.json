@@ -1,0 +1,100 @@
+{
+  "passed": true,
+  "errors": [],
+  "error_count": 0,
+  "site_count": 3,
+  "patients": 13067,
+  "raw_observations": 119259,
+  "clean_measurements": 117190,
+  "disposition_counts": {
+    "accept": 117217,
+    "quarantine": 440,
+    "duplicate": 1602
+  },
+  "independent_sql_results": [
+    {
+      "site": "VN_A",
+      "cohort": "all",
+      "patients": 6213,
+      "complete_cbc": 6076,
+      "matches_rule": 1090,
+      "matches_with_hplc": 1089
+    },
+    {
+      "site": "VN_A",
+      "cohort": "research_derived",
+      "patients": 6201,
+      "complete_cbc": 6068,
+      "matches_rule": 1085,
+      "matches_with_hplc": 1085
+    },
+    {
+      "site": "VN_A",
+      "cohort": "synthetic_scenarios",
+      "patients": 12,
+      "complete_cbc": 8,
+      "matches_rule": 5,
+      "matches_with_hplc": 4
+    },
+    {
+      "site": "VN_B",
+      "cohort": "all",
+      "patients": 2959,
+      "complete_cbc": 2913,
+      "matches_rule": 813,
+      "matches_with_hplc": 812
+    },
+    {
+      "site": "VN_B",
+      "cohort": "research_derived",
+      "patients": 2947,
+      "complete_cbc": 2905,
+      "matches_rule": 808,
+      "matches_with_hplc": 808
+    },
+    {
+      "site": "VN_B",
+      "cohort": "synthetic_scenarios",
+      "patients": 12,
+      "complete_cbc": 8,
+      "matches_rule": 5,
+      "matches_with_hplc": 4
+    },
+    {
+      "site": "VN_C",
+      "cohort": "all",
+      "patients": 3895,
+      "complete_cbc": 3701,
+      "matches_rule": 805,
+      "matches_with_hplc": 804
+    },
+    {
+      "site": "VN_C",
+      "cohort": "research_derived",
+      "patients": 3883,
+      "complete_cbc": 3693,
+      "matches_rule": 800,
+      "matches_with_hplc": 800
+    },
+    {
+      "site": "VN_C",
+      "cohort": "synthetic_scenarios",
+      "patients": 12,
+      "complete_cbc": 8,
+      "matches_rule": 5,
+      "matches_with_hplc": 4
+    }
+  ],
+  "source_sha256": "51a5729c9864a5292c134fb911e199d628fb4812e19367c8cc503363b009daee",
+  "checks": [
+    "source_hash",
+    "original_row_lineage",
+    "raw_only_roundtrip",
+    "per_observation_disposition",
+    "site_scoped_identity",
+    "specimen_ownership",
+    "duplicate_and_revision_resolution",
+    "independent_sql_cohorts",
+    "no_answer_columns_in_node_exports"
+  ]
+}

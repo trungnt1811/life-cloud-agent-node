@@ -1,0 +1,110 @@
+{
+  "site": "VN_C",
+  "fictional_site": true,
+  "layout": "wide",
+  "source_system": "MANUAL_SPREADSHEET_EXPORT",
+  "delimiter": ";",
+  "encoding": "utf-8-sig",
+  "decimal_separator": ",",
+  "date_format": "%d/%m/%Y",
+  "columns": {
+    "patient_id": "MaBN",
+    "encounter_id": "MaKham",
+    "specimen_id": "MaMau",
+    "date": "NgayXN",
+    "date_format": "KieuNgay",
+    "revision": "LanSua",
+    "status": "TrangThai"
+  },
+  "tests": {
+    "Huyet sac to": {
+      "code": "HB",
+      "export_unit": "g / dL",
+      "export_factor": "1",
+      "canonical_unit": "g/dL",
+      "accepted_units": {
+        "g / dL": "1"
+      }
+    },
+    "The tich HC": {
+      "code": "MCV",
+      "export_unit": "fL",
+      "export_factor": "1",
+      "canonical_unit": "fL",
+      "accepted_units": {
+        "fL": "1"
+      }
+    },
+    "Luong Hb HC": {
+      "code": "MCH",
+      "export_unit": "pg",
+      "export_factor": "1",
+      "canonical_unit": "pg",
+      "accepted_units": {
+        "pg": "1"
+      }
+    },
+    "So luong HC": {
+      "code": "RBC",
+      "export_unit": "10^12/L",
+      "export_factor": "1",
+      "canonical_unit": "10^12/L",
+      "accepted_units": {
+        "10^12/L": "1"
+      }
+    },
+    "Nong do Hb HC": {
+      "code": "MCHC",
+      "export_unit": "g / dL",
+      "export_factor": "1",
+      "canonical_unit": "g/dL",
+      "accepted_units": {
+        "g / dL": "1"
+      }
+    },
+    "RDW": {
+      "code": "RDW",
+      "export_unit": "%",
+      "export_factor": "1",
+      "canonical_unit": "%",
+      "accepted_units": {
+        "%": "1"
+      }
+    },
+    "Hb A0": {
+      "code": "HBA0",
+      "export_unit": "%",
+      "export_factor": "1",
+      "canonical_unit": "%",
+      "accepted_units": {
+        "%": "1"
+      }
+    },
+    "Hb A2": {
+      "code": "HBA2",
+      "export_unit": "%",
+      "export_factor": "1",
+      "canonical_unit": "%",
+      "accepted_units": {
+        "%": "1"
+      }
+    },
+    "Hb F": {
+      "code": "HBF",
+      "export_unit": "%",
+      "export_factor": "1",
+      "canonical_unit": "%",
+      "accepted_units": {
+        "%": "1"
+      }
+    }
+  },
+  "identity_rule": "Strip outer whitespace; join patient_id to registry.local_patient_id within this site only.",
+  "revision_rule": "After re-export deduplication, latest final revision per specimen and test wins.",
+  "date_rule": "Use declared DateFormat/ts_format/KieuNgay. Blank format is unknown and requires review.",
+  "unit_assumption": "Canonical source units follow the demo dictionary; source units were not independently clinically validated.",
+  "files": [
+    "results.csv",
+    "reexport.csv"
+  ]
+}
