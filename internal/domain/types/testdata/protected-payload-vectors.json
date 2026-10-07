@@ -1,0 +1,98 @@
+[
+  {
+    "name": "visible-zero",
+    "raw_count": "0",
+    "local_k": "5",
+    "effective_k": "10",
+    "kind": "EXACT",
+    "value": "0",
+    "lower_bound": null,
+    "upper_bound": null,
+    "canonical_json": "{\"count\":{\"kind\":\"EXACT\",\"lower_bound\":null,\"upper_bound\":null,\"value\":\"0\"},\"effective_k\":\"10\"}",
+    "digest": "sha256:07c624e0632560c834f39ef69e77fdb71d1821ad62bd2931229f20ac2f884b43"
+  },
+  {
+    "name": "suppressed-one",
+    "raw_count": "1",
+    "local_k": "5",
+    "effective_k": "10",
+    "kind": "SUPPRESSED",
+    "value": null,
+    "lower_bound": "1",
+    "upper_bound": "9",
+    "canonical_json": "{\"count\":{\"kind\":\"SUPPRESSED\",\"lower_bound\":\"1\",\"upper_bound\":\"9\",\"value\":null},\"effective_k\":\"10\"}",
+    "digest": "sha256:d402cce802763d7f77961f2065f16038245b86849f3ebbac7bf905c50b6dde79"
+  },
+  {
+    "name": "suppressed-nine",
+    "raw_count": "9",
+    "local_k": "5",
+    "effective_k": "10",
+    "kind": "SUPPRESSED",
+    "value": null,
+    "lower_bound": "1",
+    "upper_bound": "9",
+    "canonical_json": "{\"count\":{\"kind\":\"SUPPRESSED\",\"lower_bound\":\"1\",\"upper_bound\":\"9\",\"value\":null},\"effective_k\":\"10\"}",
+    "digest": "sha256:d402cce802763d7f77961f2065f16038245b86849f3ebbac7bf905c50b6dde79"
+  },
+  {
+    "name": "visible-at-floor",
+    "raw_count": "10",
+    "local_k": "5",
+    "effective_k": "10",
+    "kind": "EXACT",
+    "value": "10",
+    "lower_bound": null,
+    "upper_bound": null,
+    "canonical_json": "{\"count\":{\"kind\":\"EXACT\",\"lower_bound\":null,\"upper_bound\":null,\"value\":\"10\"},\"effective_k\":\"10\"}",
+    "digest": "sha256:3ead5e44e7e282abab1d5272a1cd5785223219ec0b5e53cc48dab2871c45f6b2"
+  },
+  {
+    "name": "visible-fourteen",
+    "raw_count": "14",
+    "local_k": "5",
+    "effective_k": "10",
+    "kind": "EXACT",
+    "value": "14",
+    "lower_bound": null,
+    "upper_bound": null,
+    "canonical_json": "{\"count\":{\"kind\":\"EXACT\",\"lower_bound\":null,\"upper_bound\":null,\"value\":\"14\"},\"effective_k\":\"10\"}",
+    "digest": "sha256:6d0f42baafd29e99fe2e1354c97b5db9ab5c999fee27d66b7d0a65ba88083158"
+  },
+  {
+    "name": "raised-local-k",
+    "raw_count": "14",
+    "local_k": "20",
+    "effective_k": "20",
+    "kind": "SUPPRESSED",
+    "value": null,
+    "lower_bound": "1",
+    "upper_bound": "19",
+    "canonical_json": "{\"count\":{\"kind\":\"SUPPRESSED\",\"lower_bound\":\"1\",\"upper_bound\":\"19\",\"value\":null},\"effective_k\":\"20\"}",
+    "digest": "sha256:4608803d4f1f1eee1d96eba973efb06e84a31f53f7cd76df9a5cbfc9ead259d5"
+  },
+  {
+    "name": "visible-at-local-k",
+    "raw_count": "20",
+    "local_k": "20",
+    "effective_k": "20",
+    "kind": "EXACT",
+    "value": "20",
+    "lower_bound": null,
+    "upper_bound": null,
+    "canonical_json": "{\"count\":{\"kind\":\"EXACT\",\"lower_bound\":null,\"upper_bound\":null,\"value\":\"20\"},\"effective_k\":\"20\"}",
+    "digest": "sha256:f1ec32700bcf4a5c0b40da51fc47bb0f708d13c191ec1366e0eb4a988affcfe1"
+  },
+  {
+    "name": "signed-limit",
+    "raw_count": "9223372036854775807",
+    "local_k": "5",
+    "effective_k": "10",
+    "kind": "EXACT",
+    "value": "9223372036854775807",
+    "lower_bound": null,
+    "upper_bound": null,
+    "canonical_json": "{\"count\":{\"kind\":\"EXACT\",\"lower_bound\":null,\"upper_bound\":null,\"value\":\"9223372036854775807\"},\"effective_k\":\"10\"}",
+    "digest": "sha256:d08f77569614fe27991503932334864cc0f56094053a8e93dbe3dec3d05ab6ff"
+  }
+]

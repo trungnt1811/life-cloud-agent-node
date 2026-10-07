@@ -1,0 +1,199 @@
+{
+  "schema": "cohort-definition/v1",
+  "vectors": [
+    {
+      "name": "canonical-cbc-example",
+      "params": {
+        "query_schema_version": 1,
+        "date_from": "2024-01-01",
+        "date_to": "2024-12-31",
+        "specimen_policy": "LATEST_IN_RANGE",
+        "conditions": [
+          {
+            "field_code": "MCV",
+            "op": "LT",
+            "value": "80"
+          },
+          {
+            "field_code": "MCH",
+            "op": "LT",
+            "value": "27"
+          }
+        ],
+        "required_panels": [
+          {
+            "field_codes": [
+              "HB",
+              "MCV",
+              "MCH"
+            ],
+            "value_constraint": "EXACT"
+          }
+        ],
+        "group_by": []
+      },
+      "expected_hash": "sha256:1a0b397a55403a5fea599885b0679630ee0bdf8c190c865f42741f6185935bdf"
+    },
+    {
+      "name": "equivalent-decimals-and-set-order",
+      "params": {
+        "query_schema_version": 1,
+        "date_from": "2024-01-01",
+        "date_to": "2024-12-31",
+        "specimen_policy": "LATEST_IN_RANGE",
+        "conditions": [
+          {
+            "field_code": "MCH",
+            "op": "LT",
+            "value": "027.00"
+          },
+          {
+            "field_code": "MCV",
+            "op": "LT",
+            "value": "00080.000"
+          },
+          {
+            "field_code": "MCV",
+            "op": "LT",
+            "value": "80"
+          }
+        ],
+        "required_panels": [
+          {
+            "field_codes": [
+              "MCH",
+              "HB",
+              "MCV",
+              "HB"
+            ],
+            "value_constraint": "EXACT"
+          }
+        ],
+        "group_by": []
+      },
+      "expected_hash": "sha256:1a0b397a55403a5fea599885b0679630ee0bdf8c190c865f42741f6185935bdf"
+    },
+    {
+      "name": "microcytic-hypochromic-2024",
+      "template_version": "demo/2024/v1",
+      "params": {
+        "query_schema_version": 1,
+        "date_from": "2024-01-01",
+        "date_to": "2024-12-31",
+        "specimen_policy": "LATEST_IN_RANGE",
+        "conditions": [
+          {
+            "field_code": "MCV",
+            "op": "LT",
+            "value": "80"
+          },
+          {
+            "field_code": "MCH",
+            "op": "LT",
+            "value": "27"
+          }
+        ],
+        "required_panels": [
+          {
+            "field_codes": [
+              "HB",
+              "MCV",
+              "MCH",
+              "RBC"
+            ],
+            "value_constraint": "EXACT"
+          },
+          {
+            "field_codes": [
+              "HBA0",
+              "HBA2",
+              "HBF"
+            ],
+            "value_constraint": "ALLOW_CENSORED"
+          }
+        ],
+        "group_by": []
+      },
+      "expected_hash": "sha256:36144b3d5a1bdd4bc2736e418029b936adcdf1f01588b1429d98898ab0f28c5a"
+    },
+    {
+      "name": "cbc-within-range-2024",
+      "template_version": "demo/2024/v1",
+      "params": {
+        "query_schema_version": 1,
+        "date_from": "2024-01-01",
+        "date_to": "2024-12-31",
+        "specimen_policy": "LATEST_IN_RANGE",
+        "conditions": [
+          {
+            "field_code": "HB",
+            "op": "GT",
+            "value": "10"
+          },
+          {
+            "field_code": "RBC",
+            "op": "GT",
+            "value": "4"
+          },
+          {
+            "field_code": "MCHC",
+            "op": "GT",
+            "value": "30"
+          },
+          {
+            "field_code": "RDW",
+            "op": "LT",
+            "value": "20"
+          }
+        ],
+        "required_panels": [
+          {
+            "field_codes": [
+              "HB",
+              "RBC",
+              "MCHC",
+              "RDW"
+            ],
+            "value_constraint": "EXACT"
+          }
+        ],
+        "group_by": []
+      },
+      "expected_hash": "sha256:1dcd0979ee6230da29bbf9be771e9fe7f219b532acfd45c82bbaa68d7a2831e9"
+    },
+    {
+      "name": "hplc-hba2-raised-2024",
+      "template_version": "demo/2024/v1",
+      "params": {
+        "query_schema_version": 1,
+        "date_from": "2024-01-01",
+        "date_to": "2024-12-31",
+        "specimen_policy": "LATEST_IN_RANGE",
+        "conditions": [
+          {
+            "field_code": "HBA0",
+            "op": "GT",
+            "value": "90"
+          },
+          {
+            "field_code": "HBA2",
+            "op": "GT",
+            "value": "2"
+          }
+        ],
+        "required_panels": [
+          {
+            "field_codes": [
+              "HBA0",
+              "HBA2",
+              "HBF"
+            ],
+            "value_constraint": "ALLOW_CENSORED"
+          }
+        ],
+        "group_by": []
+      },
+      "expected_hash": "sha256:bbc77acefce4d97fa6ed406c8f85f7d52bc4830a256762981c54b879775bc159"
+    }
+  ]
+}

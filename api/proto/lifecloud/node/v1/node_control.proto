@@ -18,6 +18,11 @@ message NodeToCenter {
     Register register = 1;
     Heartbeat heartbeat = 2;
     QueryResult query_result = 3;
+    GovernanceReport governance_report = 4;
+    CommandAck command_ack = 5;
+    JobStage job_stage = 6;
+    ReleaseRequest release_request = 7;
+    GovernedQueryResult governed_query_result = 8;
   }
 }
 
@@ -26,6 +31,13 @@ message CenterToNode {
   oneof payload {
     QueryTask query_task = 1;
     UpdateAdvisory update_advisory = 2;
+    GovernanceSnapshot governance_snapshot = 3;
+    GovernanceAck governance_ack = 4;
+    GovernedQueryTask governed_query_task = 5;
+    StageAck stage_ack = 6;
+    InvalidateWork invalidate_work = 7;
+    ReleaseDecision release_decision = 8;
+    ResultReceipt result_receipt = 9;
   }
 }
 
@@ -34,6 +46,9 @@ message Register {
   string node_id = 1;
   string agent_version = 2;
   uint32 query_schema_version = 3;
+  repeated string supported_governance_profiles = 4;
+  uint32 governance_message_schema_version = 5;
+  repeated ReleaseMode supported_release_modes = 6;
 }
 
 // Heartbeat is sent periodically while the stream is open.
@@ -136,4 +151,270 @@ enum QueryResultStatus {
   QUERY_RESULT_STATUS_REJECTED_INVALID_QUERY = 2;
   QUERY_RESULT_STATUS_UNSUPPORTED_VERSION = 3;
   QUERY_RESULT_STATUS_ERROR = 4;
+}
+
+// Separate governed variants never enable execution by themselves.
+enum ReleaseMode {
+  RELEASE_MODE_UNSPECIFIED = 0;
+  RELEASE_MODE_AUTO = 1;
+  RELEASE_MODE_MANUAL = 2;
+}
+
+enum PermitStatus {
+  PERMIT_STATUS_UNSPECIFIED = 0;
+  PERMIT_STATUS_ACTIVE = 1;
+  PERMIT_STATUS_REVOKED = 2;
+}
+
+message PermitScope {
+  string tenant_id = 1;
+  string permit_id = 2;
+  int64 version = 3;
+  string permit_hash = 4;
+  string title = 5;
+  string pi_principal_id = 6;
+  repeated string member_principal_ids = 7;
+  string purpose = 8;
+  string job_type = 9;
+  string job_version = 10;
+  repeated string allowed_field_codes = 11;
+  repeated string allowed_node_ids = 12;
+  string ethics_reference = 13;
+  google.protobuf.Timestamp valid_from = 14;
+  google.protobuf.Timestamp expires_at = 15;
+  PermitStatus status = 16;
+}
+
+message GovernanceSnapshot {
+  string profile = 1;
+  uint32 message_schema_version = 2;
+  int64 snapshot_revision = 3;
+  string session_epoch = 4;
+  uint64 network_floor = 5;
+  repeated PermitScope permits = 6;
+}
+
+message LocalPolicy {
+  int64 version = 1;
+  string policy_hash = 2;
+  uint64 local_k = 3;
+  ReleaseMode release_mode = 4;
+  repeated string enabled_field_codes = 5;
+  repeated string filter_field_codes = 6;
+  repeated string panel_field_codes = 7;
+}
+
+enum AcceptanceDecision {
+  ACCEPTANCE_DECISION_UNSPECIFIED = 0;
+  ACCEPTANCE_DECISION_ACCEPTED = 1;
+  ACCEPTANCE_DECISION_DECLINED = 2;
+}
+
+message PermitAcceptance {
+  string tenant_id = 1;
+  string permit_id = 2;
+  int64 permit_version = 3;
+  string permit_hash = 4;
+  AcceptanceDecision decision = 5;
+  int64 revision = 6;
+  repeated string allowed_field_codes = 7;
+  google.protobuf.Timestamp expires_at = 8;
+}
+
+message GovernanceReport {
+  string profile = 1;
+  uint32 message_schema_version = 2;
+  string session_epoch = 3;
+  int64 applied_snapshot_revision = 4;
+  int64 local_revision = 5;
+  LocalPolicy policy = 6;
+  repeated PermitAcceptance acceptances = 7;
+  bool paused = 8;
+}
+
+message GovernanceAck {
+  string session_epoch = 1;
+  int64 snapshot_revision = 2;
+  int64 local_revision = 3;
+}
+
+message AuthorizationContext {
+  string tenant_id = 1;
+  string principal_id = 2;
+  string purpose = 3;
+  string job_type = 4;
+  string job_version = 5;
+  string authorization_snapshot_hash = 6;
+  string policy_version = 7;
+  string policy_hash = 8;
+}
+
+message GovernedQueryTask {
+  string profile = 1;
+  uint32 message_schema_version = 2;
+  QueryTask criteria = 3;
+  string query_id = 4;
+  string node_id = 5;
+  string definition_hash = 6;
+  PermitScope permit = 7;
+  AuthorizationContext authorization = 8;
+  int64 local_policy_version = 9;
+  string local_policy_hash = 10;
+  int64 acceptance_revision = 11;
+  ReleaseMode release_mode = 12;
+  uint64 effective_k = 13;
+  google.protobuf.Timestamp dispatch_deadline = 14;
+  google.protobuf.Timestamp query_deadline = 15;
+  string session_epoch = 16;
+}
+
+enum GovernedJobPhase {
+  GOVERNED_JOB_PHASE_UNSPECIFIED = 0;
+  GOVERNED_JOB_PHASE_QUEUED = 1;
+  GOVERNED_JOB_PHASE_EXECUTING = 2;
+  GOVERNED_JOB_PHASE_WAITING_APPROVAL = 3;
+  GOVERNED_JOB_PHASE_READY_TO_RELEASE = 4;
+  GOVERNED_JOB_PHASE_SUCCEEDED = 5;
+  GOVERNED_JOB_PHASE_DECLINED = 6;
+  GOVERNED_JOB_PHASE_APPROVAL_EXPIRED = 7;
+  GOVERNED_JOB_PHASE_POLICY_DENIED = 8;
+  GOVERNED_JOB_PHASE_FAILED = 9;
+  GOVERNED_JOB_PHASE_TIMED_OUT = 10;
+  GOVERNED_JOB_PHASE_CANCELED = 11;
+}
+
+// Bounded reasons, never hospital exceptions or raw data.
+enum GovernanceReason {
+  GOVERNANCE_REASON_UNSPECIFIED = 0;
+  GOVERNANCE_REASON_PERMIT_REVOKED = 1;
+  GOVERNANCE_REASON_PERMIT_SUPERSEDED = 2;
+  GOVERNANCE_REASON_PERMIT_EXPIRED = 3;
+  GOVERNANCE_REASON_ACCEPTANCE_REQUIRED = 4;
+  GOVERNANCE_REASON_SCOPE_DENIED = 5;
+  GOVERNANCE_REASON_LOCAL_POLICY_CHANGED = 6;
+  GOVERNANCE_REASON_HOSPITAL_PAUSED = 7;
+  GOVERNANCE_REASON_QUERY_CANCELED = 8;
+  GOVERNANCE_REASON_QUERY_EXPIRED = 9;
+  GOVERNANCE_REASON_SESSION_STALE = 10;
+  GOVERNANCE_REASON_GRANT_EXPIRED = 11;
+  GOVERNANCE_REASON_PAYLOAD_CONFLICT = 12;
+  GOVERNANCE_REASON_PRIVACY_REJECTED = 13;
+  GOVERNANCE_REASON_INTERNAL_FAILURE = 14;
+  GOVERNANCE_REASON_GOVERNANCE_UNSUPPORTED = 15;
+  GOVERNANCE_REASON_APPROVAL_DECLINED = 16;
+}
+
+// Only protected payloads are digested, never hidden raw counts.
+message ReleaseBinding {
+  string tenant_id = 1;
+  string node_id = 2;
+  string query_id = 3;
+  string job_id = 4;
+  string event_id = 5;
+  string protected_payload_digest = 6;
+  string definition_hash = 7;
+  string permit_id = 8;
+  int64 permit_version = 9;
+  string permit_hash = 10;
+  int64 local_policy_version = 11;
+  string local_policy_hash = 12;
+  int64 acceptance_revision = 13;
+  string authorization_snapshot_hash = 14;
+  string session_epoch = 15;
+}
+
+message JobStage {
+  ReleaseBinding binding = 1;
+  int64 sequence = 2;
+  GovernedJobPhase phase = 3;
+  GovernanceReason reason = 4;
+  google.protobuf.Timestamp occurred_at = 5;
+  uint64 execution_duration_milliseconds = 6;
+}
+
+message StageAck {
+  string job_id = 1;
+  string event_id = 2;
+  int64 sequence = 3;
+  string session_epoch = 4;
+  google.protobuf.Timestamp execution_deadline = 5;
+  google.protobuf.Timestamp approval_deadline = 6;
+  google.protobuf.Timestamp query_deadline = 7;
+}
+
+message InvalidateWork {
+  string command_id = 1;
+  string tenant_id = 2;
+  string permit_id = 3;
+  int64 through_permit_version = 4;
+  string query_id = 5;
+  GovernanceReason reason = 6;
+  string session_epoch = 7;
+}
+
+message CommandAck {
+  string command_id = 1;
+  string session_epoch = 2;
+}
+
+message ReleaseRequest {
+  ReleaseBinding binding = 1;
+}
+
+message ReleaseGrant {
+  string grant_id = 1;
+  ReleaseBinding binding = 2;
+  google.protobuf.Timestamp granted_at = 3;
+  google.protobuf.Timestamp expires_at = 4;
+}
+
+message ReleaseDenied {
+  ReleaseBinding binding = 1;
+  GovernanceReason reason = 2;
+}
+
+message ReleaseDecision {
+  oneof outcome {
+    ReleaseGrant grant = 1;
+    ReleaseDenied denied = 2;
+  }
+}
+
+// Exact zero requires oneof presence; absence is never zero.
+message ProtectedCohortPayload {
+  uint64 effective_k = 1;
+  oneof count {
+    uint64 exact_count = 2;
+    PositiveSuppressedCount suppressed_count = 3;
+  }
+}
+
+message PositiveSuppressedCount {
+  uint64 lower_bound = 1;
+  uint64 upper_bound = 2;
+}
+
+message GovernedQueryResult {
+  string profile = 1;
+  uint32 message_schema_version = 2;
+  string grant_id = 3;
+  ReleaseBinding binding = 4;
+  ProtectedCohortPayload protected_payload = 5;
+}
+
+enum ResultReceiptOutcome {
+  RESULT_RECEIPT_OUTCOME_UNSPECIFIED = 0;
+  RESULT_RECEIPT_OUTCOME_COMMITTED = 1;
+  RESULT_RECEIPT_OUTCOME_DUPLICATE_COMMITTED = 2;
+  RESULT_RECEIPT_OUTCOME_REJECTED = 3;
+}
+
+message ResultReceipt {
+  string receipt_id = 1;
+  string job_id = 2;
+  string event_id = 3;
+  string protected_payload_digest = 4;
+  ResultReceiptOutcome outcome = 5;
+  GovernanceReason reason = 6;
+  google.protobuf.Timestamp committed_at = 7;
 }

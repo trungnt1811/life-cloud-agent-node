@@ -230,6 +230,9 @@ func (c *NodeClient) runConnection(ctx context.Context, conn *grpc.ClientConn) e
 			return err
 		}
 		c.handleCenterMessage(connCtx, cancel, msg, sendCh, inflight, &taskWG)
+		if err := connCtx.Err(); err != nil {
+			return err
+		}
 	}
 }
 
@@ -241,6 +244,14 @@ func (c *NodeClient) handleCenterMessage(
 	inflight *inflightJobs,
 	taskWG *sync.WaitGroup,
 ) {
+	if connCtx.Err() != nil {
+		return
+	}
+	if msg == nil || len(msg.ProtoReflect().GetUnknown()) > 0 {
+		c.logger.Warn("Unsupported control message; closing stream")
+		cancel()
+		return
+	}
 	switch payload := msg.GetPayload().(type) {
 	case *nodev1.CenterToNode_QueryTask:
 		task := payload.QueryTask
@@ -274,7 +285,10 @@ func (c *NodeClient) handleCenterMessage(
 			logger.String("version", advisory.GetVersion()),
 			logger.String("severity", advisory.GetSeverity().String()))
 	default:
-		c.logger.Warn("Received unknown control message; ignoring")
+		// No governed protocol support is advertised until durable guards and
+		// release/receipt handling exist. Never reinterpret this as legacy work.
+		c.logger.Warn("Unsupported control message; closing stream")
+		cancel()
 	}
 }
 

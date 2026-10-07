@@ -22,6 +22,13 @@ aggregation. The `.proto` source and generated Go stubs live under
 `api/proto/` and `gen/`; regenerate with `make proto`. The `example*` CRUD
 code remains a template placeholder. See `docs/plans/` for completed work.
 
+The coordinated governed-cohort wire and protected-payload hash fixtures are
+pre-activation foundations only. This client advertises no governed profile and
+closes unsupported governed streams without executing them. Legacy schema-v1
+execution, checkpoint fingerprints and its default k=5 remain unchanged. Durable
+hospital policy/acceptance, approvals, grants and receipts are not implemented;
+see [the active governed work](docs/plans/active/governed-cohort.md).
+
 ## Features
 
 - **Clean Architecture**: layered codebase separating delivery, domain, and
