@@ -1,0 +1,93 @@
+{
+  "schema_version": "governed-query-hashes/v1",
+  "request_input": {
+    "governance_profile": "governed-cohort/v1",
+    "job_type": "COUNT_MATCHING_COHORT",
+    "job_version": "v1",
+    "purpose": "research",
+    "study_permit": {
+      "id": "demo",
+      "version": 1
+    },
+    "target": {
+      "mode": "EXPLICIT_NODE_IDS",
+      "node_ids": [
+        "node-a"
+      ]
+    },
+    "params": {
+      "query_schema_version": 1,
+      "date_from": "2024-01-01",
+      "date_to": "2024-12-31",
+      "specimen_policy": "LATEST_IN_RANGE",
+      "conditions": [
+        {
+          "field_code": "MCV",
+          "op": "LT",
+          "value": "80"
+        }
+      ],
+      "required_panels": [],
+      "group_by": []
+    },
+    "saved_definition": null
+  },
+  "request_hash": "sha256:50bfdc7a636ddc763a83c4edc7a24c273f49a515d50c9130b5cf4f511893f76e",
+  "authorization_input": {
+    "profile": "governed-cohort/v1",
+    "query_id": "7fe1b949-22ee-4341-9a02-812590d30b8b",
+    "tenant_id": "53a96e1c-87aa-4def-b926-675e7e74df6c",
+    "principal_id": "4bf1a9a6-1a90-43bc-bded-0a4e901559fb",
+    "roles": [
+      "researcher"
+    ],
+    "purpose": "research",
+    "job_type": "COUNT_MATCHING_COHORT",
+    "job_version": "v1",
+    "permit": {
+      "tenant_id": "53a96e1c-87aa-4def-b926-675e7e74df6c",
+      "id": "demo",
+      "version": 1,
+      "scope": {
+        "title": "Thalassemia <synthetic>",
+        "pi_principal_id": "4bf1a9a6-1a90-43bc-bded-0a4e901559fb",
+        "member_principal_ids": [
+          "4bf1a9a6-1a90-43bc-bded-0a4e901559fb"
+        ],
+        "purpose": "research",
+        "job_type": "COUNT_MATCHING_COHORT",
+        "job_version": "v1",
+        "allowed_field_codes": [
+          "MCH",
+          "MCV"
+        ],
+        "allowed_node_ids": [
+          "node-a"
+        ],
+        "ethics_reference": "synthetic-only",
+        "valid_from": "2026-10-01T00:00:00Z",
+        "expires_at": "2026-11-01T00:00:00Z"
+      },
+      "permit_hash": "sha256:e231320958af5d5c3fc9a241637d48af808352b3bc43a5a4c1655481ea558773"
+    },
+    "definition_hash": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "policy_decision_id": "c88b4c59-f9db-4ff7-a80f-281808a334f5",
+    "policy_version": "local-v1",
+    "policy_hash": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "targets": [
+      {
+        "node_id": "node-a",
+        "acceptance_revision": 1,
+        "local_policy_version": 2,
+        "local_policy_hash": "sha256:2291f0434aa8842dac1c4dd3eba25b6dd9e23dfbccb062154ef11238f2897ef3",
+        "release_mode": "AUTO",
+        "effective_k": 15
+      }
+    ],
+    "network_floor": 10,
+    "created_at": "2026-10-07T12:00:00Z",
+    "dispatch_deadline": "2026-10-07T12:00:30Z",
+    "query_deadline": "2026-10-07T12:01:30Z"
+  },
+  "authorization_hash": "sha256:8a588db6095cc04d2dc887f644f89370fe971aae87db2c3753f7446ddf433f13"
+}

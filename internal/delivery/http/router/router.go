@@ -130,6 +130,7 @@ func setupApplicationRoutes(r *gin.Engine, useCases *di.UseCases, log logger.Log
 	routev1.SetupExampleRoutes(r, exampleHandler)
 	routev1.SetupEnabledQueryFieldRoutes(r, enabledQueryFieldHandler, adminAuth, log)
 	routev1.SetupStatusRoutes(r, statusHandler, adminAuth, log)
+	routev1.SetupHospitalGovernanceRoutes(r, handlers.NewHospitalGovernanceHandler(useCases.HospitalGovernanceUseCase, useCases.GovernedHospitalJobUseCase), adminAuth)
 }
 
 func registerSwaggerRoute(r *gin.Engine, options Options, log logger.Logger) {

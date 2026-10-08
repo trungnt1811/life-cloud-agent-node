@@ -5,6 +5,8 @@ import "context"
 // TxRepositories exposes repository ports bound to the same transaction.
 type TxRepositories interface {
 	Examples() ExampleRepository
+	HospitalGovernance() HospitalGovernanceRepository
+	GovernedHospitalJobs() GovernedHospitalJobRepository
 }
 
 // TransactionManager runs a function inside one atomic repository transaction.

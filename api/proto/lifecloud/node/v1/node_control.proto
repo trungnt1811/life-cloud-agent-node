@@ -23,6 +23,7 @@ message NodeToCenter {
     JobStage job_stage = 6;
     ReleaseRequest release_request = 7;
     GovernedQueryResult governed_query_result = 8;
+    ReceiptLookup receipt_lookup = 9;
   }
 }
 
@@ -302,6 +303,7 @@ enum GovernanceReason {
   GOVERNANCE_REASON_INTERNAL_FAILURE = 14;
   GOVERNANCE_REASON_GOVERNANCE_UNSUPPORTED = 15;
   GOVERNANCE_REASON_APPROVAL_DECLINED = 16;
+  GOVERNANCE_REASON_APPROVAL_DEADLINE_REACHED = 17;
 }
 
 // Only protected payloads are digested, never hidden raw counts.
@@ -359,6 +361,12 @@ message CommandAck {
 
 message ReleaseRequest {
   ReleaseBinding binding = 1;
+}
+
+// Receipt-only reconciliation must not retransmit the protected count.
+message ReceiptLookup {
+  string grant_id = 1;
+  ReleaseBinding binding = 2;
 }
 
 message ReleaseGrant {

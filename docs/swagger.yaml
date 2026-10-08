@@ -82,6 +82,328 @@ definitions:
       total_count:
         type: integer
     type: object
+  dto.HospitalAcceptanceDTO:
+    properties:
+      acknowledged_revision:
+        type: integer
+      allowed_field_codes:
+        items:
+          type: string
+        type: array
+      cp_synchronized:
+        type: boolean
+      decision:
+        type: string
+      expires_at:
+        type: string
+      local_revision:
+        type: integer
+      permit_hash:
+        type: string
+      permit_id:
+        type: string
+      permit_version:
+        type: integer
+      revision:
+        type: integer
+      snapshot_revision:
+        type: integer
+      tenant_id:
+        type: string
+    type: object
+  dto.HospitalAcceptanceRequest:
+    properties:
+      allowed_field_codes:
+        items:
+          type: string
+        type: array
+      decision:
+        enum:
+        - ACCEPTED
+        - DECLINED
+        type: string
+      expected_revision:
+        type: integer
+      expires_at:
+        type: string
+      permit_hash:
+        type: string
+      permit_version:
+        type: integer
+    required:
+    - decision
+    - expected_revision
+    - expires_at
+    - permit_hash
+    - permit_version
+    type: object
+  dto.HospitalApprovalDTO:
+    properties:
+      approval_deadline:
+        type: string
+      decision:
+        type: string
+      decision_actor:
+        type: string
+      decision_at:
+        type: string
+      definition_hash:
+        type: string
+      job_id:
+        type: string
+      local_policy_hash:
+        type: string
+      local_policy_version:
+        type: integer
+      permit_id:
+        type: string
+      permit_version:
+        type: integer
+      phase:
+        type: string
+      protected_payload:
+        $ref: '#/definitions/dto.HospitalProtectedPayloadDTO'
+      protected_payload_digest:
+        type: string
+      query_id:
+        type: string
+      revision:
+        type: integer
+    type: object
+  dto.HospitalApprovalListDTO:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.HospitalApprovalDTO'
+        type: array
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total_count:
+        type: integer
+    type: object
+  dto.HospitalApprovalRequest:
+    properties:
+      expected_revision:
+        minimum: 1
+        type: integer
+    required:
+    - expected_revision
+    type: object
+  dto.HospitalAvailabilityDTO:
+    properties:
+      acknowledged_revision:
+        type: integer
+      cp_synchronized:
+        type: boolean
+      local_revision:
+        type: integer
+      paused:
+        type: boolean
+      snapshot_revision:
+        type: integer
+      version:
+        type: integer
+    type: object
+  dto.HospitalAvailabilityRequest:
+    properties:
+      expected_revision:
+        type: integer
+      paused:
+        type: boolean
+    required:
+    - expected_revision
+    - paused
+    type: object
+  dto.HospitalOutboundEventDTO:
+    properties:
+      committed_at:
+        type: string
+      created_at:
+        type: string
+      delivery_state:
+        type: string
+      event_id:
+        type: string
+      job_id:
+        type: string
+      local_policy_version:
+        type: integer
+      permit_id:
+        type: string
+      permit_version:
+        type: integer
+      protected_payload:
+        $ref: '#/definitions/dto.HospitalProtectedPayloadDTO'
+      protected_payload_digest:
+        type: string
+      query_id:
+        type: string
+      receipt_id:
+        type: string
+      tenant_id:
+        type: string
+      updated_at:
+        type: string
+    type: object
+  dto.HospitalOutboundEventListDTO:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/dto.HospitalOutboundEventDTO'
+        type: array
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total_count:
+        type: integer
+    type: object
+  dto.HospitalPermitDTO:
+    properties:
+      acceptance:
+        $ref: '#/definitions/dto.HospitalAcceptanceDTO'
+      allowed_field_codes:
+        items:
+          type: string
+        type: array
+      allowed_node_ids:
+        items:
+          type: string
+        type: array
+      ethics_reference:
+        type: string
+      expires_at:
+        type: string
+      id:
+        type: string
+      job_type:
+        type: string
+      job_version:
+        type: string
+      member_principal_ids:
+        items:
+          type: string
+        type: array
+      permit_hash:
+        type: string
+      pi_principal_id:
+        type: string
+      purpose:
+        type: string
+      status:
+        type: string
+      tenant_id:
+        type: string
+      title:
+        type: string
+      valid_from:
+        type: string
+      version:
+        type: integer
+    type: object
+  dto.HospitalPermitListDTO:
+    properties:
+      acknowledged_revision:
+        type: integer
+      cp_synchronized:
+        type: boolean
+      items:
+        items:
+          $ref: '#/definitions/dto.HospitalPermitDTO'
+        type: array
+      local_revision:
+        type: integer
+      page:
+        type: integer
+      page_size:
+        type: integer
+      snapshot_revision:
+        type: integer
+      total_count:
+        type: integer
+    type: object
+  dto.HospitalPolicyDTO:
+    properties:
+      acknowledged_revision:
+        type: integer
+      cp_synchronized:
+        type: boolean
+      enabled_field_codes:
+        items:
+          type: string
+        type: array
+      filter_field_codes:
+        items:
+          type: string
+        type: array
+      local_k:
+        type: string
+      local_revision:
+        type: integer
+      panel_field_codes:
+        items:
+          type: string
+        type: array
+      policy_hash:
+        type: string
+      release_mode:
+        type: string
+      snapshot_revision:
+        type: integer
+      version:
+        type: integer
+    type: object
+  dto.HospitalPolicyRequest:
+    properties:
+      enabled_field_codes:
+        items:
+          type: string
+        type: array
+      expected_revision:
+        type: integer
+      filter_field_codes:
+        items:
+          type: string
+        type: array
+      local_k:
+        type: string
+      panel_field_codes:
+        items:
+          type: string
+        type: array
+      release_mode:
+        enum:
+        - AUTO
+        - MANUAL
+        type: string
+    required:
+    - expected_revision
+    - local_k
+    - release_mode
+    type: object
+  dto.HospitalProtectedCountDTO:
+    properties:
+      kind:
+        enum:
+        - EXACT
+        - SUPPRESSED
+        type: string
+      lower_bound:
+        type: string
+      upper_bound:
+        type: string
+      value:
+        type: string
+    type: object
+  dto.HospitalProtectedPayloadDTO:
+    properties:
+      count:
+        $ref: '#/definitions/dto.HospitalProtectedCountDTO'
+      effective_k:
+        type: string
+    type: object
   dto.StatusDTO:
     properties:
       advisory:
@@ -111,6 +433,312 @@ info:
   contact: {}
   title: Life Cloud Node Agent API
 paths:
+  /admin/approvals:
+    get:
+      parameters:
+      - default: 1
+        description: Page, minimum 1
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HospitalApprovalListDTO'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+      security:
+      - BasicAuth: []
+      summary: List pending hospital-local result approvals
+      tags:
+      - hospital-governance
+  /admin/approvals/{job_id}/approve:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Governed job ID
+        in: path
+        name: job_id
+        required: true
+        type: string
+      - description: UUID stable across retries
+        in: header
+        name: Idempotency-Key
+        required: true
+        type: string
+      - description: Expected current approval revision
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.HospitalApprovalRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HospitalApprovalDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+      security:
+      - BasicAuth: []
+      summary: Approve a protected governed result
+      tags:
+      - hospital-governance
+  /admin/approvals/{job_id}/decline:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: Governed job ID
+        in: path
+        name: job_id
+        required: true
+        type: string
+      - description: UUID stable across retries
+        in: header
+        name: Idempotency-Key
+        required: true
+        type: string
+      - description: Expected current approval revision
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.HospitalApprovalRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HospitalApprovalDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+      security:
+      - BasicAuth: []
+      summary: Decline a protected governed result
+      tags:
+      - hospital-governance
+  /admin/availability:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HospitalAvailabilityDTO'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+      security:
+      - BasicAuth: []
+      summary: Read hospital-local availability
+      tags:
+      - hospital-governance
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: One key per logical command
+        in: header
+        name: Idempotency-Key
+        required: true
+        type: string
+      - description: Versioned pause command
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.HospitalAvailabilityRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HospitalAvailabilityDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "413":
+          description: Request Entity Too Large
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+      security:
+      - BasicAuth: []
+      summary: Change hospital-local pause
+      tags:
+      - hospital-governance
+  /admin/outbound-events:
+    get:
+      parameters:
+      - default: 1
+        description: Page, minimum 1
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size, maximum 100
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HospitalOutboundEventListDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+      security:
+      - BasicAuth: []
+      summary: List hospital-local protected outbound events
+      tags:
+      - hospital-governance
+  /admin/policy:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HospitalPolicyDTO'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+      security:
+      - BasicAuth: []
+      summary: Read hospital-local governance policy
+      tags:
+      - hospital-governance
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: One key per logical command
+        in: header
+        name: Idempotency-Key
+        required: true
+        type: string
+      - description: Versioned local policy; AUTO or MANUAL
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.HospitalPolicyRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HospitalPolicyDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "413":
+          description: Request Entity Too Large
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+      security:
+      - BasicAuth: []
+      summary: Update hospital-local governance policy
+      tags:
+      - hospital-governance
   /admin/query-fields:
     get:
       description: List all schema v1 field codes with this node's local whitelist
@@ -200,6 +828,96 @@ paths:
       summary: Get node status
       tags:
       - admin
+  /admin/study-permits:
+    get:
+      parameters:
+      - default: 1
+        description: Page, minimum 1
+        in: query
+        name: page
+        type: integer
+      - default: 20
+        description: Page size
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HospitalPermitListDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+      security:
+      - BasicAuth: []
+      summary: List hospital-local study permit snapshots
+      tags:
+      - hospital-governance
+  /admin/study-permits/{id}/acceptance:
+    put:
+      consumes:
+      - application/json
+      parameters:
+      - description: Known permit ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: One key per logical command
+        in: header
+        name: Idempotency-Key
+        required: true
+        type: string
+      - description: Restricted local scope
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.HospitalAcceptanceRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.HospitalAcceptanceDTO'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "409":
+          description: Conflict
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "413":
+          description: Request Entity Too Large
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+        "503":
+          description: Service Unavailable
+          schema:
+            $ref: '#/definitions/dto.ErrorDTOResponse'
+      security:
+      - BasicAuth: []
+      summary: Accept or decline a hospital-local permit version
+      tags:
+      - hospital-governance
   /api/v1/examples:
     get:
       consumes:

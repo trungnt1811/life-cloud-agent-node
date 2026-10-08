@@ -31,19 +31,21 @@ const bufSize = 1 << 20
 type recordingNodeControlServer struct {
 	nodev1.UnimplementedNodeControlServer
 
-	registers  chan *nodev1.Register
-	results    chan *nodev1.QueryResult
-	toSend     chan *nodev1.CenterToNode
-	dropCount  atomic.Int32
-	connOpened chan struct{}
+	registers         chan *nodev1.Register
+	results           chan *nodev1.QueryResult
+	governanceReports chan *nodev1.GovernanceReport
+	toSend            chan *nodev1.CenterToNode
+	dropCount         atomic.Int32
+	connOpened        chan struct{}
 }
 
 func newRecordingServer() *recordingNodeControlServer {
 	return &recordingNodeControlServer{
-		registers:  make(chan *nodev1.Register, 8),
-		results:    make(chan *nodev1.QueryResult, 8),
-		toSend:     make(chan *nodev1.CenterToNode, 8),
-		connOpened: make(chan struct{}, 8),
+		registers:         make(chan *nodev1.Register, 8),
+		results:           make(chan *nodev1.QueryResult, 8),
+		governanceReports: make(chan *nodev1.GovernanceReport, 16),
+		toSend:            make(chan *nodev1.CenterToNode, 8),
+		connOpened:        make(chan struct{}, 8),
 	}
 }
 
@@ -71,6 +73,12 @@ func (s *recordingNodeControlServer) Connect(stream nodev1.NodeControl_ConnectSe
 				}
 			case *nodev1.NodeToCenter_QueryResult:
 				s.results <- payload.QueryResult
+			case *nodev1.NodeToCenter_GovernanceReport:
+				select {
+				case s.governanceReports <- payload.GovernanceReport:
+				case <-stream.Context().Done():
+					return
+				}
 			case *nodev1.NodeToCenter_Heartbeat:
 				// Not asserted on directly in these tests; draining keeps
 				// the client's send loop from blocking.

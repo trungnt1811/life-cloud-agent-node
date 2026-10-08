@@ -40,19 +40,25 @@ type Dependencies struct {
 	CohortCounter         interfaces.CohortCountUseCase
 	SuppressionThreshold  uint64
 	Advisories            *AdvisoryStore
+	HospitalGovernance    interfaces.HospitalGovernanceUseCase
+	GovernedHospitalJobs  interfaces.GovernedHospitalJobUseCase
+	Now                   func() time.Time
 }
 
 // Config configures one NodeClient.
 type Config struct {
-	Address            string
-	NodeID             string
-	AgentVersion       string
-	QuerySchemaVersion uint32
-	TLS                TLSConfig
-	HeartbeatInterval  time.Duration
-	ConnectTimeout     time.Duration
-	InitialBackoff     time.Duration
-	MaxBackoff         time.Duration
+	Address                  string
+	NodeID                   string
+	AgentVersion             string
+	QuerySchemaVersion       uint32
+	TLS                      TLSConfig
+	HeartbeatInterval        time.Duration
+	ConnectTimeout           time.Duration
+	InitialBackoff           time.Duration
+	MaxBackoff               time.Duration
+	GovernanceSyncEnabled    bool
+	GovernedExecutionEnabled bool
+	ApprovalPollInterval     time.Duration
 }
 
 func (c Config) normalized() Config {
@@ -74,6 +80,9 @@ func (c Config) normalized() Config {
 	if c.MaxBackoff < c.InitialBackoff {
 		c.MaxBackoff = c.InitialBackoff
 	}
+	if c.ApprovalPollInterval <= 0 {
+		c.ApprovalPollInterval = time.Second
+	}
 	return c
 }
 
@@ -85,6 +94,9 @@ func (c Config) Validate() error {
 }
 
 func (c Config) transportCredentials() (credentials.TransportCredentials, error) {
+	if c.GovernedExecutionEnabled && (!c.GovernanceSyncEnabled || c.TLS.Insecure || strings.TrimSpace(c.TLS.ClientCertFile) == "" || strings.TrimSpace(c.TLS.ClientKeyFile) == "") {
+		return nil, errors.New("governed execution requires synchronized governance and verified mutual TLS")
+	}
 	if strings.TrimSpace(c.Address) == "" {
 		return nil, errors.New("control center address is required")
 	}
@@ -109,10 +121,11 @@ func defaultDialer(address string, creds credentials.TransportCredentials) (*grp
 // center (decision 0001): dial-out, Register/Heartbeat, receive QueryTask and
 // UpdateAdvisory, reconnect with backoff on stream loss (Fig. 4).
 type NodeClient struct {
-	config Config
-	deps   Dependencies
-	logger logger.Logger
-	dial   Dialer
+	config           Config
+	deps             Dependencies
+	logger           logger.Logger
+	dial             Dialer
+	governanceSendMu sync.Mutex
 }
 
 // NewNodeClient creates a NodeClient. dial is optional; nil uses the real
@@ -126,6 +139,9 @@ func NewNodeClient(config Config, deps Dependencies, log logger.Logger, dial Dia
 	}
 	if deps.Advisories == nil {
 		deps.Advisories = NewAdvisoryStore()
+	}
+	if deps.Now == nil {
+		deps.Now = time.Now
 	}
 	return &NodeClient{
 		config: config.normalized(),
@@ -141,6 +157,12 @@ func NewNodeClient(config Config, deps Dependencies, log logger.Logger, dial Dia
 // misconfiguration (decision 0006: bad TLS setup fails loudly at start,
 // never falls back to plaintext).
 func (c *NodeClient) Run(ctx context.Context) error {
+	if c.config.GovernedExecutionEnabled && (c.deps.GovernedHospitalJobs == nil || c.deps.HospitalGovernance == nil || c.deps.CohortCounter == nil) {
+		return errors.New("durable governed jobs, governance and counter are required for governed execution")
+	}
+	if c.config.GovernanceSyncEnabled && c.deps.HospitalGovernance == nil {
+		return errors.New("durable hospital governance is required for synchronization")
+	}
 	creds, err := c.config.transportCredentials()
 	if err != nil {
 		return err
@@ -196,7 +218,19 @@ func (c *NodeClient) runConnection(ctx context.Context, conn *grpc.ClientConn) e
 		cancel()
 		taskWG.Wait()
 		connWG.Wait()
+		if c.config.GovernanceSyncEnabled {
+			cleanupCtx, stop := context.WithTimeout(context.WithoutCancel(ctx), 5*time.Second)
+			defer stop()
+			if err := c.deps.HospitalGovernance.FenceConnection(cleanupCtx); err != nil {
+				c.logger.Error("Failed to persist disconnected governance fence", logger.Err(err))
+			}
+		}
 	}()
+	if c.config.GovernanceSyncEnabled {
+		if err := c.deps.HospitalGovernance.FenceConnection(connCtx); err != nil {
+			return fmt.Errorf("fence hospital governance session: %w", err)
+		}
+	}
 
 	stub := nodev1.NewNodeControlClient(conn)
 	stream, err := stub.Connect(connCtx)
@@ -218,18 +252,29 @@ func (c *NodeClient) runConnection(ctx context.Context, conn *grpc.ClientConn) e
 	}
 
 	inflight := newInflightJobs()
+	var governed *governedRuntime
+	if c.config.GovernedExecutionEnabled {
+		governed = newGovernedRuntime(connCtx, cancel, c, sendCh, inflight, &taskWG)
+	}
 	connWG.Add(1)
 	go func() {
 		defer connWG.Done()
 		c.heartbeatLoop(connCtx, sendCh, inflight)
 	}()
+	if c.config.GovernanceSyncEnabled {
+		connWG.Add(1)
+		go func() {
+			defer connWG.Done()
+			c.governanceReportLoop(connCtx, cancel, sendCh)
+		}()
+	}
 
 	for {
 		msg, err := stream.Recv()
 		if err != nil {
 			return err
 		}
-		c.handleCenterMessage(connCtx, cancel, msg, sendCh, inflight, &taskWG)
+		c.handleCenterMessage(connCtx, cancel, msg, sendCh, inflight, &taskWG, governed)
 		if err := connCtx.Err(); err != nil {
 			return err
 		}
@@ -243,6 +288,7 @@ func (c *NodeClient) handleCenterMessage(
 	sendCh chan<- *nodev1.NodeToCenter,
 	inflight *inflightJobs,
 	taskWG *sync.WaitGroup,
+	governed *governedRuntime,
 ) {
 	if connCtx.Err() != nil {
 		return
@@ -251,6 +297,25 @@ func (c *NodeClient) handleCenterMessage(
 		c.logger.Warn("Unsupported control message; closing stream")
 		cancel()
 		return
+	}
+	if handled, err := c.handleGovernanceControl(connCtx, msg, sendCh); handled {
+		if err == nil && governed != nil && msg.GetGovernanceAck() != nil {
+			err = governed.startRecovery()
+		}
+		if err != nil {
+			c.logger.Warn("Governance synchronization rejected; closing stream")
+			cancel()
+		}
+		return
+	}
+	if governed != nil {
+		if handled, err := governed.handle(msg); handled {
+			if err != nil {
+				c.logger.Warn("Governed control message rejected; closing stream")
+				cancel()
+			}
+			return
+		}
 	}
 	switch payload := msg.GetPayload().(type) {
 	case *nodev1.CenterToNode_QueryTask:
@@ -285,8 +350,8 @@ func (c *NodeClient) handleCenterMessage(
 			logger.String("version", advisory.GetVersion()),
 			logger.String("severity", advisory.GetSeverity().String()))
 	default:
-		// No governed protocol support is advertised until durable guards and
-		// release/receipt handling exist. Never reinterpret this as legacy work.
+		// Metadata synchronization does not authorize governed execution.
+		// Never reinterpret an unsupported task as legacy work.
 		c.logger.Warn("Unsupported control message; closing stream")
 		cancel()
 	}
@@ -370,11 +435,19 @@ func (c *NodeClient) heartbeatLoop(connCtx context.Context, sendCh chan<- *nodev
 }
 
 func registerMessage(config Config) *nodev1.NodeToCenter {
-	return &nodev1.NodeToCenter{Payload: &nodev1.NodeToCenter_Register{Register: &nodev1.Register{
+	register := &nodev1.Register{
 		NodeId:             config.NodeID,
 		AgentVersion:       config.AgentVersion,
 		QuerySchemaVersion: config.QuerySchemaVersion,
-	}}}
+	}
+	if config.GovernanceSyncEnabled {
+		register.SupportedGovernanceProfiles = []string{"governed-cohort/v1"}
+		register.GovernanceMessageSchemaVersion = 1
+	}
+	if config.GovernedExecutionEnabled {
+		register.SupportedReleaseModes = []nodev1.ReleaseMode{nodev1.ReleaseMode_RELEASE_MODE_AUTO, nodev1.ReleaseMode_RELEASE_MODE_MANUAL}
+	}
+	return &nodev1.NodeToCenter{Payload: &nodev1.NodeToCenter_Register{Register: register}}
 }
 
 // waitForReady blocks until conn reaches connectivity.Ready or timeout

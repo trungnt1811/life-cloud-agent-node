@@ -5,6 +5,486 @@
         "contact": {}
     },
     "paths": {
+        "/admin/approvals": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hospital-governance"
+                ],
+                "summary": "List pending hospital-local result approvals",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page, minimum 1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Page size",
+                        "name": "page_size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HospitalApprovalListDTO"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/approvals/{job_id}/approve": {
+            "post": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hospital-governance"
+                ],
+                "summary": "Approve a protected governed result",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Governed job ID",
+                        "name": "job_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "UUID stable across retries",
+                        "name": "Idempotency-Key",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Expected current approval revision",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.HospitalApprovalRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HospitalApprovalDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/approvals/{job_id}/decline": {
+            "post": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hospital-governance"
+                ],
+                "summary": "Decline a protected governed result",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Governed job ID",
+                        "name": "job_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "UUID stable across retries",
+                        "name": "Idempotency-Key",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Expected current approval revision",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.HospitalApprovalRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HospitalApprovalDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/availability": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hospital-governance"
+                ],
+                "summary": "Read hospital-local availability",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HospitalAvailabilityDTO"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hospital-governance"
+                ],
+                "summary": "Change hospital-local pause",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "One key per logical command",
+                        "name": "Idempotency-Key",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Versioned pause command",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.HospitalAvailabilityRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HospitalAvailabilityDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/outbound-events": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hospital-governance"
+                ],
+                "summary": "List hospital-local protected outbound events",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page, minimum 1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Page size, maximum 100",
+                        "name": "page_size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HospitalOutboundEventListDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/policy": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hospital-governance"
+                ],
+                "summary": "Read hospital-local governance policy",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HospitalPolicyDTO"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hospital-governance"
+                ],
+                "summary": "Update hospital-local governance policy",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "One key per logical command",
+                        "name": "Idempotency-Key",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Versioned local policy; AUTO or MANUAL",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.HospitalPolicyRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HospitalPolicyDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/admin/query-fields": {
             "get": {
                 "security": [
@@ -130,6 +610,146 @@
                     },
                     "401": {
                         "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/study-permits": {
+            "get": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hospital-governance"
+                ],
+                "summary": "List hospital-local study permit snapshots",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "default": 1,
+                        "description": "Page, minimum 1",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "default": 20,
+                        "description": "Page size",
+                        "name": "page_size",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HospitalPermitListDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/admin/study-permits/{id}/acceptance": {
+            "put": {
+                "security": [
+                    {
+                        "BasicAuth": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "hospital-governance"
+                ],
+                "summary": "Accept or decline a hospital-local permit version",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Known permit ID",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "One key per logical command",
+                        "name": "Idempotency-Key",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "description": "Restricted local scope",
+                        "name": "body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/dto.HospitalAcceptanceRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/dto.HospitalAcceptanceDTO"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "409": {
+                        "description": "Conflict",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "413": {
+                        "description": "Request Entity Too Large",
+                        "schema": {
+                            "$ref": "#/definitions/dto.ErrorDTOResponse"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
                         "schema": {
                             "$ref": "#/definitions/dto.ErrorDTOResponse"
                         }
@@ -512,6 +1132,491 @@
                 },
                 "total_count": {
                     "type": "integer"
+                }
+            }
+        },
+        "dto.HospitalAcceptanceDTO": {
+            "type": "object",
+            "properties": {
+                "acknowledged_revision": {
+                    "type": "integer"
+                },
+                "allowed_field_codes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "cp_synchronized": {
+                    "type": "boolean"
+                },
+                "decision": {
+                    "type": "string"
+                },
+                "expires_at": {
+                    "type": "string"
+                },
+                "local_revision": {
+                    "type": "integer"
+                },
+                "permit_hash": {
+                    "type": "string"
+                },
+                "permit_id": {
+                    "type": "string"
+                },
+                "permit_version": {
+                    "type": "integer"
+                },
+                "revision": {
+                    "type": "integer"
+                },
+                "snapshot_revision": {
+                    "type": "integer"
+                },
+                "tenant_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.HospitalAcceptanceRequest": {
+            "type": "object",
+            "required": [
+                "decision",
+                "expected_revision",
+                "expires_at",
+                "permit_hash",
+                "permit_version"
+            ],
+            "properties": {
+                "allowed_field_codes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "decision": {
+                    "type": "string",
+                    "enum": [
+                        "ACCEPTED",
+                        "DECLINED"
+                    ]
+                },
+                "expected_revision": {
+                    "type": "integer"
+                },
+                "expires_at": {
+                    "type": "string"
+                },
+                "permit_hash": {
+                    "type": "string"
+                },
+                "permit_version": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.HospitalApprovalDTO": {
+            "type": "object",
+            "properties": {
+                "approval_deadline": {
+                    "type": "string"
+                },
+                "decision": {
+                    "type": "string"
+                },
+                "decision_actor": {
+                    "type": "string"
+                },
+                "decision_at": {
+                    "type": "string"
+                },
+                "definition_hash": {
+                    "type": "string"
+                },
+                "job_id": {
+                    "type": "string"
+                },
+                "local_policy_hash": {
+                    "type": "string"
+                },
+                "local_policy_version": {
+                    "type": "integer"
+                },
+                "permit_id": {
+                    "type": "string"
+                },
+                "permit_version": {
+                    "type": "integer"
+                },
+                "phase": {
+                    "type": "string"
+                },
+                "protected_payload": {
+                    "$ref": "#/definitions/dto.HospitalProtectedPayloadDTO"
+                },
+                "protected_payload_digest": {
+                    "type": "string"
+                },
+                "query_id": {
+                    "type": "string"
+                },
+                "revision": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.HospitalApprovalListDTO": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.HospitalApprovalDTO"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "page_size": {
+                    "type": "integer"
+                },
+                "total_count": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.HospitalApprovalRequest": {
+            "type": "object",
+            "required": [
+                "expected_revision"
+            ],
+            "properties": {
+                "expected_revision": {
+                    "type": "integer",
+                    "minimum": 1
+                }
+            }
+        },
+        "dto.HospitalAvailabilityDTO": {
+            "type": "object",
+            "properties": {
+                "acknowledged_revision": {
+                    "type": "integer"
+                },
+                "cp_synchronized": {
+                    "type": "boolean"
+                },
+                "local_revision": {
+                    "type": "integer"
+                },
+                "paused": {
+                    "type": "boolean"
+                },
+                "snapshot_revision": {
+                    "type": "integer"
+                },
+                "version": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.HospitalAvailabilityRequest": {
+            "type": "object",
+            "required": [
+                "expected_revision",
+                "paused"
+            ],
+            "properties": {
+                "expected_revision": {
+                    "type": "integer"
+                },
+                "paused": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "dto.HospitalOutboundEventDTO": {
+            "type": "object",
+            "properties": {
+                "committed_at": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "delivery_state": {
+                    "type": "string"
+                },
+                "event_id": {
+                    "type": "string"
+                },
+                "job_id": {
+                    "type": "string"
+                },
+                "local_policy_version": {
+                    "type": "integer"
+                },
+                "permit_id": {
+                    "type": "string"
+                },
+                "permit_version": {
+                    "type": "integer"
+                },
+                "protected_payload": {
+                    "$ref": "#/definitions/dto.HospitalProtectedPayloadDTO"
+                },
+                "protected_payload_digest": {
+                    "type": "string"
+                },
+                "query_id": {
+                    "type": "string"
+                },
+                "receipt_id": {
+                    "type": "string"
+                },
+                "tenant_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.HospitalOutboundEventListDTO": {
+            "type": "object",
+            "properties": {
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.HospitalOutboundEventDTO"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "page_size": {
+                    "type": "integer"
+                },
+                "total_count": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.HospitalPermitDTO": {
+            "type": "object",
+            "properties": {
+                "acceptance": {
+                    "$ref": "#/definitions/dto.HospitalAcceptanceDTO"
+                },
+                "allowed_field_codes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "allowed_node_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "ethics_reference": {
+                    "type": "string"
+                },
+                "expires_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "job_type": {
+                    "type": "string"
+                },
+                "job_version": {
+                    "type": "string"
+                },
+                "member_principal_ids": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "permit_hash": {
+                    "type": "string"
+                },
+                "pi_principal_id": {
+                    "type": "string"
+                },
+                "purpose": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "tenant_id": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "valid_from": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.HospitalPermitListDTO": {
+            "type": "object",
+            "properties": {
+                "acknowledged_revision": {
+                    "type": "integer"
+                },
+                "cp_synchronized": {
+                    "type": "boolean"
+                },
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.HospitalPermitDTO"
+                    }
+                },
+                "local_revision": {
+                    "type": "integer"
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "page_size": {
+                    "type": "integer"
+                },
+                "snapshot_revision": {
+                    "type": "integer"
+                },
+                "total_count": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.HospitalPolicyDTO": {
+            "type": "object",
+            "properties": {
+                "acknowledged_revision": {
+                    "type": "integer"
+                },
+                "cp_synchronized": {
+                    "type": "boolean"
+                },
+                "enabled_field_codes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "filter_field_codes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "local_k": {
+                    "type": "string"
+                },
+                "local_revision": {
+                    "type": "integer"
+                },
+                "panel_field_codes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "policy_hash": {
+                    "type": "string"
+                },
+                "release_mode": {
+                    "type": "string"
+                },
+                "snapshot_revision": {
+                    "type": "integer"
+                },
+                "version": {
+                    "type": "integer"
+                }
+            }
+        },
+        "dto.HospitalPolicyRequest": {
+            "type": "object",
+            "required": [
+                "expected_revision",
+                "local_k",
+                "release_mode"
+            ],
+            "properties": {
+                "enabled_field_codes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "expected_revision": {
+                    "type": "integer"
+                },
+                "filter_field_codes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "local_k": {
+                    "type": "string"
+                },
+                "panel_field_codes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "release_mode": {
+                    "type": "string",
+                    "enum": [
+                        "AUTO",
+                        "MANUAL"
+                    ]
+                }
+            }
+        },
+        "dto.HospitalProtectedCountDTO": {
+            "type": "object",
+            "properties": {
+                "kind": {
+                    "type": "string",
+                    "enum": [
+                        "EXACT",
+                        "SUPPRESSED"
+                    ]
+                },
+                "lower_bound": {
+                    "type": "string"
+                },
+                "upper_bound": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.HospitalProtectedPayloadDTO": {
+            "type": "object",
+            "properties": {
+                "count": {
+                    "$ref": "#/definitions/dto.HospitalProtectedCountDTO"
+                },
+                "effective_k": {
+                    "type": "string"
                 }
             }
         },

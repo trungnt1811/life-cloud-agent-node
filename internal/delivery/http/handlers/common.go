@@ -23,6 +23,8 @@ func HandleDomainError(ctx *gin.Context, err *domainerrors.DomainError) {
 		writeDomainError(ctx, http.StatusConflict, err)
 	case domainerrors.ErrorTypeRateLimit:
 		writeDomainError(ctx, http.StatusTooManyRequests, err)
+	case domainerrors.ErrorTypeUnavailable:
+		writeDomainError(ctx, http.StatusServiceUnavailable, err)
 	case domainerrors.ErrorTypeInternal:
 		// Log internal errors for debugging
 		logger.GetLogger().Error("Internal domain error", logger.String("code", err.Code), logger.Err(err))

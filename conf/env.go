@@ -87,6 +87,8 @@ type Configuration struct {
 	// error, matching the ADMIN_BASIC_AUTH_USER/PASS pattern.
 	ControlCenterClientCertFile string `mapstructure:"CONTROL_CENTER_CLIENT_CERT_FILE"`
 	ControlCenterClientKeyFile  string `mapstructure:"CONTROL_CENTER_CLIENT_KEY_FILE"`
+	GovernanceSyncEnabled       bool   `mapstructure:"GOVERNANCE_SYNC_ENABLED"`
+	GovernedExecutionEnabled    bool   `mapstructure:"GOVERNED_EXECUTION_ENABLED"`
 }
 
 var configuration = NormalizeConfiguration(Configuration{})
@@ -158,6 +160,8 @@ var defaultConfigurations = map[string]any{
 	"CONTROL_CENTER_CA_FILE":          "",
 	"CONTROL_CENTER_CLIENT_CERT_FILE": "",
 	"CONTROL_CENTER_CLIENT_KEY_FILE":  "",
+	"GOVERNANCE_SYNC_ENABLED":         false,
+	"GOVERNED_EXECUTION_ENABLED":      false,
 }
 
 // DefaultConfiguration returns the normalized config used when no env is loaded.
@@ -204,6 +208,12 @@ func LoadConfigFromEnvFile(envFile string) (*Configuration, error) {
 
 func ValidateConfiguration(config Configuration) error {
 	config = NormalizeConfiguration(config)
+	if config.GovernedExecutionEnabled && !config.GovernanceSyncEnabled {
+		return fmt.Errorf("GOVERNED_EXECUTION_ENABLED requires GOVERNANCE_SYNC_ENABLED and verified mutual TLS")
+	}
+	if config.GovernanceSyncEnabled && (strings.TrimSpace(config.ControlCenterAddress) == "" || config.ControlCenterInsecure || strings.TrimSpace(config.ControlCenterClientCertFile) == "" || strings.TrimSpace(config.ControlCenterClientKeyFile) == "") {
+		return fmt.Errorf("GOVERNANCE_SYNC_ENABLED requires CONTROL_CENTER_ADDRESS and verified TLS with CONTROL_CENTER_CLIENT_CERT_FILE/KEY_FILE")
+	}
 	if !isProductionEnv(config.Env) {
 		return nil
 	}

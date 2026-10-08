@@ -55,6 +55,34 @@ func (mr *MockTxRepositoriesMockRecorder) Examples() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Examples", reflect.TypeOf((*MockTxRepositories)(nil).Examples))
 }
 
+// GovernedHospitalJobs mocks base method.
+func (m *MockTxRepositories) GovernedHospitalJobs() repositories.GovernedHospitalJobRepository {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GovernedHospitalJobs")
+	ret0, _ := ret[0].(repositories.GovernedHospitalJobRepository)
+	return ret0
+}
+
+// GovernedHospitalJobs indicates an expected call of GovernedHospitalJobs.
+func (mr *MockTxRepositoriesMockRecorder) GovernedHospitalJobs() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GovernedHospitalJobs", reflect.TypeOf((*MockTxRepositories)(nil).GovernedHospitalJobs))
+}
+
+// HospitalGovernance mocks base method.
+func (m *MockTxRepositories) HospitalGovernance() repositories.HospitalGovernanceRepository {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "HospitalGovernance")
+	ret0, _ := ret[0].(repositories.HospitalGovernanceRepository)
+	return ret0
+}
+
+// HospitalGovernance indicates an expected call of HospitalGovernance.
+func (mr *MockTxRepositoriesMockRecorder) HospitalGovernance() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "HospitalGovernance", reflect.TypeOf((*MockTxRepositories)(nil).HospitalGovernance))
+}
+
 // MockTransactionManager is a mock of TransactionManager interface.
 type MockTransactionManager struct {
 	ctrl     *gomock.Controller

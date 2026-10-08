@@ -12,7 +12,9 @@ import (
 
 // TransactionManagerDeps contains repositories that can be rebound to a transaction.
 type TransactionManagerDeps struct {
-	ExampleRepo domainrepos.ExampleRepository
+	ExampleRepo              domainrepos.ExampleRepository
+	HospitalGovernanceRepo   domainrepos.HospitalGovernanceRepository
+	GovernedHospitalJobsRepo domainrepos.GovernedHospitalJobRepository
 }
 
 type gormTransactionManager struct {
@@ -21,7 +23,9 @@ type gormTransactionManager struct {
 }
 
 type gormTxRepositories struct {
-	exampleRepo domainrepos.ExampleRepository
+	exampleRepo              domainrepos.ExampleRepository
+	hospitalGovernanceRepo   domainrepos.HospitalGovernanceRepository
+	governedHospitalJobsRepo domainrepos.GovernedHospitalJobRepository
 }
 
 // NewTransactionManager creates a GORM-backed transaction manager.
@@ -46,10 +50,20 @@ func (m *gormTransactionManager) bindTx(tx *gorm.DB) domainrepos.TxRepositories 
 		return gormTxRepositories{}
 	}
 	return gormTxRepositories{
-		exampleRepo: repohelpers.BindTx(m.deps.ExampleRepo, tx),
+		exampleRepo:              repohelpers.BindTx(m.deps.ExampleRepo, tx),
+		hospitalGovernanceRepo:   repohelpers.BindTx(m.deps.HospitalGovernanceRepo, tx),
+		governedHospitalJobsRepo: repohelpers.BindTx(m.deps.GovernedHospitalJobsRepo, tx),
 	}
 }
 
 func (r gormTxRepositories) Examples() domainrepos.ExampleRepository {
 	return r.exampleRepo
+}
+
+func (r gormTxRepositories) HospitalGovernance() domainrepos.HospitalGovernanceRepository {
+	return r.hospitalGovernanceRepo
+}
+
+func (r gormTxRepositories) GovernedHospitalJobs() domainrepos.GovernedHospitalJobRepository {
+	return r.governedHospitalJobsRepo
 }

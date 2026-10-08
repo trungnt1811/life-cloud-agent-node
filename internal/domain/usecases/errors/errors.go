@@ -12,6 +12,7 @@ const (
 	ErrorTypeConflict     ErrorType = "conflict"
 	ErrorTypeRateLimit    ErrorType = "rate_limit"
 	ErrorTypeInternal     ErrorType = "internal"
+	ErrorTypeUnavailable  ErrorType = "unavailable"
 )
 
 type DomainError struct {

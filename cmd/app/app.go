@@ -91,7 +91,7 @@ func SetupRouter(
 		ctx = context.Background()
 	}
 	repos := di.InitializeRepos(ctx, db, appLogger, runtimeconfig.ModuleConfigsFromConfiguration(config))
-	useCases := di.InitializeUseCases(repos, config.JobChunkSize, appLogger)
+	useCases := di.InitializeUseCases(repos, config.JobChunkSize, config.NodeID, appLogger)
 	options := httprouter.OptionsFromConfiguration(config)
 	options.Advisories = advisories
 	return httprouter.SetupWithDependencies(useCases, appLogger, options)
@@ -117,13 +117,15 @@ func startFederatedClientWorker(
 	}
 
 	repos := di.InitializeRepos(ctx, db, appLogger, runtimeconfig.ModuleConfigsFromConfiguration(config))
-	useCases := di.InitializeUseCases(repos, config.JobChunkSize, appLogger)
+	useCases := di.InitializeUseCases(repos, config.JobChunkSize, config.NodeID, appLogger)
 
 	nodeClient := client.NewNodeClient(federatedClientConfig(config), client.Dependencies{
 		EnabledQueryFieldRepo: repos.EnabledQueryFieldRepo,
 		CohortCounter:         useCases.CohortCountUseCase,
 		SuppressionThreshold:  config.SuppressionThreshold,
 		Advisories:            advisories,
+		HospitalGovernance:    useCases.HospitalGovernanceUseCase,
+		GovernedHospitalJobs:  useCases.GovernedHospitalJobUseCase,
 	}, appLogger, nil)
 
 	worker := workers.NewFederatedClientWorker(nodeClient, appLogger)
@@ -160,10 +162,12 @@ func mergeAppErrorChannels(ctx context.Context, serverErrC, workerErrC <-chan er
 
 func federatedClientConfig(config *conf.Configuration) client.Config {
 	return client.Config{
-		Address:            config.ControlCenterAddress,
-		NodeID:             config.NodeID,
-		AgentVersion:       config.AgentVersion,
-		QuerySchemaVersion: 1,
+		Address:                  config.ControlCenterAddress,
+		NodeID:                   config.NodeID,
+		AgentVersion:             config.AgentVersion,
+		QuerySchemaVersion:       1,
+		GovernanceSyncEnabled:    config.GovernanceSyncEnabled,
+		GovernedExecutionEnabled: config.GovernedExecutionEnabled,
 		TLS: client.TLSConfig{
 			Insecure:       config.ControlCenterInsecure,
 			CAFile:         config.ControlCenterCAFile,
